@@ -5,6 +5,8 @@
 MAKE = make
 LPR = lpr
 
+.PHONY: all clean depend print
+
 all: 
 	cd threads; $(MAKE) nachos
 	cd userprog; $(MAKE) nachos 
@@ -14,14 +16,11 @@ all:
 	cd bin; make all
 	cd test; make all
 
-# don't delete executables in "test" in case there is no cross-compiler
 clean:
-	cp /dev/null threads/.depend
-	cp /dev/null userprog/.depend
-	cp /dev/null vm/.depend
-	cp /dev/null filesys/.depend
-	cp /dev/null network/.depend
-	/bin/csh -c "rm -f */{core,nachos,DISK,*.o,swtch.s} test/{*.coff} bin/{coff2flat,coff2noff,disassemble,out}"
+	rm -f `find . -name 'core' -o -name 'nachos' -o -name 'DISK' -o \
+		-name '*.o' -o -name '*.s' -o -name '*.coff' -o \
+		-name 'coff2flat' -o -name 'coff2noff' -o -name 'out' -o \
+		-name 'disassemble' -o -name '.depend'`
 
 depend:
 	cd threads; $(MAKE) depend
