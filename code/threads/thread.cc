@@ -149,15 +149,22 @@ Thread::Finish ()
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
     
     // LB: necessary to detect that the thread to be destroyed 
-    // kept in the variable is not lost here
-   if (threadToBeDestroyed != NULL)
-	  {
-	      delete threadToBeDestroyed;
-	      threadToBeDestroyed = NULL;
-	  }
-    ASSERT(threadToBeDestroyed == NULL);
-    // End of addition 
+    // kept in variable threadToBeDestroyed is not lost here
 
+    // This assertation "often" fails here... Just try!
+    // ASSERT(threadToBeDestroyed == NULL);
+
+    if (threadToBeDestroyed != NULL)
+      {
+	delete threadToBeDestroyed;
+	threadToBeDestroyed = NULL;
+      }
+    
+    // In contrast, it is fine here...
+    ASSERT(threadToBeDestroyed == NULL);
+    
+    // End of addition 
+    
     threadToBeDestroyed = currentThread;
     Sleep();					// invokes SWITCH
     // not reached
