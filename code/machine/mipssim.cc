@@ -453,9 +453,35 @@ Machine::OneInstruction(Instruction *instr)
 	break;
 	
       case OP_SRL:
-	tmp = registers[instr->rt];
-	tmp >>= instr->extra;
-	registers[instr->rd] = tmp;
+	//------------------------------------------------------------
+	// LB: The following code is wrong!
+	//
+	// http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
+	//
+	// The above reference says:
+	// "Shifts a register value right by the shift amount 
+	// (shamt) and places the value in the destination register. 
+	// Zeroes are shifted in."
+	// The C reference manual says that the result of >> is 
+	// implementation-dependent if the argument is a negative
+	// integer (Section A7.8). It is specified only is the
+	// argument is unsigned, or a positive or null int.
+
+	// Beginnin of original code
+	// tmp = registers[instr->rt];
+	// tmp >>= instr->extra;
+	// registers[instr->rd] = tmp;
+	// End of original code
+
+	// A simple turn around is to use the unsigned imm local
+	// variable.
+	
+	imm = registers[instr->rt];
+	imm >>= instr->extra;
+	registers[instr->rd] = imm;
+	
+	// End of correction
+
 	break;
 	
       case OP_SRLV:
