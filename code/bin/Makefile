@@ -38,3 +38,8 @@ coff2flat: coff2flat.o
 # dis-assembles a COFF file
 disassemble: out.o opstrings.o
 	$(LD) out.o opstrings.o -o disassemble
+
+# Cleaning rule
+.PHONY: clean
+clean:
+	rm -f core nachos DISK *.o *.s .*.d coff2noff out disassemble

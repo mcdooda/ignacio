@@ -14,17 +14,13 @@
 
 DEFINES = -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVM -DUSE_TLB
 INCPATH = -I../filesys -I../bin -I../vm -I../userprog -I../threads -I../machine
-
-CFILES = $(THREAD_C) $(USERPROG_C) $(VM_C)
 C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O)
 
 # if file sys done first!
 # DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS -DVM -DUSE_TLB
 # INCPATH = -I../vm -I../bin -I../filesys -I../userprog -I../threads -I../machine
-
-# CFILES = $(THREAD_C) $(USERPROG_C) $(FILESYS_C) $(VM_C)
 # C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O) $(VM_O)
 
 include ../Makefile.common
 include ../Makefile.dep
--include .depend
+

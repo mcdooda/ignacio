@@ -9,11 +9,9 @@
 
 DEFINES = -DTHREADS
 INCPATH = -I../threads -I../machine
-
-CFILES = $(THREAD_C)
 C_OFILES = $(THREAD_O)
 
 include ../Makefile.common
 include ../Makefile.dep
--include .depend
+
 

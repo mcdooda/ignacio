@@ -25,6 +25,28 @@
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
+###########################################################################
+# RN: Sets of objects file to be linked for each nachos flavor. This
+# is the only section you may need to modify when adding files in nachos.
+#
+THREAD_O	:=	main.o list.o scheduler.o synch.o synchlist.o \
+			system.o thread.o utility.o threadtest.o interrupt.o \
+			stats.o sysdep.o timer.o
+
+USERPROG_O	:=	addrspace.o bitmap.o exception.o progtest.o console.o \
+			machine.o mipssim.o translate.o
+
+VM_O		:=
+
+FILESYS_O	:=	directory.o filehdr.o filesys.o fstest.o openfile.o \
+			synchdisk.o disk.o
+
+NETWORK_O	:=	nettest.o post.o network.o
+#
+###########################################################################
+
+S_OFILES	:=	switch.o
+
 CFLAGS = -g -Wall -Wshadow -fwritable-strings $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
 
 # These definitions may change as the software is updated.
@@ -34,88 +56,85 @@ CC = g++
 LD = g++
 AS = gcc -c
 
-PROGRAM = nachos
+PROGRAM		:=	nachos
 
+MAKEFILES	:=	Makefile \
+			../Makefile.common \
+			../Makefile.dep
+
+OFILES		:=	$(strip $(C_OFILES) $(S_OFILES))
+
+# RN: Dependency files start with a '.' to avoid annoying completion
+# confusion under shell or emacs...
+C_DFILES	:=	$(patsubst %.o,.%.d,$(C_OFILES))
+S_DFILES	:=	$(patsubst %.o,.%.d,$(S_OFILES))
+DFILES		:=	$(strip $(C_DFILES) $(S_DFILES))
+
+# RN: Hummm. There's a lot to tell about the story of the two
+# following lines. Basically, it allows 'make' to implicitely search
+# for source/header files in various directories. The original Nachos
+# Makefile was not using this 'vpath' feature, although it was using
+# the aforementionned implicit search policy! The problem came from
+# the rule:
+#	$(C_OFILES): %.o:
+# 		$(CC) blabla...
+# which is correct if .o files have no extra dependency rules. In this
+# case, 'make' finds the associated .cc file in the directories it
+# knows (because they were listed in some macros!). However, if we add
+# a rule such as
+# 	$(C_OFILES): toto
+# then 'make' tries to compile 'toto' each time it tries to build a .o
+# file. As a result, the former rule was modified as follows
+# 	$(C_OFILES): %.o: %.cc
+# As you may guess, it did'nt work because 'make' was no longer using
+# its @#!^# implicit policy in this case. Crazy isn't it? Fortunately,
+# there's a GNU extension that asks 'make' to use "search path" for
+# files that match a given pattern: this is the vpath directive...
+# Ok, I hope you'll stop wondering why these two lines are here: you'd
+# better concentrate on your exercise! ;-)
+
+vpath %.cc ../machine:../threads:../userprog:../filesys:../network:../vm
+vpath %.S  ../machine:../threads:../userprog:../filesys:../network:../vm
+
+# Must be the first rule
 .PHONY: default
 default: $(PROGRAM)
 
-MAKEFILES=../Makefile.common ../Makefile.dep Makefile
-
-THREAD_C =../threads/main.cc\
-	../threads/list.cc\
-	../threads/scheduler.cc\
-	../threads/synch.cc \
-	../threads/synchlist.cc\
-	../threads/system.cc\
-	../threads/thread.cc\
-	../threads/utility.cc\
-	../threads/threadtest.cc\
-	../machine/interrupt.cc\
-	../machine/sysdep.cc\
-	../machine/stats.cc\
-	../machine/timer.cc
-
-THREAD_S = ../threads/switch.S
-
-THREAD_O =main.o list.o scheduler.o synch.o synchlist.o system.o thread.o \
-	utility.o threadtest.o interrupt.o stats.o sysdep.o timer.o
-
-USERPROG_C = ../userprog/addrspace.cc\
-	../userprog/bitmap.cc\
-	../userprog/exception.cc\
-	../userprog/progtest.cc\
-	../machine/console.cc\
-	../machine/machine.cc\
-	../machine/mipssim.cc\
-	../machine/translate.cc
-
-USERPROG_O = addrspace.o bitmap.o exception.o progtest.o console.o machine.o \
-	mipssim.o translate.o
-
-VM_C = 
-VM_O = 
-
-FILESYS_C =../filesys/directory.cc\
-	../filesys/filehdr.cc\
-	../filesys/filesys.cc\
-	../filesys/fstest.cc\
-	../filesys/openfile.cc\
-	../filesys/synchdisk.cc\
-	../machine/disk.cc
-FILESYS_O =directory.o filehdr.o filesys.o fstest.o openfile.o synchdisk.o\
-	disk.o
-
-NETWORK_C = ../network/nettest.cc ../network/post.cc ../machine/network.cc
-NETWORK_O = nettest.o post.o network.o
-
-S_OFILES = switch.o
-
-OFILES = $(C_OFILES) $(S_OFILES)
-
-$(OFILES): .depend $(MAKEFILES)
-
-VPATH=../threads:../machine:../userprog:../filesys:../network
+$(OFILES): $(MAKEFILES)
 
 $(PROGRAM): $(OFILES)
 	$(LD) $(OFILES) $(LDFLAGS) -o $(PROGRAM)
 
 $(C_OFILES): %.o: %.cc
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 switch.o: ../threads/switch.S
 	$(CPP) $(INCPATH) $(HOST) ../threads/switch.S > swtch.s
 	$(AS) -o switch.o swtch.s
 	rm swtch.s
 
+# RN: Rules to generate dependency files. We can no longer use a
+# single '.depend' file if we want to avoid a global recompilation each
+# time a file is modified! Thus, each %.cc file has its associated
+# .%.d dependency file...
 .PHONY: depend
-depend: .depend ;
+depend: $(DFILES) ;
 
-.depend: $(CFILES) $(MAKEFILES)
-	@set -e; \
-	echo "Making .depend" ; \
-	cp /dev/null .depend ; \
-	for f in $(CFILES); do \
-		$(CC) $(CFLAGS) -MM $$f | \
-			sed -e 's|\(.*\)\.o:|.depend \1.o:|g' >> .depend ; \
-	done
+$(DFILES): $(MAKEFILES)
 
+$(C_DFILES): .%.d: %.cc
+	$(CC) $(CFLAGS) -MM $< | \
+		sed -e 's|\(.*\)\.o:|.\1.d \1.o:|g' > $@
+
+$(S_DFILES): .%.d: %.S
+	$(CC) $(CFLAGS) -MM $< | \
+		sed -e 's|\(.*\)\.o:|.\1.d \1.o:|g' > $@
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DFILES)
+endif
+
+# Cleaning rule
+.PHONY: clean
+clean:
+	rm -f core nachos DISK *.o *.s .*.d coff2noff out disassemble

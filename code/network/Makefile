@@ -10,18 +10,14 @@
 
 DEFINES = -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS -DNETWORK
 INCPATH = -I../network -I../bin -I../filesys -I../vm -I../userprog -I../threads -I../machine
-
-CFILES = $(THREAD_C) $(USERPROG_C) $(VM_C) $(FILESYS_C) $(NETWORK_C)
 C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O) $(NETWORK_O)
 
 # bare bones version
 # DEFINES =-DTHREADS -DNETWORK
 # INCPATH = -I../network -I../threads -I../machine
-
-# CFILES = $(THREAD_C) $(NETWORK_C)
 # C_OFILES = $(THREAD_O) $(NETWORK_O)
 
 include ../Makefile.common
 include ../Makefile.dep
--include .depend
+
 

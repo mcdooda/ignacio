@@ -84,3 +84,8 @@ matmult.o: matmult.c
 matmult: matmult.o start.o
 	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
 	../bin/coff2noff matmult.coff matmult
+
+# Cleaning rule
+.PHONY: clean
+clean:
+	rm -f core *.o *.s
