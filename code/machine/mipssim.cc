@@ -126,6 +126,9 @@ Machine::OneInstruction(Instruction *instr)
     int sum, diff, tmp, value;
     unsigned int rs, rt, imm;
 
+    // LB: Added to handle the >> operator correctly in the SRL* instructions
+    unsigned tmp_unsigned;
+
     // Execute the instruction (cf. Kane's book)
     switch (instr->opCode) {
 	
@@ -473,12 +476,12 @@ Machine::OneInstruction(Instruction *instr)
 	// registers[instr->rd] = tmp;
 	// End of original code
 
-	// A simple turnaround is to use the unsigned imm local
+	// A simple turnaround is to use the unsigned tmp_unsigned local
 	// variable.
 	
-	imm = registers[instr->rt];
-	imm >>= instr->extra;
-	registers[instr->rd] = imm;
+	tmp_unsigned = registers[instr->rt];
+	tmp_unsigned >>= instr->extra;
+	registers[instr->rd] = tmp_unsigned;
 	
 	// End of correction
 	//------------------------------------------------------------
@@ -494,9 +497,9 @@ Machine::OneInstruction(Instruction *instr)
 	// registers[instr->rd] = tmp;
 	// End of original code
 
-	imm = registers[instr->rt];
-	imm >>= (registers[instr->rs] & 0x1f);
-	registers[instr->rd] = imm;
+	tmp_unsigned = registers[instr->rt];
+	tmp_unsigned >>= (registers[instr->rs] & 0x1f);
+	registers[instr->rd] = tmp_unsigned;
 
 	// End of correction
 	//------------------------------------------------------------

@@ -6,7 +6,6 @@
  *	calls.
  */
 
-#define IN_ASM
 #include "syscall.h"
 
         .text   

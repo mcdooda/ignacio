@@ -30,7 +30,11 @@
 #define SC_Fork		9
 #define SC_Yield	10
 
-#ifndef IN_ASM
+#ifdef IN_USER_MODE
+
+// LB: This part is read only on compiling the test/*.c files.
+// It is *not* read on compiling test/start.S
+
 
 /* The system call interface.  These are the operations the Nachos
  * kernel needs to support, to be able to run user programs.
@@ -124,6 +128,6 @@ void Fork (void (*func) ());
  */
 void Yield ();
 
-#endif /* IN_ASM */
+#endif // IN_USER_MODE
 
 #endif /* SYSCALL_H */

@@ -49,7 +49,7 @@ LD	:=	$(GCCDIR)/ld
 
 CPP	:=	$(GCCDIR)/gcc -E -P
 INCDIR	:=	-I../userprog -I../threads
-CFLAGS = -c $(INCDIR) -G 0
+CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 
 
 SOURCES	:=	$(wildcard *.c)
 PROGS	:=	$(patsubst %.c,%,$(SOURCES))
