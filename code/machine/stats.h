@@ -21,12 +21,22 @@
 
 class Statistics {
   public:
-    int totalTicks;      	// Total time running Nachos
-    int idleTicks;       	// Time spent idle (no threads to run)
-    int systemTicks;	 	// Time spent executing system code
-    int userTicks;       	// Time spent executing user code
+  // LB: type of ticks promoted from 32 bit int to 64 bit long long
+  // to cope with long runs
+  // int totalTicks;      	// Total time running Nachos
+  // int idleTicks;       	// Time spent idle (no threads to run)
+  // int systemTicks;	 	// Time spent executing system code
+  // int userTicks;       	// Time spent executing user code
 				// (this is also equal to # of
 				// user instructions executed)
+  long long totalTicks;      	// Total time running Nachos
+  long long idleTicks;       	// Time spent idle (no threads to run)
+  long long systemTicks;	// Time spent executing system code
+  long long userTicks;       	// Time spent executing user code
+				// (this is also equal to # of
+				// user instructions executed)
+  // End of correction
+
 
     int numDiskReads;		// number of disk read requests
     int numDiskWrites;		// number of disk write requests

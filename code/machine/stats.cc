@@ -33,8 +33,13 @@ Statistics::Statistics()
 void
 Statistics::Print()
 {
-    printf("Ticks: total %d, idle %d, system %d, user %d\n", totalTicks, 
-	idleTicks, systemTicks, userTicks);
+  // LB: format adapted to long long tick type
+  // printf("Ticks: total %d, idle %d, system %d, user %d\n", totalTicks, 
+  // idleTicks, systemTicks, userTicks);
+  printf("Ticks: total %lld, idle %lld, system %lld, user %lld\n", 
+	 totalTicks, idleTicks, systemTicks, userTicks);
+  // End of correction
+
     printf("Disk I/O: reads %d, writes %d\n", numDiskReads, numDiskWrites);
     printf("Console I/O: reads %d, writes %d\n", numConsoleCharsRead, 
 	numConsoleCharsWritten);

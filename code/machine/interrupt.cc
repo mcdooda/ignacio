@@ -74,10 +74,10 @@ Interrupt::Interrupt()
 Interrupt::~Interrupt()
 {
     while (!pending->IsEmpty())
-      /* LB: correction */
-      /* delete pending->Remove();
-	 delete PendingInterrupt *(pending->Remove());
-	 /* End of correction */
+      // LB: correction 
+      //delete pending->Remove(); 
+       delete (PendingInterrupt *)(pending->Remove());
+    // End of correction 
     delete pending;
 }
 
@@ -362,8 +362,14 @@ PrintPending(int arg)
 void
 Interrupt::DumpState()
 {
-    printf("Time: %d, interrupts %s\n", stats->totalTicks, 
-					intLevelNames[level]);
+  // LB: Print format adapted after the promotion of tick type 
+  // from int to long long
+  // printf("Time: %d, interrupts %s\n", stats->totalTicks, 
+  //	 intLevelNames[level]);
+  printf("Time: %lld, interrupts %s\n", stats->totalTicks, 
+	 intLevelNames[level]);
+  // End of correction
+
     printf("Pending interrupts:\n");
     fflush(stdout);
     pending->Mapcar(PrintPending);

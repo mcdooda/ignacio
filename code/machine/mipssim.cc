@@ -373,10 +373,10 @@ Machine::OneInstruction(Instruction *instr)
 	break;
 	
       case OP_OR:
-	/* LB: Stupid bug corrected here! */
-	/* registers[instr->rd] = registers[instr->rs] | registers[instr->rs]; */
+	// LB: Stupid bug corrected here! 
+	// registers[instr->rd] = registers[instr->rs] | registers[instr->rs];
 	registers[instr->rd] = registers[instr->rs] | registers[instr->rt];
-	/* End of correction */
+	// End of correction 
 	break;
 	
       case OP_ORI:
