@@ -1,7 +1,7 @@
 # NOTE: this is a GNU Makefile.  You must use "gmake" rather than "make".
 #
 # Makefile for the threads assignment.  The threads assignment must
-#  be done first!
+#    be done first!
 #
 # Copyright (c) 1992 The Regents of the University of California.
 # All rights reserved.  See copyright.h for copyright notice and limitation 

@@ -1,4 +1,4 @@
-# Use normal make for this Makefile
+# Use regular make for this Makefile
 #
 # Makefile for:
 #	coff2noff -- converts a normal MIPS executable into a Nachos executable

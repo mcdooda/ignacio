@@ -1,17 +1,14 @@
-# use normal make for this Makefile
+# Use regular make for this Makefile
 #
 # Makefile for building user programs to run on top of Nachos
+# Several things to be aware of: Nachos assumes that the location of
+# the program startup routine (the location where the kernel jumps to
+# when the program initially starts up) is location 0.  This means:
+# start.o must be the first .o passed to ld, so that routine "Start"
+# gets loaded at location 0
 #
-# Several things to be aware of:
-#
-#    Nachos assumes that the location of the program startup routine (the
-# 	location the kernel jumps to when the program initially starts up)
-#       is at location 0.  This means: start.o must be the first .o passed 
-# 	to ld, in order for the routine "Start" to be loaded at location 0
-#
-
 # if you are cross-compiling, you need to point to the right executables
-# and change the flags to ld and the build procedure for as
+# and change the flags to "ld" and the build procedure for "as".
 
 NACHOS_ROOT = ../../
 NACHOS_SYS := $(shell $(NACHOS_ROOT)/bin/nachos_sys)
@@ -29,8 +26,8 @@ endif
 endif
 
 ifeq ($(NACHOS_SYS),LINUX_SYS)
-#Linux : Mettez ici le chemin d'acces au repertoire d'installation 
-#        des binutils + gcc, par exemple :
+# Linux: fill in with the full path to the binutils and gcc.
+# For instance:
 GCCDIR	= /usr/local/xgcc/decstation-ultrix/bin
 endif
 
@@ -39,7 +36,7 @@ ASFLAGS =
 CPPFLAGS = $(INCDIR) -DCHANGED
 
 
-# if you aren't cross-compiling:
+# If you aren't cross-compiling:
 # GCCDIR =
 # LDFLAGS = -N -T 0
 # ASFLAGS =
@@ -57,10 +54,11 @@ CFLAGS = -c $(INCDIR) -G 0
 SOURCES	:=	$(wildcard *.c)
 PROGS	:=	$(patsubst %.c,%,$(SOURCES))
 
-# RN: be careful to use '=' instead of ':=' here!
+# RN: Be careful to use '=' instead of ':=' here!
 COFF	=	$(patsubst %,%.coff,$@)
 
 .PHONY: all
+
 all: $(PROGS)
 
 start.o: start.S ../userprog/syscall.h

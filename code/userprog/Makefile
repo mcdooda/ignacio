@@ -13,7 +13,7 @@ DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB
 INCPATH = -I../bin -I../filesys -I../userprog -I../threads -I../machine
 C_OFILES = $(THREAD_O) $(USERPROG_O)
 
-# if file sys done first!
+# if file system done first!
 # DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS
 # INCPATH = -I../bin -I../filesys -I../userprog -I../threads -I../machine
 # C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O)
