@@ -46,46 +46,39 @@ CPPFLAGS = $(INCDIR) -DCHANGED
 # CPPFLAGS = -P $(INCDIR)
 
 
-CC = $(GCCDIR)/gcc
-AS = $(GCCDIR)/as
-LD = $(GCCDIR)/ld
+CC	:=	$(GCCDIR)/gcc
+AS	:=	$(GCCDIR)/as
+LD	:=	$(GCCDIR)/ld
 
-CPP = $(GCCDIR)/gcc -E -P
-INCDIR =-I../userprog -I../threads
+CPP	:=	$(GCCDIR)/gcc -E -P
+INCDIR	:=	-I../userprog -I../threads
 CFLAGS = -c $(INCDIR) -G 0
 
-all: halt shell matmult sort
+SOURCES	:=	$(wildcard *.c)
+PROGS	:=	$(patsubst %.c,%,$(SOURCES))
+
+# RN: be careful to use '=' instead of ':=' here!
+COFF	=	$(patsubst %,%.coff,$@)
+
+.PHONY: all
+all: $(PROGS)
 
 start.o: start.S ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.S > strt.s
 	$(AS) $(ASFLAGS) -o start.o strt.s
 	rm strt.s
 
-halt.o: halt.c
-	$(CC) $(CFLAGS) -c halt.c
-halt: halt.o start.o
-	$(LD) $(LDFLAGS) start.o halt.o -o halt.coff
-	../bin/coff2noff halt.coff halt
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
 
-shell.o: shell.c
-	$(CC) $(CFLAGS) -c shell.c
-shell: shell.o start.o
-	$(LD) $(LDFLAGS) start.o shell.o -o shell.coff
-	../bin/coff2noff shell.coff shell
+$(PROGS): %: %.o
+	$(LD) $(LDFLAGS) $< start.o -o $(COFF)
+	../bin/coff2noff $(COFF) $@
+	rm $(COFF)
 
-sort.o: sort.c
-	$(CC) $(CFLAGS) -c sort.c
-sort: sort.o start.o
-	$(LD) $(LDFLAGS) start.o sort.o -o sort.coff
-	../bin/coff2noff sort.coff sort
-
-matmult.o: matmult.c
-	$(CC) $(CFLAGS) -c matmult.c
-matmult: matmult.o start.o
-	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
-	../bin/coff2noff matmult.coff matmult
+$(PROGS): start.o
 
 # Cleaning rule
 .PHONY: clean
 clean:
-	rm -f core *.o *.s
+	rm -f core *.o *.s $(PROGS)

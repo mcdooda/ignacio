@@ -9,13 +9,14 @@ DIRS	:=	threads userprog filesys network vm
 
 .PHONY: all clean depend print
 
-all: 
+all:
 	@set -e; \
 	for i in $(DIRS) ; do \
 		$(MAKE) -C $$i nachos; \
+	done ; \
+	for i in bin test ; do \
+		$(MAKE) -C $$i all; \
 	done
-	cd bin; make all
-	cd test; make all
 
 clean:
 	@set -e; \

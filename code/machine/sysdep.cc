@@ -357,7 +357,7 @@ ReadFromSocket(int sockID, char *buffer, int packetSize)
     // versions, it is specified as a void *. Casting size to int instead
     // of unsigned seems to fix the problem, but it is admittingly
     // rather ad-hoc...
-#ifdef LINUX
+#ifndef SOLARIS
     unsigned int size = sizeof(uName);
 #else
     int size = (int) sizeof(uName);
