@@ -71,7 +71,7 @@ start.o: start.S ../userprog/syscall.h
 
 # LB: Caution! start.o should appear *before* $< for the load!
 
-$(PROGS): %: %.o
+$(PROGS): %: %.o start.o
 	$(LD) $(LDFLAGS) start.o $< -o $(COFF)
 	../bin/coff2noff $(COFF) $@
 	rm $(COFF)
