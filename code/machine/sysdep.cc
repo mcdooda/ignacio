@@ -40,7 +40,7 @@ extern "C" {
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <errno.h> // modif norme ansi
 
 // UNIX routines called by procedures in this file 
 
@@ -349,7 +349,7 @@ void
 ReadFromSocket(int sockID, char *buffer, int packetSize)
 {
     int retVal;
-    /* extern int errno;*/
+    /* extern int errno; modif norme ANSI*/
     struct sockaddr_un uName;
 
     // LB: Signedness problem on Solaris 5.6/SPARC, as the last

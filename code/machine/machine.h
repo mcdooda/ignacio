@@ -84,9 +84,9 @@ class Instruction {
 
     unsigned int value; // binary representation of the instruction
 
-    char opCode;     // Type of instruction.  This is NOT the same as the
+   unsigned char opCode;     // Type of instruction.  This is NOT the same as the
     		     // opcode field from the instruction: see defs in mips.h
-    char rs, rt, rd; // Three registers from instruction.
+   unsigned  char rs, rt, rd; // Three registers from instruction.
     int extra;       // Immediate or target or shamt field or offset.
                      // Immediates are sign-extended.
 };
