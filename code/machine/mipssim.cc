@@ -33,8 +33,15 @@ Machine::Run()
     Instruction *instr = new Instruction;  // storage for decoded instruction
 
     if(DebugIsEnabled('m'))
-        printf("Starting thread \"%s\" at time %d\n",
-	       currentThread->getName(), stats->totalTicks);
+
+    // LB: Update the print format after the promotion of tick types
+    // from int to long long
+    //    printf("Starting thread \"%s\" at time %d\n",
+    //       currentThread->getName(), stats->totalTicks);
+      printf("Starting thread \"%s\" at time %lld\n",
+	     currentThread->getName(), stats->totalTicks);
+    // End of correction
+
     interrupt->setStatus(UserMode);
     for (;;) {
         OneInstruction(instr);

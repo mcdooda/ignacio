@@ -127,7 +127,13 @@ void Machine::Debugger()
 
     interrupt->DumpState();
     DumpState();
-    printf("%d> ", stats->totalTicks);
+
+    // LB: Update the print format after the promotion of tick types
+    // from int to long long
+    //    printf("%d> ", stats->totalTicks);
+    printf("%lld> ", stats->totalTicks);
+    // End of correction 
+
     fflush(stdout);
     fgets(buf, 80, stdin);
     if (sscanf(buf, "%d", &num) == 1)

@@ -75,4 +75,8 @@ ExceptionHandler(ExceptionType which)
 	printf("Unexpected user mode exception %d %d\n", which, type);
 	ASSERT(FALSE);
     }
+
+    // LB: Do not forget to increment the pc before returning!
+    UpdatePC();
+    // End of addition
 }
