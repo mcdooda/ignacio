@@ -32,10 +32,20 @@ depend:
 	done
 
 print:
-	@set -e; \
-	for i in machine $(DIRS) test; do \
-		$(LPR) -Emakefile Makefile -Ecpp *.h *.cc *.S -Ec *.c; \
+	set -e; \
+	for dir in machine $(DIRS) test; do \
+		$(LPR) -Emakefile $$dir/Makefile \
+			-Ecpp $${dir}/*.h $${dir}/*.cc $${dir}/*.S \
+			-Ec $${dir}/*.c; \
 	done
-	@$(LPR) -Emakefile Makefile*
-	@$(LPR) -Ec bin/noff.h bin/coff.h bin/coff2noff.c
+	$(LPR) -Emakefile Makefile*
+	$(LPR) -Ec bin/noff.h bin/coff.h bin/coff2noff.c
 
+INDENT	:= indent --indent-level4
+DIRS_INDENT	:= threads userprog test
+
+indent:
+	set +e; \
+	for dir in $(DIRS_INDENT); do \
+		$(INDENT)  `ls $$dir/*.cc $$dir/*.h $$dir/*.c`; \
+	done
