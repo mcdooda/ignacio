@@ -27,7 +27,7 @@
 //      "sortKey" is the priority of the item, if any.
 //----------------------------------------------------------------------
 
-ListElement::ListElement (void *itemPtr, int sortKey)
+ListElement::ListElement (void *itemPtr, long long sortKey)
 {
     item = itemPtr;
     key = sortKey;
@@ -183,7 +183,7 @@ List::IsEmpty ()
 //----------------------------------------------------------------------
 
 void
-List::SortedInsert (void *item, int sortKey)
+List::SortedInsert (void *item, long long sortKey)
 {
     ListElement *element = new ListElement (item, sortKey);
     ListElement *ptr;		// keep track
@@ -229,7 +229,7 @@ List::SortedInsert (void *item, int sortKey)
 //----------------------------------------------------------------------
 
 void *
-List::SortedRemove (int *keyPtr)
+List::SortedRemove (long long *keyPtr)
 {
     ListElement *element = first;
     void *thing;

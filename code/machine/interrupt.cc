@@ -41,7 +41,7 @@ static char *intTypeNames[] = { "timer", "disk", "console write",
 //	"kind" is the hardware device that generated the interrupt
 //----------------------------------------------------------------------
 
-PendingInterrupt::PendingInterrupt(VoidFunctionPtr func, int param, int time, 
+PendingInterrupt::PendingInterrupt(VoidFunctionPtr func, int param, long long time, 
 				IntType kind)
 {
     handler = func;
@@ -265,9 +265,9 @@ Interrupt::Halt()
 //	"type" is the hardware device that generated the interrupt
 //----------------------------------------------------------------------
 void
-Interrupt::Schedule(VoidFunctionPtr handler, int arg, int fromNow, IntType type)
+Interrupt::Schedule(VoidFunctionPtr handler, int arg, long long fromNow, IntType type)
 {
-    int when = stats->totalTicks + fromNow;
+    long long when = stats->totalTicks + fromNow;
     PendingInterrupt *toOccur = new PendingInterrupt(handler, arg, when, type);
 
     DEBUG('i', "Scheduling interrupt handler the %s at time = %d\n", 
@@ -294,7 +294,7 @@ bool
 Interrupt::CheckIfDue(bool advanceClock)
 {
     MachineStatus old = status;
-    int when;
+    long long when;
 
     ASSERT(level == IntOff);		// interrupts need to be disabled,
 					// to invoke an interrupt handler
@@ -324,7 +324,7 @@ Interrupt::CheckIfDue(bool advanceClock)
     DEBUG('i', "Invoking interrupt handler for the %s at time %d\n", 
 			intTypeNames[toOccur->type], toOccur->when);
 #ifdef USER_PROGRAM
-    if (machine != NULL)
+    if (machine != NULL && status == UserMode)
     	machine->DelayedLoad(0, 0);
 #endif
     inHandler = TRUE;
@@ -349,7 +349,7 @@ PrintPending(int arg)
 {
     PendingInterrupt *pend = (PendingInterrupt *)arg;
 
-    printf("Interrupt handler %s, scheduled at %d\n", 
+    printf("Interrupt handler %s, scheduled at %lld\n", 
 	intTypeNames[pend->type], pend->when);
 }
 

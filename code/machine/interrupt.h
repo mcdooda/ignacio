@@ -58,14 +58,15 @@ enum IntType { TimerInt, DiskInt, ConsoleWriteInt, ConsoleReadInt,
 
 class PendingInterrupt {
   public:
-    PendingInterrupt(VoidFunctionPtr func, int param, int time, IntType kind);
+    PendingInterrupt(VoidFunctionPtr func, int param,
+		     long long time, IntType kind);
 				// initialize an interrupt that will
 				// occur in the future
 
     VoidFunctionPtr handler;    // The function (in the hardware device
 				// emulator) to call when the interrupt occurs
     int arg;                    // The argument to the function.
-    int when;			// When the interrupt is supposed to fire
+    long long when;		// When the interrupt is supposed to fire
     IntType type;		// for debugging
 };
 
@@ -99,7 +100,7 @@ class Interrupt {
     void setStatus(MachineStatus st) { status = st; }
 
     void DumpState();			// Print interrupt state
-    
+
 
     // NOTE: the following are internal to the hardware simulation code.
     // DO NOT call these directly.  I should make them "private",
@@ -107,7 +108,7 @@ class Interrupt {
     // hardware device simulators.
 
     void Schedule(VoidFunctionPtr handler,// Schedule an interrupt to occur
-	int arg, int when, IntType type);// at time ``when''.  This is called
+	int arg, long long when, IntType type);// at time ``when''.  This is called
     					// by the hardware device simulators.
     
     void OneTick();       		// Advance simulated time
