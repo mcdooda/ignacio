@@ -13,9 +13,6 @@
 #
 #   Other than that, you have complete flexibility.
 #
-# Also whenever you change the include structure of your program, you should 
-# do a gmake depend in the subdirectory -- this will modify the Makefile
-# to keep track of the new dependency.
 
 # You might want to play with the CFLAGS, but if you use -O it may
 # break the thread system.  You might want to use -fno-inline if
@@ -65,32 +62,33 @@ MAKEFILES	:=	Makefile \
 OFILES		:=	$(strip $(C_OFILES) $(S_OFILES))
 
 # RN: Dependency files start with a '.' to avoid annoying completion
-# confusion under shell or emacs...
+# confusion under shell, emacs, etc.
+
 C_DFILES	:=	$(patsubst %.o,.%.d,$(C_OFILES))
 S_DFILES	:=	$(patsubst %.o,.%.d,$(S_OFILES))
 DFILES		:=	$(strip $(C_DFILES) $(S_DFILES))
 
-# RN: Hummm. There's a lot to tell about the story of the two
-# following lines. Basically, it allows 'make' to implicitely search
+# RN: Hummm... There's a lot to tell about the story of the two
+# following lines. Essentially, it allows 'make' to implicitely search
 # for source/header files in various directories. The original Nachos
 # Makefile was not using this 'vpath' feature, although it was using
-# the aforementionned implicit search policy! The problem came from
+# the aforementioned implicit search policy! The problem came from
 # the rule:
 #	$(C_OFILES): %.o:
 # 		$(CC) blabla...
 # which is correct if .o files have no extra dependency rules. In this
 # case, 'make' finds the associated .cc file in the directories it
-# knows (because they were listed in some macros!). However, if we add
+# knows of (because they were listed in some macros!). However, if we add
 # a rule such as
 # 	$(C_OFILES): toto
-# then 'make' tries to compile 'toto' each time it tries to build a .o
+# then 'make' tries to compile 'toto' each time it rebuilds the a .o
 # file. As a result, the former rule was modified as follows
 # 	$(C_OFILES): %.o: %.cc
 # As you may guess, it did'nt work because 'make' was no longer using
-# its @#!^# implicit policy in this case. Crazy isn't it? Fortunately,
-# there's a GNU extension that asks 'make' to use "search path" for
+# its @#!^# implicit policy in this case. Crazy, isn't it? Fortunately,
+# there's a GNU extension that requires 'make' to use a "search path" for
 # files that match a given pattern: this is the vpath directive...
-# Ok, I hope you'll stop wondering why these two lines are here: you'd
+# Well, I guess you should stop wondering why these two lines are here: you'd
 # better concentrate on your exercise! ;-)
 
 vpath %.cc ../machine:../threads:../userprog:../filesys:../network:../vm
@@ -113,12 +111,13 @@ switch.o: ../threads/switch.S
 	$(AS) -o switch.o swtch.s
 	rm swtch.s
 
-# RN: Rules to generate dependency files. We can no longer use a
+# RN: Rules to generate dependency files. We can no longer rely on a
 # single '.depend' file if we want to avoid a global recompilation each
-# time a file is modified! Thus, each %.cc file has its associated
+# time a file is modified! Thus, each %.cc file is associated with its own
 # .%.d dependency file...
+
 .PHONY: depend
-depend: $(DFILES) ;
+depend: $(DFILES)
 
 $(DFILES): $(MAKEFILES)
 
@@ -138,3 +137,5 @@ endif
 .PHONY: clean
 clean:
 	rm -f core nachos DISK *.o *.s .*.d coff2noff out disassemble
+
+

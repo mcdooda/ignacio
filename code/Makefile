@@ -33,7 +33,7 @@ depend:
 print:
 	@set -e; \
 	for i in machine $(DIR) test ; do \
-		$(LPR) Makefile *.h *.cc *.s ; \
+		$(LPR) Makefile *.h *.cc *.S *.c ; \
 	done
 	@$(LPR) Makefile*
 	$(LPR) bin/noff.h bin/coff.h bin/coff2noff.c
