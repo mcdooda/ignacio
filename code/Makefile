@@ -3,7 +3,8 @@
 # of liability and disclaimer of warranty provisions.
 
 MAKE	:=	make
-LPR	:=	lpr
+## LPR	:=	echo
+LPR	:=	enscript
 
 DIRS	:=	threads userprog filesys network vm
 
@@ -11,30 +12,30 @@ DIRS	:=	threads userprog filesys network vm
 
 all:
 	@set -e; \
-	for i in $(DIRS) ; do \
+	for i in $(DIRS); do \
 		$(MAKE) -C $$i nachos; \
 	done ; \
-	for i in bin test ; do \
+	for i in bin test; do \
 		$(MAKE) -C $$i all; \
 	done
 
 clean:
 	@set -e; \
-	for i in $(DIRS) bin test ; do \
+	for i in $(DIRS) bin test; do \
 		$(MAKE) -C $$i $@; \
 	done
 
 depend:
 	@set -e; \
-	for i in $(DIRS) ; do \
+	for i in $(DIRS); do \
 		$(MAKE) -C $$i $@; \
 	done
 
 print:
 	@set -e; \
-	for i in machine $(DIR) test ; do \
-		$(LPR) Makefile *.h *.cc *.S *.c ; \
+	for i in machine $(DIRS) test; do \
+		$(LPR) -Emakefile Makefile -Ecpp *.h *.cc *.S -Ec *.c; \
 	done
-	@$(LPR) Makefile*
-	$(LPR) bin/noff.h bin/coff.h bin/coff2noff.c
+	@$(LPR) -Emakefile Makefile*
+	@$(LPR) -Ec bin/noff.h bin/coff.h bin/coff2noff.c
 
