@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+#                      PM2 HIGH-PERF/ISOMALLOC
+#           High Performance Parallel Multithreaded Machine
+#                           version 3.0
+#
+#     Gabriel Antoniu, Olivier Aumage, Luc Bouge, Vincent Danjean,
+#       Christian Perez, Jean-Francois Mehaut, Raymond Namyst
+#
+#            Laboratoire de l'Informatique du Parallelisme
+#                        UMR 5668 CNRS-INRIA
+#                 Ecole Normale Superieure de Lyon
+#
+#                      External Contributors:
+#                 Yves Denneulin (LMC - Grenoble),
+#                 Benoit Planquelle (LIFL - Lille)
+#
+#                    1998 All Rights Reserved
+#
+#
+#                             NOTICE
+#
+# Permission to use, copy, modify, and distribute this software and
+# its documentation for any purpose and without fee is hereby granted
+# provided that the above copyright notice appear in all copies and
+# that both the copyright notice and this permission notice appear in
+# supporting documentation.
+#
+# Neither the institutions (Ecole Normale Superieure de Lyon,
+# Laboratoire de L'informatique du Parallelisme, Universite des
+# Sciences et Technologies de Lille, Laboratoire d'Informatique
+# Fondamentale de Lille), nor the Authors make any representations
+# about the suitability of this software for any purpose. This
+# software is provided ``as is'' without express or implied warranty.
+#
+
+#
+# determine the machine type from scratch
+#
+if [ -f /bin/uname -o -f /usr/bin/uname ]; then
+	if [ -f /bin/uname ]; then
+		os="`/bin/uname -s`"
+		ht="`/bin/uname -m`"
+	else
+		os="`/usr/bin/uname -s`"
+		ht="`/usr/bin/uname -m`"
+	fi
+
+	case "$os,$ht" in
+	SunOS,*)           PM2_SYS=SOLARIS_SYS ;;
+	AIX*,*)            PM2_SYS=AIX_SYS ;;
+	IRIX*,*)           PM2_SYS=IRIX_SYS ;;
+	OSF*,*)            PM2_SYS=OSF_SYS ;;
+	Linux,*)           PM2_SYS=LINUX_SYS ;;
+	FreeBSD,*)         PM2_SYS=FREEBSD_SYS ;;
+	esac
+fi
+
+echo $PM2_SYS
+exit
+

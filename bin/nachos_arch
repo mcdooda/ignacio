@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+#                      PM2 HIGH-PERF/ISOMALLOC
+#           High Performance Parallel Multithreaded Machine
+#                           version 3.0
+#
+#     Gabriel Antoniu, Olivier Aumage, Luc Bouge, Vincent Danjean,
+#       Christian Perez, Jean-Francois Mehaut, Raymond Namyst
+#
+#            Laboratoire de l'Informatique du Parallelisme
+#                        UMR 5668 CNRS-INRIA
+#                 Ecole Normale Superieure de Lyon
+#
+#                      External Contributors:
+#                 Yves Denneulin (LMC - Grenoble),
+#                 Benoit Planquelle (LIFL - Lille)
+#
+#                    1998 All Rights Reserved
+#
+#
+#                             NOTICE
+#
+# Permission to use, copy, modify, and distribute this software and
+# its documentation for any purpose and without fee is hereby granted
+# provided that the above copyright notice appear in all copies and
+# that both the copyright notice and this permission notice appear in
+# supporting documentation.
+#
+# Neither the institutions (Ecole Normale Superieure de Lyon,
+# Laboratoire de L'informatique du Parallelisme, Universite des
+# Sciences et Technologies de Lille, Laboratoire d'Informatique
+# Fondamentale de Lille), nor the Authors make any representations
+# about the suitability of this software for any purpose. This
+# software is provided ``as is'' without express or implied warranty.
+#
+
+if [ -f /bin/uname -o -f /usr/bin/uname ]; then
+	if [ -f /bin/uname ]; then
+		os="`/bin/uname -s`"
+		ht="`/bin/uname -m`"
+	else
+		os="`/usr/bin/uname -s`"
+		ht="`/usr/bin/uname -m`"
+	fi
+
+	case "$os,$ht" in
+	SunOS,sun*)        PM2_ARCH=SPARC_ARCH ;;
+	*,i86pc)           PM2_ARCH=X86_ARCH ;;
+	*,i[3456]86)       PM2_ARCH=X86_ARCH ;;
+	BSD/OS,i[3456]86)  PM2_ARCH=X86_ARCH ;;
+	FreeBSD,i386 )     PM2_ARCH=X86_ARCH ;;
+	AIX*,*)            PM2_ARCH=RS6K_ARCH ;;
+	*,alpha)           PM2_ARCH=ALPHA_ARCH ;;
+	*,mips)            PM2_ARCH=MIPS_ARCH ;;
+	*,IP*)             PM2_ARCH=MIPS_ARCH ;;
+	*,ppc)  	   PM2_ARCH=PPC_ARCH ;;
+	*)		   PM2_ARCH=UNKNOWN_ARCH ;;
+	esac
+fi
+
+echo $PM2_ARCH
+exit
+

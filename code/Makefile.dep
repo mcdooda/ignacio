@@ -1,0 +1,43 @@
+# This is part of a GNU-Makefile, to specify system-dependent 
+# parts of the Makefile enviroment.
+#
+# This gets included as part of the GNU-Makefile used in each of 
+# the subdirectories.
+#
+# Depending on your platform, you need to select the correct definition.
+# Also, you need to edit the Makefile in the bin subdirectory.
+
+NACHOS_ROOT = ../../
+NACHOS_SYS := $(shell $(NACHOS_ROOT)/bin/nachos_sys)
+NACHOS_ARCH := $(shell $(NACHOS_ROOT)/bin/nachos_arch)
+
+# DEC MIPS, Ultrix
+# HOST = -DHOST_MIPS
+
+ifeq ($(NACHOS_SYS),SOLARIS_SYS)
+
+LDFLAGS += -lnsl -lsocket
+
+ifeq ($(NACHOS_ARCH),SPARC_ARCH)
+HOST = -DHOST_SPARC -DHOST_IS_BIG_ENDIAN -DSOLARIS
+endif
+ifeq ($(NACHOS_ARCH),X86_ARCH)
+HOST = -DHOST_i386 -DSOLARIS
+endif
+endif
+
+ifeq ($(NACHOS_SYS),LINUX_SYS)
+HOST = -DHOST_i386 -DLINUX
+endif
+
+# HP PA-RISC, HP_UX
+# HOST = -DHOST_SNAKE -DHOST_IS_BIG_ENDIAN
+
+# 386, 386BSD Unix, or NetBSD Unix (available via anon ftp 
+#    from agate.berkeley.edu)
+# HOST = -DHOST_i386
+# CPP=/usr/bin/cpp
+
+# slight variant for 386 FreeBSD
+# HOST = -DHOST_i386 -DFreeBSD
+# CPP=/usr/bin/cpp
