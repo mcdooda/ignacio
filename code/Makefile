@@ -51,7 +51,11 @@ DIRS_INDENT	:= threads userprog test
 
 indent:
 	-for dir in machine $(DIRS_INDENT) test; do \
-		ls -f $$dir/Makefile* $${dir}/*.h $${dir}/*.cc $${dir}/*.S \
-			 $${dir}/*.c; \
+		ls -f \
+		$${dir}/*.h \
+		$${dir}/*.cc \
+		$${dir}/*.c; \
 	done > list
-	$(INDENT) `cat list`
+	for file in `cat list`; do \
+		echo $${file}; $(INDENT) $${file}; \
+	done
