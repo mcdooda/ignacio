@@ -30,7 +30,12 @@ static void Mult(int a, int b, bool signedArith, int* hiPtr, int* loPtr);
 void
 Machine::Run()
 {
-    Instruction *instr = new Instruction;  // storage for decoded instruction
+  // LB: Using a dynamic instr is right here as one never exits this
+  // function.
+  // Instruction *instr = new Instruction;  // storage for decoded instruction
+  Instruction the_instr;
+  Instruction *instr = &the_instr;
+  // End of Modification
 
     if(DebugIsEnabled('m'))
 

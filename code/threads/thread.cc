@@ -92,6 +92,18 @@ Thread::Fork (VoidFunctionPtr func, int arg)
 
     StackAllocate (func, arg);
 
+#ifdef USER_PROGRAM
+
+    // LB: The addrspace should be tramsitted here, instead of later in
+    // StartProcess, so that the pageTable can be restored at
+    // launching time. This is crucial if the thread is launched with
+    // an already running program, as in the "fork" Unix system call. 
+    
+    // LB: Observe that currentThread->space may be NULL at that time.
+    this->space = currentThread->space;
+
+#endif // USER_PROGRAM
+
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
     scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts 
     // are disabled!
@@ -148,21 +160,9 @@ Thread::Finish ()
 
     DEBUG ('t', "Finishing thread \"%s\"\n", getName ());
 
-    // LB: necessary to detect that the thread to be destroyed 
-    // kept in variable threadToBeDestroyed is not lost here
-
-    // This assertation "often" fails here... Just try!
-    // ASSERT(threadToBeDestroyed == NULL);
-
-    if (threadToBeDestroyed != NULL)
-      {
-	  delete threadToBeDestroyed;
-	  threadToBeDestroyed = NULL;
-      }
-
-    // In contrast, it is fine here...
+    // LB: Be careful to guarantee that no thread to be destroyed 
+    // is ever lost 
     ASSERT (threadToBeDestroyed == NULL);
-
     // End of addition 
 
     threadToBeDestroyed = currentThread;
@@ -262,6 +262,54 @@ InterruptEnable ()
     interrupt->Enable ();
 }
 
+// LB: This function has to be called on starting  a new thread to set
+// up the pagetable correctly. This was missing from the original
+// version. Credits to Clement Menier for finding this bug!
+
+void 
+SetupThreadState ()
+{
+
+  // LB: Similar to the second part of Scheduler::Run. This has to be
+  // done each time a thread is scheduled, either by SWITCH, or by
+  // getting created.
+  
+  if (threadToBeDestroyed != NULL)
+    {
+      delete threadToBeDestroyed;
+      threadToBeDestroyed = NULL;
+    }
+  
+#ifdef USER_PROGRAM
+
+  // LB: Now, we have to simulate the RestoreUserState/RestoreState
+  // part of Scheduler::Run
+
+  // Be very careful! We have no information about the thread which is
+  // currently running at the time this function is called. Actually,
+  // there is no reason why the running thread should have the same
+  // pageTable as the thread just being created.
+
+  // This is definitely the case as soon as several *processes* are
+  // running together.
+
+  if (currentThread->space != NULL)
+    {				// if there is an address space
+      // LB: Actually, the user state is void at that time. Keep this
+      // action for consistency with the Scheduler::Run function
+      currentThread->RestoreUserState ();	// to restore, do it.
+      currentThread->space->RestoreState ();
+    }
+
+#endif // USER_PROGRAM
+
+  // LB: The default level for interrupts is IntOn.
+  InterruptEnable (); 
+
+}
+
+// End of addition
+
 void
 ThreadPrint (int arg)
 {
@@ -309,7 +357,13 @@ Thread::StackAllocate (VoidFunctionPtr func, int arg)
 #endif // HOST_SNAKE
 
     machineState[PCState] = (int) ThreadRoot;
-    machineState[StartupPCState] = (int) InterruptEnable;
+
+    // LB: It is not sufficient to enable interrupts!
+    // A more complex function has to be called here...
+    // machineState[StartupPCState] = (int) InterruptEnable;
+    machineState[StartupPCState] = (int) SetupThreadState;
+    // End of modification
+    
     machineState[InitialPCState] = (int) func;
     machineState[InitialArgState] = arg;
     machineState[WhenDonePCState] = (int) ThreadFinish;
@@ -350,3 +404,5 @@ Thread::RestoreUserState ()
 	machine->WriteRegister (i, userRegisters[i]);
 }
 #endif
+
+

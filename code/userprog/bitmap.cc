@@ -33,7 +33,10 @@ BitMap::BitMap (int nitems)
 
 BitMap::~BitMap ()
 {
-    delete map;
+  // LB: Missing [] in delete directive
+  //  delete map;
+  delete [] map;
+  // End of modification
 }
 
 //----------------------------------------------------------------------

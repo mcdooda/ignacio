@@ -92,6 +92,10 @@ Scheduler::Run (Thread * nextThread)
 {
     Thread *oldThread = currentThread;
 
+    // LB: For safety...
+    ASSERT (interrupt->getLevel () == IntOff);
+    // End of addition
+
 #ifdef USER_PROGRAM		// ignore until running user programs
     if (currentThread->space != NULL)
       {				// if this thread is a user program,
