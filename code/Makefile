@@ -3,8 +3,8 @@
 # of liability and disclaimer of warranty provisions.
 
 MAKE	:=	make
-## LPR	:=	echo
-LPR	:=	enscript
+
+
 
 DIRS	:=	threads userprog filesys network vm
 
@@ -31,21 +31,27 @@ depend:
 		$(MAKE) -C $$i $@; \
 	done
 
+## LPR	:=	echo
+LPR	:=	enscript --columns=2  --borders -r --landscape \
+		--media=A4 --verbose --pretty-print --toc 
+
 print:
-	set -e; \
-	for dir in machine $(DIRS) test; do \
-		$(LPR) -Emakefile $$dir/Makefile \
-			-Ecpp $${dir}/*.h $${dir}/*.cc $${dir}/*.S \
-			-Ec $${dir}/*.c; \
-	done
-	$(LPR) -Emakefile Makefile*
-	$(LPR) -Ec bin/noff.h bin/coff.h bin/coff2noff.c
+	-for dir in machine threads userprog filesys network vm test; \
+	do \
+		ls -f \
+		$$dir/Makefile* \
+		$${dir}/*.h \
+		$${dir}/*.cc $${dir}/*.S \
+		$${dir}/*.c; \
+	done > list
+	$(LPR) `cat list` 
 
 INDENT	:= indent --indent-level4
 DIRS_INDENT	:= threads userprog test
 
 indent:
-	set +e; \
-	for dir in $(DIRS_INDENT); do \
-		$(INDENT)  `ls $$dir/*.cc $$dir/*.h $$dir/*.c`; \
-	done
+	-for dir in machine $(DIRS_INDENT) test; do \
+		ls -f $$dir/Makefile* $${dir}/*.h $${dir}/*.cc $${dir}/*.S \
+			 $${dir}/*.c; \
+	done > list
+	$(INDENT) `cat list`

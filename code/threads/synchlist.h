@@ -1,8 +1,8 @@
 // synchlist.h 
-//	Data structures for synchronized access to a list.
+//      Data structures for synchronized access to a list.
 //
-//	Implemented by surrounding the List abstraction
-//	with synchronization routines.
+//      Implemented by surrounding the List abstraction
+//      with synchronization routines.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
 // All rights reserved.  See copyright.h for copyright notice and limitation 
@@ -17,24 +17,25 @@
 
 // The following class defines a "synchronized list" -- a list for which:
 // these constraints hold:
-//	1. Threads trying to remove an item from a list will
-//	wait until the list has an element on it.
-//	2. One thread at a time can access list data structures
+//      1. Threads trying to remove an item from a list will
+//      wait until the list has an element on it.
+//      2. One thread at a time can access list data structures
 
-class SynchList {
+class SynchList
+{
   public:
-    SynchList();		// initialize a synchronized list
-    ~SynchList();		// de-allocate a synchronized list
+    SynchList ();		// initialize a synchronized list
+    ~SynchList ();		// de-allocate a synchronized list
 
-    void Append(void *item);	// append item to the end of the list,
-				// and wake up any thread waiting in remove
-    void *Remove();		// remove the first item from the front of
-				// the list, waiting if the list is empty
-				// apply function to every item in the list
-    void Mapcar(VoidFunctionPtr func);
+    void Append (void *item);	// append item to the end of the list,
+    // and wake up any thread waiting in remove
+    void *Remove ();		// remove the first item from the front of
+    // the list, waiting if the list is empty
+    // apply function to every item in the list
+    void Mapcar (VoidFunctionPtr func);
 
   private:
-    List *list;			// the unsynchronized list
+      List * list;		// the unsynchronized list
     Lock *lock;			// enforce mutual exclusive access to the list
     Condition *listEmpty;	// wait in Remove if the list is empty
 };

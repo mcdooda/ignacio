@@ -13,8 +13,8 @@
 #include "syscall.h"
 
 int
-main()
+main ()
 {
-    Halt();
+    Halt ();
     /* not reached */
 }

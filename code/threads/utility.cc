@@ -1,6 +1,6 @@
 // utility.cc 
-//	Debugging routines.  Allows users to control whether to 
-//	print DEBUG statements, based on a command line argument.
+//      Debugging routines.  Allows users to control whether to 
+//      print DEBUG statements, based on a command line argument.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
 // All rights reserved.  See copyright.h for copyright notice and limitation 
@@ -17,21 +17,21 @@
 #include "/usr/include/stdarg.h"
 #endif
 
-static char *enableFlags = NULL; // controls which DEBUG messages are printed 
+static char *enableFlags = NULL;	// controls which DEBUG messages are printed 
 
 //----------------------------------------------------------------------
 // DebugInit
 //      Initialize so that only DEBUG messages with a flag in flagList 
-//	will be printed.
+//      will be printed.
 //
-//	If the flag is "+", we enable all DEBUG messages.
+//      If the flag is "+", we enable all DEBUG messages.
 //
-// 	"flagList" is a string of characters for whose DEBUG messages are 
-//		to be enabled.
+//      "flagList" is a string of characters for whose DEBUG messages are 
+//              to be enabled.
 //----------------------------------------------------------------------
 
 void
-DebugInit(char *flagList)
+DebugInit (char *flagList)
 {
     enableFlags = flagList;
 }
@@ -42,30 +42,31 @@ DebugInit(char *flagList)
 //----------------------------------------------------------------------
 
 bool
-DebugIsEnabled(char flag)
+DebugIsEnabled (char flag)
 {
     if (enableFlags != NULL)
-       return (strchr(enableFlags, flag) != 0) 
-		|| (strchr(enableFlags, '+') != 0);
+	return (strchr (enableFlags, flag) != 0)
+	    || (strchr (enableFlags, '+') != 0);
     else
-      return FALSE;
+	return FALSE;
 }
 
 //----------------------------------------------------------------------
 // DEBUG
 //      Print a debug message, if flag is enabled.  Like printf,
-//	only with an extra argument on the front.
+//      only with an extra argument on the front.
 //----------------------------------------------------------------------
 
-void 
-DEBUG(char flag, char *format, ...)
+void
+DEBUG (char flag, char *format, ...)
 {
-    if (DebugIsEnabled(flag)) {
-	va_list ap;
-	// You will get an unused variable message here -- ignore it.
-	va_start(ap, format);
-	vfprintf(stdout, format, ap);
-	va_end(ap);
-	fflush(stdout);
-    }
+    if (DebugIsEnabled (flag))
+      {
+	  va_list ap;
+	  // You will get an unused variable message here -- ignore it.
+	  va_start (ap, format);
+	  vfprintf (stdout, format, ap);
+	  va_end (ap);
+	  fflush (stdout);
+      }
 }
