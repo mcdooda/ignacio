@@ -49,7 +49,10 @@ LD	:=	$(GCCDIR)/ld
 
 CPP	:=	$(GCCDIR)/gcc -E -P
 INCDIR	:=	-I../userprog -I../threads
-CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 
+# LB: Missing options in CFLAGS: -Wall -DCHANGED
+# CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 
+CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 -Wall -DCHANGED
+# End of modification
 
 SOURCES	:=	$(wildcard *.c)
 PROGS	:=	$(patsubst %.c,%,$(SOURCES))
@@ -66,7 +69,10 @@ start.o: start.S ../userprog/syscall.h
 	$(AS) $(ASFLAGS) -o start.o strt.s
 	rm strt.s
 
-%.o: %.c
+# LB: Missing dependency from syscall.h
+# %.o: %.c
+%.o: %.c ../userprog/syscall.h
+# End of modification
 	$(CC) $(CFLAGS) -c $<
 
 # LB: Caution! start.o should appear *before* $< for the load!
