@@ -467,13 +467,13 @@ Machine::OneInstruction(Instruction *instr)
 	// integer (Section A7.8). It is specified only is the
 	// argument is unsigned, or a positive or null int.
 
-	// Beginnin of original code
+	// Beginning of original code
 	// tmp = registers[instr->rt];
 	// tmp >>= instr->extra;
 	// registers[instr->rd] = tmp;
 	// End of original code
 
-	// A simple turn around is to use the unsigned imm local
+	// A simple turnaround is to use the unsigned imm local
 	// variable.
 	
 	imm = registers[instr->rt];
@@ -481,13 +481,25 @@ Machine::OneInstruction(Instruction *instr)
 	registers[instr->rd] = imm;
 	
 	// End of correction
-
+	//------------------------------------------------------------
 	break;
 	
       case OP_SRLV:
-	tmp = registers[instr->rt];
-	tmp >>= (registers[instr->rs] & 0x1f);
-	registers[instr->rd] = tmp;
+	//------------------------------------------------------------
+	// LB: Same problem here. Same turnaround.
+
+	// Beginning of original code
+	// tmp = registers[instr->rt];
+	// tmp >>= (registers[instr->rs] & 0x1f);
+	// registers[instr->rd] = tmp;
+	// End of original code
+
+	imm = registers[instr->rt];
+	imm >>= (registers[instr->rs] & 0x1f);
+	registers[instr->rd] = imm;
+
+	// End of correction
+	//------------------------------------------------------------
 	break;
 	
       case OP_SUB:	  
