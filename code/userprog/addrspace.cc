@@ -129,7 +129,10 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
 AddrSpace::~AddrSpace ()
 {
-    delete pageTable;
+  // LB: Missing [] for delete
+  // delete pageTable;
+  delete [] pageTable;
+  // End of modification
 }
 
 //----------------------------------------------------------------------
