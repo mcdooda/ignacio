@@ -81,7 +81,7 @@ DFILES		:=	$(strip $(C_DFILES) $(S_DFILES))
 # knows of (because they were listed in some macros!). However, if we add
 # a rule such as
 # 	$(C_OFILES): toto
-# then 'make' tries to compile 'toto' each time it rebuilds the a .o
+# then 'make' tries to compile 'toto' each time it rebuilds a ".o"
 # file. As a result, the former rule was modified as follows
 # 	$(C_OFILES): %.o: %.cc
 # As you may guess, it did'nt work because 'make' was no longer using
