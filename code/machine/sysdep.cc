@@ -351,8 +351,17 @@ ReadFromSocket(int sockID, char *buffer, int packetSize)
     int retVal;
     /* extern int errno;*/
     struct sockaddr_un uName;
-    unsigned int size = sizeof(uName);
-   
+
+    // LB: Signedness problem on Solaris 5.6/SPARC, as the last
+    // parameter of recvfrom is specified as a int *. In the later
+    // versions, it is specified as a void *. Casting size to int instead
+    // of unsigned seems to fix the problem, but it is admittingly
+    // rather ad-hoc...
+
+    // unsigned int size = sizeof(uName);
+    int size = (int) sizeof(uName);
+    // End of correction.
+
     retVal = recvfrom(sockID, buffer, packetSize, 0,
 				   (struct sockaddr *) &uName, &size);
 
