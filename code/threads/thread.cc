@@ -148,6 +148,16 @@ Thread::Finish ()
     
     DEBUG('t', "Finishing thread \"%s\"\n", getName());
     
+    /* LB: necessary to detect that the thread to be destroyed kept in
+       the variable is not lost here */
+   if (threadToBeDestroyed != NULL)
+	  {
+	      delete threadToBeDestroyed;
+	      threadToBeDestroyed = NULL;
+	  }
+    ASSERT(threadToBeDestroyed == NULL);
+    /* End of addition */
+
     threadToBeDestroyed = currentThread;
     Sleep();					// invokes SWITCH
     // not reached
