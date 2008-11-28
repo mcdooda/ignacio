@@ -44,7 +44,7 @@ NETWORK_O	:=	nettest.o post.o network.o
 
 S_OFILES	:=	switch.o
 
-CFLAGS = -g -Wall -Wshadow -fwritable-strings $(INCPATH) $(DEFINES) $(HOST) -DCHANGED 
+CFLAGS = -g -Wall -Wshadow $(INCPATH) $(DEFINES) $(HOST) -DCHANGED 
 
 # These definitions may change as the software is updated.
 # Some of them are also system dependent
