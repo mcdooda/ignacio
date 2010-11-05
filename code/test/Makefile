@@ -14,6 +14,7 @@ NACHOS_ROOT = ../../
 NACHOS_SYS := $(shell $(NACHOS_ROOT)/bin/nachos_sys)
 NACHOS_ARCH := $(shell $(NACHOS_ROOT)/bin/nachos_arch)
 
+ifeq ($(GCCDIR),'')
 ifeq ($(NACHOS_SYS),SOLARIS_SYS)
 # Solaris/PC
 ifeq ($(NACHOS_ARCH),X86_ARCH)
@@ -29,6 +30,7 @@ ifeq ($(NACHOS_SYS),LINUX_SYS)
 # Linux: fill in with the full path to the binutils and gcc.
 # For instance:
 GCCDIR	= /opt/NACHOS/nachos_gcc/cross/decstation-ultrix/bin
+endif
 endif
 
 LDFLAGS = -T script -N
