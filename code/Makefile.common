@@ -49,10 +49,10 @@ CFLAGS = -g -Wall -Wshadow $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
 
 # These definitions may change as the software is updated.
 # Some of them are also system dependent
-CPP= gcc -E -P
-CC = g++
-LD = g++
-AS = gcc -c
+CPP= gcc -E -P -m32
+CC = g++ -m32
+LD = g++ -m32
+AS = gcc -c -m32
 
 PROGRAM		:=	nachos
 
