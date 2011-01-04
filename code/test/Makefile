@@ -53,7 +53,7 @@ CPP	:=	$(GCCDIR)/gcc -E -P
 INCDIR	:=	-I../userprog -I../threads
 # LB: Missing options in CFLAGS: -Wall -DCHANGED
 # CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 
-CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 -Wall -DCHANGED
+CFLAGS 	:=	-DIN_USER_MODE -c $(INCDIR) -G 0 -Wall -Werror -DCHANGED
 # End of modification
 
 SOURCES	:=	$(wildcard *.c)

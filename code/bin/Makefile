@@ -18,7 +18,7 @@ NACHOS_ARCH := $(shell $(NACHOS_ROOT)/bin/nachos_arch)
 # all: coff2noff
 
 CC=gcc
-CFLAGS=-I./ -I../threads
+CFLAGS=-I./ -I../threads -Wall -Werror
 LD=gcc
 
 ifeq ($(NACHOS_ARCH),SPARC_ARCH)
