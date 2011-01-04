@@ -26,7 +26,7 @@
 // returning.
 class SynchDisk {
   public:
-    SynchDisk(char* name);    		// Initialize a synchronous disk,
+    SynchDisk(const char* name);    		// Initialize a synchronous disk,
 					// by initializing the raw Disk.
     ~SynchDisk();			// De-allocate the synch disk data
     

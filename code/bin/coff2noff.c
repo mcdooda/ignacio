@@ -29,6 +29,9 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 #include "coff.h"
 #include "noff.h"
@@ -66,7 +69,6 @@ ShortToHost(unsigned short shortword) {
 
 #define ReadStruct(f,s) 	Read(f,(char *)&s,sizeof(s))
 
-extern char *malloc();
 char *noffFileName = NULL;
 
 /* read and check for error */
@@ -89,7 +91,7 @@ void Write(int fd, char *buf, int nBytes)
     }
 }
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
     int fdIn, fdOut, numsections, i, inNoffFile;
     struct filehdr fileh;
@@ -162,7 +164,7 @@ main (int argc, char **argv)
     lseek(fdOut, inNoffFile, 0);
     printf("Loading %d sections:\n", numsections);
     for (i = 0; i < numsections; i++) {
-	printf("\t\"%s\", filepos 0x%x, mempos 0x%x, size 0x%x\n",
+	printf("\t\"%s\", filepos 0x%lx, mempos 0x%lx, size 0x%lx\n",
 	      sections[i].s_name, sections[i].s_scnptr,
 	      sections[i].s_paddr, sections[i].s_size);
 	if (sections[i].s_size == 0) {

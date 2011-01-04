@@ -33,7 +33,7 @@
 //      "initialValue" is the initial value of the semaphore.
 //----------------------------------------------------------------------
 
-Semaphore::Semaphore (char *debugName, int initialValue)
+Semaphore::Semaphore (const char *debugName, int initialValue)
 {
     name = debugName;
     value = initialValue;
@@ -101,7 +101,7 @@ Semaphore::V ()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock (char *debugName)
+Lock::Lock (const char *debugName)
 {
 }
 
@@ -117,7 +117,7 @@ Lock::Release ()
 {
 }
 
-Condition::Condition (char *debugName)
+Condition::Condition (const char *debugName)
 {
 }
 

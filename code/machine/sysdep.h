@@ -19,24 +19,24 @@ extern bool PollFile(int fd);
 
 // File operations: open/read/write/lseek/close, and check for error
 // For simulating the disk and the console devices.
-extern int OpenForWrite(char *name);
-extern int OpenForReadWrite(char *name, bool crashOnError);
+extern int OpenForWrite(const char *name);
+extern int OpenForReadWrite(const char *name, bool crashOnError);
 extern void Read(int fd, char *buffer, int nBytes);
 extern int ReadPartial(int fd, char *buffer, int nBytes);
-extern void WriteFile(int fd, char *buffer, int nBytes);
+extern void WriteFile(int fd, const char *buffer, int nBytes);
 extern void Lseek(int fd, int offset, int whence);
 extern int Tell(int fd);
 extern void Close(int fd);
-extern bool Unlink(char *name);
+extern bool Unlink(const char *name);
 
 // Interprocess communication operations, for simulating the network
 extern int OpenSocket();
 extern void CloseSocket(int sockID);
-extern void AssignNameToSocket(char *socketName, int sockID);
-extern void DeAssignNameToSocket(char *socketName);
+extern void AssignNameToSocket(const char *socketName, int sockID);
+extern void DeAssignNameToSocket(const char *socketName);
 extern bool PollSocket(int sockID);
 extern void ReadFromSocket(int sockID, char *buffer, int packetSize);
-extern void SendToSocket(int sockID, char *buffer, int packetSize,char *toName);
+extern void SendToSocket(int sockID, const char *buffer, int packetSize, const char *toName);
 
 // Process control: abort, exit, and sleep
 extern void Abort();

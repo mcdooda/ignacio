@@ -47,13 +47,13 @@
  */
 
 /* Stop Nachos, and print out performance stats */
-void Halt ();
+void Halt () __attribute__((noreturn));
 
 
 /* Address space control operations: Exit, Exec, and Join */
 
 /* This user program is done (status = 0 means exited normally). */
-void Exit (int status);
+void Exit (int status) __attribute__((noreturn));
 
 /* A unique identifier for an executing user program (address space) */
 typedef int SpaceId;

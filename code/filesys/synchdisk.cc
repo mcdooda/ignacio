@@ -40,7 +40,7 @@ DiskRequestDone (int arg)
 //	   (usually, "DISK")
 //----------------------------------------------------------------------
 
-SynchDisk::SynchDisk(char* name)
+SynchDisk::SynchDisk(const char* name)
 {
     semaphore = new Semaphore("synch disk", 0);
     lock = new Lock("synch disk lock");

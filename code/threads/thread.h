@@ -83,7 +83,7 @@ class Thread
     int machineState[MachineStateSize];	// all registers except for stackTop
 
   public:
-      Thread (char *debugName);	// initialize a Thread 
+      Thread (const char *debugName);	// initialize a Thread 
      ~Thread ();		// deallocate a Thread
     // NOTE -- thread being deleted
     // must not be running when delete 
@@ -104,7 +104,7 @@ class Thread
     {
 	status = st;
     }
-    char *getName ()
+    const char *getName ()
     {
 	return (name);
     }
@@ -120,7 +120,7 @@ class Thread
     // NULL if this is the main thread
     // (If NULL, don't deallocate stack)
     ThreadStatus status;	// ready, running or blocked
-    char *name;
+    const char *name;
 
     void StackAllocate (VoidFunctionPtr func, int arg);
     // Allocate a stack for thread.

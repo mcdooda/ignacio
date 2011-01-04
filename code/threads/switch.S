@@ -106,7 +106,7 @@ SWITCH:
 
 	j	ra
 	.end SWITCH
-#endif HOST_MIPS
+#endif // HOST_MIPS
 
 #ifdef HOST_SPARC
 
@@ -195,7 +195,7 @@ _SWITCH:
 	ret
 	restore
 
-#endif HOST_SPARC
+#endif // HOST_SPARC
 
 #ifdef HOST_SNAKE
 

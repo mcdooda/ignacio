@@ -78,7 +78,7 @@ void
 Initialize (int argc, char **argv)
 {
     int argCount;
-    char *debugArgs = "";
+    const char *debugArgs = "";
     bool randomYield = FALSE;
 
 #ifdef USER_PROGRAM

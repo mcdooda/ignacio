@@ -32,7 +32,7 @@
 //      "threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
-Thread::Thread (char *threadName)
+Thread::Thread (const char *threadName)
 {
     name = threadName;
     stackTop = NULL;
