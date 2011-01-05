@@ -2,22 +2,17 @@
 #
 # Makefile for the network assignment
 #    Defines set up assuming this assignment is done last 
-#    If not, use the "bare bones"  defines below. 
+#    If not, use the "bare bones"  defines in ../Makefile.define-flavors. 
 #
 # Copyright (c) 1992 The Regents of the University of California.
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-DEFINES = -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS -DNETWORK
-INCPATH = -I../network -I../bin -I../filesys -I../vm -I../userprog -I../threads -I../machine
-C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O) $(NETWORK_O)
+# This makefile will compile the flavor named as the current directory
+# This compilation is done *WITHOUT* -DCHANGE (look into the build/
+# directory to have a build with -DCHANGE)
 
-# bare bones version
-# DEFINES =-DTHREADS -DNETWORK
-# INCPATH = -I../network -I../threads -I../machine
-# C_OFILES = $(THREAD_O) $(NETWORK_O)
+FLAVOR=$(notdir $(CURDIR))
 
 include ../Makefile.common
-include ../Makefile.dep
-
-
+include ../Makefile.compile-flavor

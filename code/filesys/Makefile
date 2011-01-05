@@ -2,22 +2,17 @@
 #
 # Makefile for the file system assignment
 #    Defines set up assuming multiprogramming and virtual memory done first.
-#    If not, use the "bare bones"  defines below. 
+#    If not, use the "bare bones"  defines in ../Makefile.define-flavors. 
 #
 # Copyright (c) 1992 The Regents of the University of California.
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-DEFINES =-DTHREADS -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS
-INCPATH = -I../filesys -I../bin -I../vm -I../userprog -I../threads -I../machine
-C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O)
+# This makefile will compile the flavor named as the current directory
+# This compilation is done *WITHOUT* -DCHANGE (look into the build/
+# directory to have a build with -DCHANGE)
 
-# bare bones version
-# DEFINES =-DTHREADS -DFILESYS_NEEDED -DFILESYS
-# INCPATH = -I../filesys -I../threads -I../machine
-# C_OFILES = $(THREAD_O) $(FILESYS_O)
+FLAVOR=$(notdir $(CURDIR))
 
 include ../Makefile.common
-include ../Makefile.dep
-
-
+include ../Makefile.compile-flavor

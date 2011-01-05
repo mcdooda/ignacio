@@ -3,7 +3,7 @@
 # Makefile for the virtual memory assignment
 #    Defines set up assuming the virtual memory assignment is done before 
 # 	the file system assignment. If not, use the "filesys first"  
-#	defines below. 
+#	defines in ../Makefile.define-flavors. 
 #
 # Also, if you want to simplify the translation so it assumes
 # only linear page tables, don't define USE_TLB.
@@ -12,15 +12,11 @@
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-DEFINES = -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVM -DUSE_TLB
-INCPATH = -I../filesys -I../bin -I../vm -I../userprog -I../threads -I../machine
-C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O)
+# This makefile will compile the flavor named as the current directory
+# This compilation is done *WITHOUT* -DCHANGE (look into the build/
+# directory to have a build with -DCHANGE)
 
-# if file sys done first!
-# DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS -DVM -DUSE_TLB
-# INCPATH = -I../vm -I../bin -I../filesys -I../userprog -I../threads -I../machine
-# C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O) $(VM_O)
+FLAVOR=$(notdir $(CURDIR))
 
 include ../Makefile.common
-include ../Makefile.dep
-
+include ../Makefile.compile-flavor

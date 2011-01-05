@@ -2,23 +2,19 @@
 #
 # Makefile for the multiprogramming assignment
 #    Defines set up assuming multiprogramming is done before the file system.
-#    If not, use the "filesys first"  defines below. 
+#    If not, use the "filesys first"  defines in ../Makefile.define-flavors. 
 #
 #
 # Copyright (c) 1992 The Regents of the University of California.
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB
-INCPATH = -I../bin -I../filesys -I../userprog -I../threads -I../machine
-C_OFILES = $(THREAD_O) $(USERPROG_O)
+# This makefile will compile the flavor named as the current directory
+# This compilation is done *WITHOUT* -DCHANGE (look into the build/
+# directory to have a build with -DCHANGE)
 
-# if file system done first!
-# DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS
-# INCPATH = -I../bin -I../filesys -I../userprog -I../threads -I../machine
-# C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O)
+FLAVOR=$(notdir $(CURDIR))
 
 include ../Makefile.common
-include ../Makefile.dep
-
+include ../Makefile.compile-flavor
 

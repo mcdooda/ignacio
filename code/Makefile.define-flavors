@@ -1,0 +1,119 @@
+# This is part of a GNU Makefile
+#
+# This file is used to defined flavors that will be compiled in
+# nachos subdirectories and/or in the build/ subdirectory.
+#
+# You will probably edit this file to define new flavors
+#
+# This file includes all of the baseline code provided by Nachos.
+# Whenever you add a .c or .cc file, put it in the appropriate 
+# _O list and/or only to your own flavor
+#
+# The dependency graph between assignments is:
+#   1. THREADS before everything else
+#   2. USERPROG must come before VM
+#   3. USERPROG can come before or after FILESYS, but if USERPROG comes 
+#	before (as in this distribution), then it must define FILESYS_STUB
+#
+#   Other than that, you have complete flexibility.
+#
+
+# You might want to play with the CFLAGS, but if you use -O it may
+# break the thread system.  You might want to use -fno-inline if
+# you need to call some inline functions from the debugger.
+
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+
+###########################################################################
+# RN: Sets of objects file to be linked for each nachos flavor. This
+# is the only section you may need to modify when adding files in nachos.
+#
+THREAD_O	:=	main.o list.o scheduler.o synch.o synchlist.o \
+			system.o thread.o utility.o threadtest.o interrupt.o \
+			stats.o sysdep.o timer.o
+
+USERPROG_O	:=	addrspace.o bitmap.o exception.o progtest.o console.o \
+			machine.o mipssim.o translate.o
+
+VM_O		:=
+
+FILESYS_O	:=	directory.o filehdr.o filesys.o fstest.o openfile.o \
+			synchdisk.o disk.o
+
+NETWORK_O	:=	nettest.o post.o network.o
+#
+###########################################################################
+
+# flavors comming from original nachos.
+# Flavors that will be compiled *without* -DCHANGED under the name nachos
+# in their respective directory
+ORIG_FLAVORS=threads userprog filesys network vm
+# Flavors that will be compiled *with* -DCHANGED under the name nachos-"flavor"
+# in the build/ directory
+# Add yours here if needed and/or remove the current ones.
+USER_FLAVORS=$(ORIG_FLAVORS)
+
+# Define new flavors when needed, based on the provided original ones:
+# USER_FLAVORS=step2
+#
+# step2_DEFINES = -DTHREADS
+# step2_INCDIRS = threads machine
+# step2_C_OFILES = $(THREAD_O) syncconsole.o
+
+###########################################################################
+#            Original flavors
+###########################################################################
+
+###########################################################################
+######### threads
+threads_DEFINES = -DTHREADS
+threads_INCDIRS = threads machine
+threads_C_OFILES = $(THREAD_O)
+
+###########################################################################
+######### userprog
+userprog_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB
+userprog_INCDIRS = filesys userprog bin threads machine
+userprog_C_OFILES = $(THREAD_O) $(USERPROG_O)
+
+# if file system done first!
+# userprog_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS
+# userprog_INCDIRS = bin filesys userprog threads machine
+# userprog_C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O)
+
+###########################################################################
+######### filesys
+filesys_DEFINES =-DTHREADS -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS
+filesys_INCDIRS = filesys vm userprog bin threads machine
+filesys_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O)
+
+# bare bones version
+# filesys_DEFINES =-DTHREADS -DFILESYS_NEEDED -DFILESYS
+# filesys_INCDIRS = filesys threads machine
+# filesys_C_OFILES = $(THREAD_O) $(FILESYS_O)
+
+###########################################################################
+######### network
+network_DEFINES = -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS -DNETWORK
+network_INCDIRS = network filesys vm userprog bin threads machine
+network_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O) $(NETWORK_O)
+
+# bare bones version
+# network_DEFINES =-DTHREADS -DNETWORK
+# network_INCDIRS = network threads machine
+# network_C_OFILES = $(THREAD_O) $(NETWORK_O)
+
+###########################################################################
+######### vm
+vm_DEFINES = -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVM -DUSE_TLB
+vm_INCDIRS = filesys vm userprog bin threads machine
+vm_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O)
+
+# if file sys done first!
+# vm_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS -DVM -DUSE_TLB
+# vm_INCDIRS = vm bin filesys userprog threads machine
+# vm_C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O) $(VM_O)
+
+###########################################################################

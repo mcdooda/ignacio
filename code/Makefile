@@ -2,15 +2,16 @@
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-MAKE	:=	make
-
-
-
 DIRS	:=	threads userprog filesys network vm
 
-.PHONY: all clean depend print
+.PHONY: all clean depend print build check
 
-all:
+all: build
+
+build:
+	$(MAKE) -C build V=0
+
+check: build
 	@set -e; \
 	for i in $(DIRS); do \
 		$(MAKE) -C $$i nachos; \
@@ -21,13 +22,7 @@ all:
 
 clean:
 	@set -e; \
-	for i in $(DIRS) bin test; do \
-		$(MAKE) -C $$i $@; \
-	done
-
-depend:
-	@set -e; \
-	for i in $(DIRS); do \
+	for i in build $(DIRS) bin test; do \
 		$(MAKE) -C $$i $@; \
 	done
 

@@ -7,11 +7,13 @@
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
-DEFINES = -DTHREADS
-INCPATH = -I../threads -I../machine
-C_OFILES = $(THREAD_O)
+# This makefile will compile the flavor named as the current directory
+# This compilation is done *WITHOUT* -DCHANGE (look into the build/
+# directory to have a build with -DCHANGE)
+
+FLAVOR=$(notdir $(CURDIR))
 
 include ../Makefile.common
-include ../Makefile.dep
+include ../Makefile.compile-flavor
 
 
