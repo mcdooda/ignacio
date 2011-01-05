@@ -2,7 +2,8 @@ OUTPUT_FORMAT("ecoff-littlemips")
 ENTRY(__start)
 SECTIONS
 {
-  .text  0 : {
+  . = 0;
+  .text : {
      _ftext = . ;
     *(.init)
      eprol  =  .;
@@ -11,26 +12,47 @@ SECTIONS
      etext  =  .;
      _etext  =  .;
   }
-  .rdata  . : {
-    *(.rdata)
-  }
    _fdata = .;
-  .data  . : {
+  .data : {
     *(.data)
+    *(.reginfo)
     CONSTRUCTORS
+    /* VD: putting the read-only data section into the rw data section
+       coff2noff only support 3 sections */
+    *(.rdata)
   }
    edata  =  .;
    _edata  =  .;
    _fbss = .;
-  .sbss  . : {
+  .bss : {
+    *(.bss)
+    *(COMMON)
+    /* Putting .sbss sections (shared bss ?) into the .bss one */
     *(.sbss)
     *(.scommon)
   }
-  .bss  . : {
-    *(.bss)
-    *(COMMON)
-  }
    end = .;
    _end = .;
+  /* Sections to be discarded */
+  /* list blindly copied from the arcboot project */
+  /DISCARD/ : {
+        *(.text.exit)
+        *(.data.exit)
+        *(.exitcall.exit)
+        *(.stab)
+        *(.stabstr)
+        *(.pdr)
+        *(.note)
+        *(.reginfo)
+        *(.options)
+        *(.MIPS.options)
+        *(.debug*)
+        *(.line)
+        *(.mdebug*)
+        *(.comment*)
+        *(.gptab*)
+        *(.note)
+        *(.gnu.att*)
+  }
 }
  
