@@ -27,8 +27,7 @@
 # of liability and disclaimer of warranty provisions.
 
 ###########################################################################
-# RN: Sets of objects file to be linked for each nachos flavor. This
-# is the only section you may need to modify when adding files in nachos.
+# Group of files used to defined initial flavors
 #
 THREAD_O	:=	main.o list.o scheduler.o synch.o synchlist.o \
 			system.o thread.o utility.o threadtest.o interrupt.o \
@@ -46,21 +45,27 @@ NETWORK_O	:=	nettest.o post.o network.o
 #
 ###########################################################################
 
-# flavors comming from original nachos.
-# Flavors that will be compiled *without* -DCHANGED under the name nachos
+# Flavors comming from original nachos.
+# *************************************
+# These flavors will be compiled *without* -DCHANGED under the name nachos
 # in their respective directory
 ORIG_FLAVORS=threads userprog filesys network vm
-# Flavors that will be compiled *with* -DCHANGED under the name nachos-"flavor"
+# These flavors will also be compiled *with* -DCHANGED under the name nachos-"flavor"
 # in the build/ directory
-# Add yours here if needed and/or remove the current ones.
 USER_FLAVORS=$(ORIG_FLAVORS)
 
-# Define new flavors when needed, based on the provided original ones:
-# USER_FLAVORS=step2
+# Add yours own flavors here if needed and/or remove the current ones.
+# ********************************************************************
+
+###################################################################
+# Example : define a new flavor based on the 'thread' one that has
+# one more source file (syncconsole.cc) :
+# USER_FLAVORS+=step2
 #
-# step2_DEFINES = -DTHREADS
-# step2_INCDIRS = threads machine
-# step2_C_OFILES = $(THREAD_O) syncconsole.o
+# step2_DEFINES = $(threads_DEFINES)
+# step2_INCDIRS = $(threads_INCDIRS)
+# step2_C_OFILES = $(threads_C_OFILES) syncconsole.o
+###################################################################
 
 ###########################################################################
 #            Original flavors
