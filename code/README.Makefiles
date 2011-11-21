@@ -1,0 +1,35 @@
+These Makefiles allow to easily compile different flavor of nachos.
+
+  In the original Nachos sources, one flavor of nachos were compiled per
+directory (threads userprog filesys network vm), the nachos kernel was always
+named 'nachos'
+
+
+  In the current layout, when compiling in one of these directory, the 'nachos'
+kernel is still compiled but without -DCHANGED (ie, you should get the initial
+'nachos' kernel)
+
+  When compiling in the build/ directory, several flavors of nachos are
+compiled, all with -DCHANGED set. Each flavor has its object files
+prefixed by the name of the flavor and the 'nachos' kernel suffixed by the
+flavor name (ie threads-*.o and nachos-threads for the 'threads' flavor).
+  By default, there is 5 flavors defined (threads userprog filesys network vm)
+corresponding to the initial way of compiling nachos.
+
+  Users must add/remove/modify flavors to compile by editing the
+Makefile.define-flavors file.
+
+  Note that initial flavors (threads userprog filesys network vm) must not be
+modified if you want to be able to compile the initial state of nachos (ie
+within 'threads', 'userprog', 'filesys', 'network', or 'vm' subdirectory
+without -DCHANGED). You can however avoid to compile them by removing them from
+the USER_FLAVORS variable.
+  You can easily add a new flavor by adding its name to USER_FLAVORS and
+defining the three following variables:
+ $(name)_DEFINES   flags of compilation to use
+ $(name)_INCDIRS   directories to search for included files
+ $(name)_C_OFILES  object files to link into the nachos kernel
+The easiest way is to use an existing flavor and adding what is needed.
+See the 'step2' flavor that is commented out in Makefile.define-flavors
+
+
