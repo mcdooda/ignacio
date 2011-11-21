@@ -2,7 +2,7 @@
 # in the build/ subdirectory.
 #
 # This Makefile use the FLAVOR variable to define the variables
-# required by Makefile.compile-kernel
+# required by Makefile.compile-nachos
 # 
 # Copyright (c) 2011 Vincent Danjean
 
@@ -25,6 +25,6 @@ ifeq ($(C_OFILES),)
 $(warning C_OFILES is empty. Is $(FLAVOR)_C_OFILES defined ?)
 endif
 
-include $(topsrc_dir)/Makefile.compile-kernel
+include $(topsrc_dir)/Makefile.compile-nachos
 
 
