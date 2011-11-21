@@ -5,6 +5,14 @@
 # start.o must be the first .o passed to ld, so that routine "Start"
 # gets loaded at location 0
 
+
+ifeq ($(MIPS_CC),)
+$(warning No MIPS cross-compiler found)
+$(warning Set GCCDIR or MIPS_CC in Makefile.sysdep)
+$(warning Cannot compile nachos user programs.)
+$(error Aborting.)
+endif
+
 C_SOURCES	:=	$(notdir $(wildcard $(topsrc_dir)/test/*.c))
 S_SOURCES	:=	$(notdir $(wildcard $(topsrc_dir)/test/*.S))
 # By default, all C files are expected to create a program. Change it
