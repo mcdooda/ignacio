@@ -9,7 +9,7 @@ DIRS	:=	threads userprog filesys network vm
 all: build
 
 build:
-	$(MAKE) -C build V=0
+	$(MAKE) -C build DEFAULT_VERBOSITY=0
 
 check: build
 	@set -e; \
