@@ -19,14 +19,28 @@ build:
 mips-progs:
 	$(MAKE) -C build $@
 
-check: build
-	@set -e; \
+check: initial build
+
+initial:
+	@set -e; RET= ;\
 	for i in $(DIRS); do \
-		$(MAKE) -C $$i nachos; \
-	done ; \
+		$(MAKE) -C $$i nachos || RET="$$RET $$i"; \
+	done ;\
 	for i in bin test; do \
-		$(MAKE) -C $$i all; \
-	done
+		$(MAKE) -C $$i all || RET="$$RET $$i"; \
+	done ;\
+	if [ -n "$$RET" ]; then \
+		echo "=========================================================================" ;\
+		echo "=========================================================================" ;\
+		echo "=========================================================================" ;\
+		echo "Initial compilation of nachos does not work in the following directories:" ;\
+		echo "$$RET" ;\
+		echo "Do you forget to protect your modifications with '#ifdef CHANGED'?" ;\
+		echo "=========================================================================" ;\
+		echo "=========================================================================" ;\
+		echo "=========================================================================" ;\
+		exit 1;\
+	fi
 
 clean:
 	@set -e; \
