@@ -1,3 +1,8 @@
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
+#
 # This is part of a GNU Makefile, mainly used by the Makefile
 # in the build/ subdirectory.
 #
@@ -25,12 +30,6 @@
 #   the name of the nachos kernel executable
 # * S_OFILES (default [switch.o])
 #   list of object files (without prefix) built from assembly
-#
-#
-# Copyright (c) 1992 The Regents of the University of California.
-# All rights reserved.  See copyright.h for copyright notice and limitation 
-# of liability and disclaimer of warranty provisions.
-# Copyright (c) 2011 Vincent Danjean
 
 ###########################################################################
 

@@ -1,6 +1,4 @@
-# Copyright (c) 1992 The Regents of the University of California.
-# All rights reserved.  See copyright.h for copyright notice and limitation 
-# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
 
 DIRS	:=	threads userprog filesys network vm
 

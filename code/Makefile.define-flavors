@@ -1,3 +1,8 @@
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
+#
 # This is part of a GNU Makefile
 #
 # This file is used to defined flavors that will be compiled in
@@ -21,10 +26,6 @@
 # You might want to play with the CFLAGS, but if you use -O it may
 # break the thread system.  You might want to use -fno-inline if
 # you need to call some inline functions from the debugger.
-
-# Copyright (c) 1992 The Regents of the University of California.
-# All rights reserved.  See copyright.h for copyright notice and limitation 
-# of liability and disclaimer of warranty provisions.
 
 ###########################################################################
 # Group of files used to defined initial flavors
