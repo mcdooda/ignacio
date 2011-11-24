@@ -4,12 +4,15 @@
 
 DIRS	:=	threads userprog filesys network vm
 
-.PHONY: all clean depend print build check
+.PHONY: all clean depend print build check mips-progs
 
 all: build
 
 build:
 	$(MAKE) -C build DEFAULT_VERBOSITY=0
+
+mips-progs:
+	$(MAKE) -C build DEFAULT_VERBOSITY=0 $@
 
 check: build
 	@set -e; \
