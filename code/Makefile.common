@@ -23,7 +23,7 @@ CPPFLAGS += $(addprefix -I$(topsrc_dir)/,$(INCDIRS))
 
 # Set default make verbosity
 # By default, show only main commands
-DEFAULT_VERBOSITY=1
+DEFAULT_VERBOSITY?=1
 # Default setting can be overruled with 'V=x' on make invocation
 # Ie: make V=2
 # Possible values are :

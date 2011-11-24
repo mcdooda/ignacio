@@ -1,16 +1,23 @@
 # Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
 
+DEFAULT_VERBOSITY=0
+export DEFAULT_VERBOSITY
+
 DIRS	:=	threads userprog filesys network vm
 
 .PHONY: all clean depend print build check mips-progs
 
+# By default, build the check target so that we check that initial
+# nachos code still compile
+check:
+
 all: build
 
 build:
-	$(MAKE) -C build DEFAULT_VERBOSITY=0
+	$(MAKE) -C build
 
 mips-progs:
-	$(MAKE) -C build DEFAULT_VERBOSITY=0 $@
+	$(MAKE) -C build $@
 
 check: build
 	@set -e; \
