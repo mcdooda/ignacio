@@ -58,13 +58,14 @@ USER_FLAVORS=$(ORIG_FLAVORS)
 # ********************************************************************
 
 ###################################################################
-# Example : define a new flavor based on the 'thread' one that has
-# one more source file (syncconsole.cc) :
+# Example : define a new flavor based on the 'userprog' one that has
+# one more source file (synchconsole.cc) :
+#
 # USER_FLAVORS+=step2
 #
-# step2_DEFINES = $(threads_DEFINES)
-# step2_INCDIRS = $(threads_INCDIRS)
-# step2_C_OFILES = $(threads_C_OFILES) syncconsole.o
+# step2_DEFINES = $(userprog_DEFINES)
+# step2_INCDIRS = $(userprog_INCDIRS)
+# step2_C_OFILES = $(userprog_C_OFILES) synchconsole.o
 ###################################################################
 
 ###########################################################################
