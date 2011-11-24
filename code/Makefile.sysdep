@@ -30,8 +30,8 @@ MIPS_CC=$(firstword $(wildcard \
 	/opt/NACHOS/nachos_gcc/cross/decstation-ultrix/bin))
 # do not use standard include paths when cross-compiling nachos user programs
 MIPS_CPPFLAGS += -nostdinc
-# generate MIPS1 instructions only
-MIPS_CFLAGS += -mips1
+# generate MIPS1 instructions only and use plain function calls
+MIPS_CFLAGS += -mips1 -mno-abicalls
 MIPS_ASFLAGS += -mips1
 # do not link with standard libraries (libc) when creating nachos user programs
 MIPS_LDFLAGS += -nostdlib
