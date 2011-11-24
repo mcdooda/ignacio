@@ -6,17 +6,15 @@
 #	defines in ../Makefile.define-flavors. 
 #
 # Also, if you want to simplify the translation so it assumes
-# only linear page tables, don't define USE_TLB.
+# only linear page tables, don't define USE_TLB (see
+# ../Makefile.define-flavors).
 #
 # Copyright (c) 1992 The Regents of the University of California.
 # All rights reserved.  See copyright.h for copyright notice and limitation 
 # of liability and disclaimer of warranty provisions.
 
 # This makefile will compile the flavor named as the current directory
-# This compilation is done *WITHOUT* -DCHANGE (look into the build/
-# directory to have a build with -DCHANGE)
+# This compilation is done *WITHOUT* -DCHANGED (look into the build/
+# directory to have a build with -DCHANGED)
 
-FLAVOR=$(notdir $(CURDIR))
-
-include ../Makefile.common
-include ../Makefile.compile-flavor
+include ../Makefile.compile-initial-nachos

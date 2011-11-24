@@ -10,11 +10,7 @@
 # of liability and disclaimer of warranty provisions.
 
 # This makefile will compile the flavor named as the current directory
-# This compilation is done *WITHOUT* -DCHANGE (look into the build/
-# directory to have a build with -DCHANGE)
+# This compilation is done *WITHOUT* -DCHANGED (look into the build/
+# directory to have a build with -DCHANGED)
 
-FLAVOR=$(notdir $(CURDIR))
-
-include ../Makefile.common
-include ../Makefile.compile-flavor
-
+include ../Makefile.compile-initial-nachos
