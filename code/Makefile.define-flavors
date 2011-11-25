@@ -12,11 +12,11 @@
 #
 # This file includes all of the baseline code provided by Nachos.
 # Whenever you add a .c or .cc file, put it in the appropriate 
-# _O list and/or only to your own flavor
+# source list and/or only to your own flavor
 #
 # The dependency graph between assignments is:
-#   1. THREADS before everything else
-#   2. USERPROG must come before VM
+#   1. THREADS (step3) before everything else
+#   2. USERPROG (step4) must come before VM
 #   3. USERPROG can come before or after FILESYS, but if USERPROG comes 
 #	before (as in this distribution), then it must define FILESYS_STUB
 #
@@ -30,43 +30,40 @@
 ###########################################################################
 # Group of files used to defined initial flavors
 #
-THREAD_O	:=	main.o list.o scheduler.o synch.o synchlist.o \
-			system.o thread.o utility.o threadtest.o interrupt.o \
-			stats.o sysdep.o timer.o
+THREAD_SRC      :=      main.cc list.cc scheduler.cc synch.cc synchlist.cc \
+                        system.cc thread.cc utility.cc threadtest.cc interrupt.cc \
+                        stats.cc sysdep.cc timer.cc switch.S
 
-USERPROG_O	:=	addrspace.o bitmap.o exception.o progtest.o console.o \
-			machine.o mipssim.o translate.o
+USERPROG_SRC    :=      addrspace.cc bitmap.cc exception.cc progtest.cc console.cc \
+                        machine.cc mipssim.cc translate.cc
 
-VM_O		:=
+VM_SRC          :=
 
-FILESYS_O	:=	directory.o filehdr.o filesys.o fstest.o openfile.o \
-			synchdisk.o disk.o
+FILESYS_SRC     :=      directory.cc filehdr.cc filesys.cc fstest.cc openfile.cc \
+                        synchdisk.cc disk.cc
 
-NETWORK_O	:=	nettest.o post.o network.o
+NETWORK_SRC     :=      nettest.cc post.cc network.cc
 #
 ###########################################################################
 
 # Flavors comming from original nachos.
 # *************************************
-# These flavors will be compiled *without* -DCHANGED under the name nachos
-# in their respective directory
+# These flavors will be compiled *without* -DCHANGED under the name
+# nachos-"flavor" in the 'build-initial/' directory
 ORIG_FLAVORS=threads userprog filesys network vm
-# These flavors will also be compiled *with* -DCHANGED under the name nachos-"flavor"
-# in the build/ directory
+# These flavors will be compiled *with* -DCHANGED under the name
+# nachos-"flavor" in the 'build-user/' directory
 USER_FLAVORS=$(ORIG_FLAVORS)
 
 # Add yours own flavors here if needed and/or remove the current ones.
 # ********************************************************************
 
 ###################################################################
-# Example : define a new flavor based on the 'userprog' one that has
+# Example : define a new flavor step2 based on the 'userprog' one that has
 # one more source file (synchconsole.cc) :
 #
 # USER_FLAVORS+=step2
-#
-# step2_DEFINES = $(userprog_DEFINES)
-# step2_INCDIRS = $(userprog_INCDIRS)
-# step2_C_OFILES = $(userprog_C_OFILES) synchconsole.o
+# $(eval $(call define-flavor,step2,userprog,synchconsole.cc))
 ###################################################################
 
 ###########################################################################
@@ -75,52 +72,61 @@ USER_FLAVORS=$(ORIG_FLAVORS)
 
 ###########################################################################
 ######### threads
-threads_DEFINES = -DTHREADS
-threads_INCDIRS = threads machine
-threads_C_OFILES = $(THREAD_O)
+$(eval $(call define-flavor,threads,,\
+  $(THREAD_SRC),\
+  -DTHREADS,\
+  threads machine))
 
 ###########################################################################
 ######### userprog
-userprog_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB
-userprog_INCDIRS = filesys userprog bin threads machine
-userprog_C_OFILES = $(THREAD_O) $(USERPROG_O)
+$(eval $(call define-flavor,userprog,,\
+  $(THREAD_SRC) $(USERPROG_SRC),\
+  -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB,\
+  bin filesys userprog threads machine))
 
 # if file system done first!
-# userprog_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS
-# userprog_INCDIRS = bin filesys userprog threads machine
-# userprog_C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O)
+# $(eval $(call define-flavor,userprog,,\
+#   $(THREAD_SRC) $(USERPROG_SRC) $(FILESYS_SRC),\
+#   -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS,\
+#    bin filesys userprog threads machine))
 
 ###########################################################################
 ######### filesys
-filesys_DEFINES =-DTHREADS -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS
-filesys_INCDIRS = filesys vm userprog bin threads machine
-filesys_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O)
+$(eval $(call define-flavor,filesys,,\
+  $(THREAD_SRC) $(USERPROG_SRC) $(VM_SRC) $(FILESYS_SRC),\
+  -DTHREADS -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS,\
+  filesys vm userprog bin threads machine))
 
 # bare bones version
-# filesys_DEFINES =-DTHREADS -DFILESYS_NEEDED -DFILESYS
-# filesys_INCDIRS = filesys threads machine
-# filesys_C_OFILES = $(THREAD_O) $(FILESYS_O)
+# $(eval $(call define-flavor,filesys,,\
+#   $(THREAD_SRC) $(FILESYS_SRC),\
+#   -DTHREADS -DFILESYS_NEEDED -DFILESYS,\
+#   filesys threads machine))
 
 ###########################################################################
 ######### network
-network_DEFINES = -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS -DNETWORK
-network_INCDIRS = network filesys vm userprog bin threads machine
-network_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O) $(FILESYS_O) $(NETWORK_O)
+$(eval $(call define-flavor,network,,\
+  $(THREAD_SRC) $(USERPROG_SRC) $(VM_SRC) $(FILESYS_SRC) $(NETWORK_SRC),\
+  -DUSER_PROGRAM -DVM -DFILESYS_NEEDED -DFILESYS -DNETWORK,\
+  network filesys vm userprog bin threads machine))
 
 # bare bones version
-# network_DEFINES =-DTHREADS -DNETWORK
-# network_INCDIRS = network threads machine
-# network_C_OFILES = $(THREAD_O) $(NETWORK_O)
+# $(eval $(call define-flavor,network,,\
+#   $(THREAD_SRC) $(NETWORK_SRC),\
+#   -DTHREADS -DNETWORK,\
+#   network threads machine))
 
 ###########################################################################
 ######### vm
-vm_DEFINES = -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVM -DUSE_TLB
-vm_INCDIRS = filesys vm userprog bin threads machine
-vm_C_OFILES = $(THREAD_O) $(USERPROG_O) $(VM_O)
+$(eval $(call define-flavor,vm,,\
+  $(THREAD_SRC) $(USERPROG_SRC) $(VM_SRC),\
+  -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS_STUB -DVM -DUSE_TLB,\
+  filesys vm userprog bin threads machine))
 
 # if file sys done first!
-# vm_DEFINES = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS -DVM -DUSE_TLB
-# vm_INCDIRS = vm bin filesys userprog threads machine
-# vm_C_OFILES = $(THREAD_O) $(USERPROG_O) $(FILESYS_O) $(VM_O)
+# $(eval $(call define-flavor,vm,,\
+#   $(THREAD_SRC) $(USERPROG_SRC) $(FILESYS_SRC) $(VM_SRC),\
+#   -DUSER_PROGRAM  -DFILESYS_NEEDED -DFILESYS -DVM -DUSE_TLB,\
+#   filesys vm userprog bin threads machine))
 
 ###########################################################################

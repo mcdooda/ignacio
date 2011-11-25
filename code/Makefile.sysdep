@@ -8,6 +8,10 @@
 #
 # Depending on your platform, you need to select the correct definition.
 
+# Remove -Werror if this is a too big constraint
+CPPFLAGS+=-Wall -Wshadow -Werror
+CFLAGS+=-g
+CXXFLAGS+=-g
 
 # HOST_CC (and other similar variables) is the compiler used to
 # produce native code
@@ -30,9 +34,10 @@ MIPS_CC=$(firstword $(wildcard \
 	/opt/NACHOS/nachos_gcc/cross/decstation-ultrix/bin))
 # do not use standard include paths when cross-compiling nachos user programs
 MIPS_CPPFLAGS += -nostdinc
-# generate MIPS1 instructions only and use plain function calls
-MIPS_CFLAGS += -mips1 -mno-abicalls
-MIPS_ASFLAGS += -mips1
+# generate MIPS1 instructions only, use plain function calls, and do not use
+# small data/bss sections
+MIPS_CFLAGS += -mips1 -mno-abicalls -G 0
+MIPS_ASFLAGS += -mips1 -mno-abicalls -G 0
 # do not link with standard libraries (libc) when creating nachos user programs
 MIPS_LDFLAGS += -nostdlib
 # -lgcc will perhaps be required with a recent gcc (not on small provided

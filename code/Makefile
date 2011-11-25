@@ -3,9 +3,7 @@
 DEFAULT_VERBOSITY=0
 export DEFAULT_VERBOSITY
 
-DIRS	:=	threads userprog filesys network vm
-
-.PHONY: all clean depend print build check mips-progs
+.PHONY: all clean depend print build build-origin origin check mips-progs bin
 
 # By default, build the check target so that we check that initial
 # nachos code still compile
@@ -13,28 +11,26 @@ check:
 
 all: build
 
-build:
-	$(MAKE) -C build
+build build-origin: bin
+	$(MAKE) -C $@
+
+bin:
+	$(MAKE) -C bin
 
 mips-progs:
 	$(MAKE) -C build $@
 
-check: initial build
+check: origin build
 
-initial:
+origin:
 	@set -e; RET= ;\
-	for i in $(DIRS); do \
-		$(MAKE) -C $$i nachos || RET="$$RET $$i"; \
-	done ;\
-	for i in bin test; do \
-		$(MAKE) -C $$i all || RET="$$RET $$i"; \
-	done ;\
+	$(MAKE) -C build-origin || RET="1" ;\
 	if [ -n "$$RET" ]; then \
 		echo "=========================================================================" ;\
 		echo "=========================================================================" ;\
 		echo "=========================================================================" ;\
-		echo "Initial compilation of nachos does not work in the following directories:" ;\
-		echo "$$RET" ;\
+		echo "Initial compilation of nachos does not work in the following directory:"   ;\
+		echo "build-origin" ;\
 		echo "Do you forget to protect your modifications with '#ifdef CHANGED'?" ;\
 		echo "=========================================================================" ;\
 		echo "=========================================================================" ;\
@@ -44,7 +40,7 @@ initial:
 
 clean:
 	@set -e; \
-	for i in build $(DIRS) bin test; do \
+	for i in build build-origin bin; do \
 		$(MAKE) -C $$i $@; \
 	done
 

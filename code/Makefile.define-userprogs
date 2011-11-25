@@ -1,0 +1,25 @@
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
+#
+# This is part of a GNU Makefile
+#
+# This file is used to defined user programs that will be compiled in
+# in the build-*/ subdirectories.
+#
+# You will probably edit this file to define new NachOS user programs
+#
+
+# List of user program initially present
+ORIG_USERPROGS=halt matmult shell sort
+
+# List of C files in test/ subdirectory that are not a plain user program
+NO_USERPROGS=
+
+# By default, all C files in test/ but the ones previously listed are
+# a user program build only from this source and start.S
+$(foreach p,$(patsubst %.c,%,$(filter-out $(NO_USERPROGS),\
+		$(notdir $(wildcard $(topsrc_dir)/test/*.c)))),\
+	$(eval $(call define-userprog,$p,$p.c start.S,,userprog threads)))
+
