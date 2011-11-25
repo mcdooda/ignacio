@@ -1,12 +1,14 @@
 # Here is a script to build and install a cross compiler to be used on Nachos
 #
 # Contrary to previous document, this script build a recent cross compiler
-# (gcc 4.5 by default) so gcc 2.95 is not used anymore.
+# (gcc 4.6 by default) so gcc 2.95 is not used anymore.
 # improvement: software is installed as real packages on the system
-# inconvenient: only works for Debian (and probably ubuntu)
-#   Recent gcc requires the target libc to build the cross-compiler.
-#   This is why I cannot tell how to build one only from gcc sources
-#   (as it was done with gcc 2.95)
+# inconvenient: only works for Debian (unstable and perhaps
+#   testing/wheezy) and it could perhaps work with ubuntu (feedback welcome)
+#
+# Note: recent gcc requires the target libc to build the cross-compiler.
+# This is why I cannot tell how to build one only from gcc sources
+# (as it was done with gcc 2.95)
 #
 # I think I put all required commands. Howver, it is probably better
 # to copy and paste the command to be able to look at the results
@@ -29,35 +31,31 @@ if test "$(ls binutils-$TARGET_*.deb 2>/dev/null)" ; then
 else
 	apt-get source binutils
 	sudo apt-get build-dep binutils
-	sudo apt-get install fakeroot build-essential
+	sudo apt-get install fakeroot build-essential binutils-multiarch
 	cd binutils-*
 	env TARGET=$TARGET dpkg-buildpackage -b -uc -us
 	cd ..
 	sudo dpkg -i binutils-$TARGET_*.deb
 fi
 
-sudo apt-get install apt-cross
-# sometimes, apt-cross does not succeed to download the listed files.
-# For me, a workaround has been to add http://ftp.fr.debian.org/debian/
-# to my /etc/apt/sources.list
-apt-cross --mirror http://ftp.fr.debian.org/debian/ \
-  --arch mipsel --suite unstable --get libc6-dev libc6 \
+sudo apt-get install dpkg-cross xapt
+sudo xapt --mirror http://ftp.fr.debian.org/debian/ \
+  --arch mipsel --suite unstable --keep-cache libc6-dev libc6 \
   libc6-dev-mips64 libc6-dev-mipsn32 libc6-mips64 linux-libc-dev libc6-mipsn32
-dpkg-cross --arch mipsel --build -X libc-dev-bin -X libc-bin -X libgcc1 \
-  *_mipsel.deb
-sudo dpkg -i *-mipsel-cross_*.deb
 
-# WARNING: gcc-4.5 is currently in experimental, not yet in unstable
-# You might have to add the experimental suite in your /etc/apt/sources.list
-# and/or use gcc-4.4 (not tested but should work)
-apt-get source gcc-4.5
-sudo apt-get build-dep gcc-4.5
+# At least 4.5. Previous does not have a correct cross-compiler build setup
+GCC_V=4.6
 
-cd gcc-4.5-*
-GCC_TARGET=mipsel dpkg-buildpackage -rfakeroot
+apt-get source gcc-${GCC_V}
+sudo apt-get build-dep gcc-${GCC_V}
+sudo apt-get install gcc-${GCC_V}-source
+
+cd gcc-${GCC_V}-*
+env GCC_TARGET=mipsel debian/rules control
+env GCC_TARGET=mipsel dpkg-buildpackage -rfakeroot -us -uc -b
 
 cd ..
-sudo dpkg -i gcc-4.5-mipsel-linux-gnu_*.deb gcc-4.5-mipsel-linux-gnu-base_*.deb  cpp-4.5-mipsel-linux-gnu_*.deb  libgcc1-mipsel-cross_*.deb  libgomp1-mipsel-cross_*.deb
+sudo dpkg -i gcc-${GCC_V}-mipsel-linux-gnu_*.deb gcc-${GCC_V}-mipsel-linux-gnu-base_*.deb  cpp-${GCC_V}-mipsel-linux-gnu_*.deb  libgcc1-mipsel-cross_*.deb  libgomp1-mipsel-cross_*.deb
 
 # Once the packages are installed, all the tools directory can be removed.
 
