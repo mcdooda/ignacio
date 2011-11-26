@@ -1,4 +1,5 @@
-code/build*/*
+code/build/*
+code/build-origin/*
 code/bin/coff2noff
 code/bin/*.o
 code/bin/.*.d
