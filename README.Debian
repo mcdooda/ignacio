@@ -1,3 +1,61 @@
+#!/bin/sh
+
+# At the end of the document, you will find a script that can help
+# to create a cross-compiler on Debian. However, currently (11/2011),
+# Debian is migrating toward multiarch and the script does not work.
+#
+# What I propose is to install Debian packages of a GCC MIPS cross-compiler
+# that has been compiled from and on a Debian squeeze (stable)
+# These packages should work on Debian stable (squeeze), testing (wheesly)
+# and unstable (sid). They should probably also work on Ubuntu (not tested,
+# please report feedback).
+#
+# Only the AMD64 architecture is supported by these pre-compiled packages, not
+# the i386 one.
+#
+# Just run this script (or look at it and type the commands yourself) to
+# install a MIPS cross-compiler
+
+set -e
+
+# either this script must be called as root or the user must be
+# able to use sudo
+if [ "$(whoami)" = root ]; then
+	ROOT=
+else
+	ROOT=sudo
+fi
+
+# Check that we are on amd64, not i386
+if [ "$(uname -m)" != x86_64 ]; then
+	echo "Wrong architechture. Aborting." 1>&2
+	exit 1
+fi
+
+# install a new sources of Debian package
+if [ -f /etc/apt/sources.list.d/nachos.list ]; then
+	echo "File /etc/apt/sources.list.d/nachos.list already installed"
+else
+	echo "deb http://moais.imag.fr/membres/vincent.danjean/debian sid nachos" | \
+		$ROOT bash -c "cat > /etc/apt/sources.list.d/nachos.list"
+fi
+# install the gpg key of the archive
+echo "Installing the key of the archive"
+echo "Check it if you are concerned by security (you should)"
+wget -O - http://moais.imag.fr/membres/vincent.danjean/pubkey.asc | \
+	$ROOT apt-key add -
+
+# update the list of available packages
+$ROOT apt-get update
+
+# install the cross-compiler
+$ROOT apt-get install gcc-4.4-mipsel-linux-gnu
+
+echo "Ok, you should be able to compile NachOS"
+
+# never go further: creating a MIPS cross-compiler is not working for now
+exit 0
+
 # Here is a script to build and install a cross compiler to be used on Nachos
 #
 # Contrary to previous document, this script build a recent cross compiler
@@ -9,7 +67,7 @@
 # Note: recent gcc requires the target libc to build the cross-compiler.
 # This is why I cannot tell how to build one only from gcc sources
 # (as it was done with gcc 2.95)
-#
+
 # I think I put all required commands. Howver, it is probably better
 # to copy and paste the command to be able to look at the results
 #
@@ -33,6 +91,8 @@ else
 	sudo apt-get build-dep binutils
 	sudo apt-get install fakeroot build-essential binutils-multiarch
 	cd binutils-*
+	# on squeeze, replace the following line by
+        # env TARGET=$TARGET fakeroot debian/rules binary-cross
 	env TARGET=$TARGET dpkg-buildpackage -b -uc -us
 	cd ..
 	sudo dpkg -i binutils-$TARGET_*.deb
