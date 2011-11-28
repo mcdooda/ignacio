@@ -54,9 +54,11 @@ $ROOT apt-get install gcc-4.4-mipsel-linux-gnu
 if [ -d /usr/share/doc/g++-multilib ]; then
 	echo "Ok, you should be able to compile NachOS"
 else
-	echo "The MIPS cross-compiler is installed"
-	echo "You probably will need to install the g++-multilib package"
-	echo "in order to compile NachOS"
+	echo "* The MIPS cross-compiler is installed                       *"
+	echo "**************************************************************"
+	echo "* You probably will need to install the g++-multilib package *"
+	echo "* in order to compile NachOS                                 *"
+	echo "**************************************************************"
 fi
 
 # never go further: creating a MIPS cross-compiler is not working for now
