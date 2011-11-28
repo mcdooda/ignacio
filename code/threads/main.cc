@@ -92,7 +92,7 @@ main (int argc, char **argv)
       {
 	  argCount = 1;
 	  if (!strcmp (*argv, "-z"))	// print copyright
-	      printf (copyright);
+	      printf ("%s", copyright);
 #ifdef USER_PROGRAM
 	  if (!strcmp (*argv, "-x"))
 	    {			// run a user program
