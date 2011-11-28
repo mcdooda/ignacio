@@ -31,7 +31,7 @@ origin:
 		echo "=========================================================================" ;\
 		echo "Initial compilation of nachos does not work in the following directory:"   ;\
 		echo "build-origin" ;\
-		echo "Do you forget to protect your modifications with '#ifdef CHANGED'?" ;\
+		echo "Did you forget to protect your modifications with '#ifdef CHANGED'?" ;\
 		echo "=========================================================================" ;\
 		echo "=========================================================================" ;\
 		echo "=========================================================================" ;\
