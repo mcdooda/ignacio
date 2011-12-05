@@ -20,6 +20,7 @@ SECTIONS
     /* VD: putting the read-only data section into the rw data section
        coff2noff only support 3 sections */
     *(.rdata)
+    *(.rodata)
   }
    edata  =  .;
    _edata  =  .;
