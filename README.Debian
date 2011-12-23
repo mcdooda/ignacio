@@ -26,11 +26,13 @@ else
 	ROOT=sudo
 fi
 
-# Check that we are on amd64, not i386
-if [ "$(uname -m)" != x86_64 ]; then
-	echo "Wrong architechture. Aborting." 1>&2
+# Check that we are on amd64 or i386
+case "$(uname -m)" in
+x86_64|i*86)	;;
+*)
+	echo "Wrong architechture $(uname -m). Aborting." 1>&2
 	exit 1
-fi
+esac
 
 # install a new sources of Debian package
 if [ -f /etc/apt/sources.list.d/nachos.list ]; then
