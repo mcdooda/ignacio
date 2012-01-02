@@ -28,7 +28,12 @@ fi
 
 # Check that we are on amd64 or i386
 case "$(uname -m)" in
-x86_64|i*86)	;;
+x86_64)
+	ARCH=amd64
+	;;
+i*86)
+	ARCH=i386
+	;;
 *)
 	echo "Wrong architechture $(uname -m). Aborting." 1>&2
 	exit 1
@@ -36,7 +41,7 @@ esac
 
 # install a new sources of Debian package
 if [ -f /etc/apt/sources.list.d/nachos.list ]; then
-	sed -e 's/ nachos/ mipsel-cross/' -i /etc/apt/sources.list.d/nachos.list
+	$ROOT sed -e 's/ nachos/ mipsel-cross/' -i /etc/apt/sources.list.d/nachos.list
 	echo "File /etc/apt/sources.list.d/nachos.list already installed"
 else
 	echo "deb http://moais.imag.fr/membres/vincent.danjean/debian sid mipsel-cross" | \
@@ -54,15 +59,24 @@ $ROOT apt-get update
 # install the cross-compiler
 $ROOT apt-get install gcc-4.4-mipsel-linux-gnu
 
-if [ -d /usr/share/doc/g++-multilib ]; then
-	echo "Ok, you should be able to compile NachOS"
+if dpkg -l g++-multilib | grep -s '^ii' ; then
+	:
 else
-	echo "* The MIPS cross-compiler is installed                       *"
-	echo "**************************************************************"
-	echo "* You probably will need to install the g++-multilib package *"
-	echo "* in order to compile NachOS                                 *"
-	echo "**************************************************************"
+	if test "$ARCH" = amd64 ; then
+		echo "**************************************************************"
+		echo "* Installing the g++-multilib package from your distrib      *"
+		echo "* in order to compile NachOS                                 *"
+		echo "**************************************************************"
+		echo "* Refuse the installation (and try to install it yourself    *"
+		echo "* with your usual package manager) if something seems wrong  *"
+		echo "* (packages that need to be removed, to many packages        *"
+		echo "* upgraded, ...)                                             *"
+		echo "**************************************************************"
+		$ROOT apt-get install g++-multilib
+	fi
 fi
+
+echo "Ok, you should be able to compile NachOS"
 
 # never go further: creating a MIPS cross-compiler is not working for now
 exit 0
