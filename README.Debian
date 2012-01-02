@@ -36,9 +36,10 @@ esac
 
 # install a new sources of Debian package
 if [ -f /etc/apt/sources.list.d/nachos.list ]; then
+	sed -e 's/ nachos/ mipsel-cross/' -i /etc/apt/sources.list.d/nachos.list
 	echo "File /etc/apt/sources.list.d/nachos.list already installed"
 else
-	echo "deb http://moais.imag.fr/membres/vincent.danjean/debian sid nachos" | \
+	echo "deb http://moais.imag.fr/membres/vincent.danjean/debian sid mipsel-cross" | \
 		$ROOT bash -c "cat > /etc/apt/sources.list.d/nachos.list"
 fi
 # install the gpg key of the archive
