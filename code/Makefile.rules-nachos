@@ -234,6 +234,14 @@ flavor-get-OFILES=$(foreach e,cc S,$(patsubst %.$e,%.o,$(filter %.$e,$(call flav
 
 define define-flavor # 1:name 2:features 3:sources 4:defines
   flavor_$1_FEATURES=$$(sort base $2 $$(foreach f,$2,$$($$f_DEP)))
+  $$(foreach f,$$(flavor_$1_FEATURES),$$(if $$($$f_DEP_ALT),\
+	$$(if $$(filter $$($$f_DEP_ALT),$$(flavor_$1_FEATURES)),,\
+	$$(error flavor $1 require one of the features $$(foreach g,$$($$f_DEP_ALT),"$$g") because it includes the feature "$$f"))\
+  ))
+  $$(foreach f,$$(flavor_$1_FEATURES),$$(if $$($$f_CONFLICTS),\
+	$$(foreach g,$$(filter $$($$f_CONFLICTS),$$(flavor_$1_FEATURES)),\
+		$$(error flavor $1 cannot have feature "$$f" and feature "$$g"))\
+  ))
   flavor_$1_SOURCES=$$(sort $$(foreach f,$$(flavor_$1_FEATURES),$$($$f_SRC)) $3) 
   flavor_$1_DEFINES=$$(foreach f,$$(flavor_$1_FEATURES),$$($$f_CPPFLAGS)) $4 
   flavor_$1_INCDIRS=$$(sort $$(foreach f,$$(flavor_$1_FEATURES),$$($$f_INCDIRS)))

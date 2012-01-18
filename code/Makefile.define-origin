@@ -71,11 +71,13 @@ userprog_INCDIRS=bin userprog
 
 # filesys: add support for filesystem
 filesys_DEP_ALT=thread-test userprog
+filesys_CONFLICTS=filesys-stub
 filesys_SRC=$(FILESYS_SRC)
 filesys_CPPFLAGS=-DFILESYS_NEEDED -DFILESYS
 filesys_INCDIRS=filesys
 
 # filesys-stub: fake filesystem using the unix one
+filesys-stub_CONFLICTS=filesys
 filesys-stub_CPPFLAGS=-DFILESYS_NEEDED -DFILESYS_STUB
 filesys-stub_INCDIRS=filesys
 
