@@ -1,0 +1,91 @@
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
+#
+# This is part of a GNU Makefile
+#
+# This file is used to defined flavors that will be compiled in
+# the build/ subdirectory.
+#
+# You will probably edit this file to define new flavors
+#
+###########################################################################
+#                      USERSPACE PROGRAMS                                 #
+###########################################################################
+# List of C files that are not userspace programs (in test/ subdirectory)
+# => add here C files that are user-space libraries
+# all other C files will be compiled as a userspace nachos program
+USERPROG_NOPROGRAM=
+
+# source files that must be included in any userspace nachos program
+USERPROG_LIBS=start.S
+
+# each program 'p' can specify extra sources in 'p'_EXTRA_SOURCES
+# => declare here program sources to add in addition to
+#    'p'.c and $(USERPROG_LIBS)
+
+# Example: a mini-libc has been written in nachos-libc.c that must
+# be linked in each program. Moreover, 'bigtest' is a big program
+# built from bigtest.c and bigtest_extra.c (and nachos-libc.c and
+# start.S of course)
+# USERPROG_NOPROGRAM    = nachos-libc.c bigtest_extra.c
+# USERPROG_LIBS         = start.S nachos-libc.c
+# bigtest_EXTRA_SOURCES = bigtest_extra.c
+
+
+# IMPORTANT: the 4 original user programs (halt, ...) cannot have extra
+# sources and will always be linked only with start.S (USERPROG_LIBS
+# and ..._EXTRA_SOURCES are ignored for them)
+
+###########################################################################
+#                        NACHOS KERNELS                                   #
+###########################################################################
+# The general way to define a flavor is to use the define-flavor macro.
+# It usage is the following:
+# $(eval $(call define-flavor,flavor-name,features list,\
+#       source files,CPPFlags))
+# with:
+#   flavor-name: the (uniq) name of the flavor (should probably be added
+#       to USER_FLAVORS)
+#   features list: space separated list of feature to include in the
+#       flavor. Features are defined and described in Makefile.define-origin
+#   source files: list of extra source files with its extension (.cc or .S)
+#       without the subdirectory (ie in addition to the source files
+#       added by the selected features)
+#   CPPFlags: cpp flags added when compiling this flavor
+
+###########################################################################
+# The Makefile.define-origin defines the following flavors
+######### threads
+# $(eval $(call define-flavor,threads,thread-test))
+######### userprog
+# $(eval $(call define-flavor,userprog,userprog filesys-stub))
+######### filesys
+# $(eval $(call define-flavor,filesys,userprog filesys))
+######### network
+# $(eval $(call define-flavor,network,thread-test userprog filesys network))
+######### vm
+# $(eval $(call define-flavor,vm,userprog filesys-stub vm))
+###########################################################################
+
+###########################################################################
+# Flavors compiled for the user
+# *************************************
+# These flavors will be compiled *with* -DCHANGED under the name
+# nachos-"flavor" in the 'build/' directory
+
+# By default, the same flavors as the original ones are compiled
+USER_FLAVORS=$(ORIG_FLAVORS)
+# Once some personnal flavor are defined, this list can be limited
+# to the personal flavors
+# USER_FLAVORS=step2 step5 mynetwork final
+
+# $(eval $(call define-flavor,step2,userprog filesys-stub,synchconsole.cc))
+# $(eval $(call define-flavor,step5,userprog filesys,\
+#     synchconsole.cc userthread.cc))
+# $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \
+#     synchconsole.cc userthread.cc))
+# $(eval $(call define-flavor,final,userprog filesys network,\
+#     synchconsole.cc userthread.cc))
+

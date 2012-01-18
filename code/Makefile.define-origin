@@ -1,0 +1,129 @@
+# Copyright (c) 1992 The Regents of the University of California.
+# All rights reserved.  See copyright.h for copyright notice and limitation 
+# of liability and disclaimer of warranty provisions.
+# Copyright (c) 2011 Vincent Danjean <Vincent.Danjean@imag.fr>
+#
+# This is part of a GNU Makefile
+#
+# This file is used to defined the initial flavors that will be compiled in
+# nachos subdirectories and/or in the build/ subdirectory.
+#
+# ###################################
+# # DO *NOT* MODIFY THIS FILE       #
+# # if you want that initial nachos #
+# # still compile                   #
+# ###################################
+# 
+# This file includes all of the baseline code provided by Nachos.
+# Whenever you add a .c or .cc file, put it in the appropriate 
+# source list and/or only to your own flavor
+#
+# The dependency graph between assignments is:
+#   1. THREADS (step3) before everything else
+#   2. USERPROG (step4) must come before VM
+#   3. USERPROG can come before or after FILESYS, but if USERPROG comes 
+#	before (as in this distribution), then it must define FILESYS_STUB
+#
+#   Other than that, you have complete flexibility.
+
+# You might want to play with the CFLAGS, but if you use -O it may
+# break the thread system.  You might want to use -fno-inline if
+# you need to call some inline functions from the debugger.
+
+###########################################################################
+# List of NachOS user programs initially present
+ORIG_USERPROGS=halt matmult shell sort
+
+###########################################################################
+# Group of files used to defined initial flavors
+#
+THREAD_SRC      :=      main.cc list.cc scheduler.cc synch.cc synchlist.cc \
+                        system.cc thread.cc utility.cc threadtest.cc interrupt.cc \
+                        stats.cc sysdep.cc timer.cc switch.S
+
+USERPROG_SRC    :=      addrspace.cc bitmap.cc exception.cc progtest.cc console.cc \
+                        machine.cc mipssim.cc translate.cc
+
+VM_SRC          :=
+
+FILESYS_SRC     :=      directory.cc filehdr.cc filesys.cc fstest.cc openfile.cc \
+                        synchdisk.cc disk.cc
+
+NETWORK_SRC     :=      nettest.cc post.cc network.cc
+#
+###########################################################################
+
+FEATURE_LIST=base thread-test userprog filesys filesys-stub network vm
+
+# The 'base' feature will always be automatically added
+base_SRC= $(THREAD_SRC)
+base_CPPFLAGS=
+base_INCDIRS=threads machine
+
+# thread-test feature: run the thread test function
+thread-test_CPPFLAGS=-DTHREADS
+
+# userprog feature: add support to load userspace program
+userprog_DEP_ALT=filesys filesys-stub
+userprog_SRC=$(USERPROG_SRC)
+userprog_CPPFLAGS=-DUSER_PROGRAM
+userprog_INCDIRS=bin userprog
+
+# filesys: add support for filesystem
+filesys_DEP_ALT=thread-test userprog
+filesys_SRC=$(FILESYS_SRC)
+filesys_CPPFLAGS=-DFILESYS_NEEDED -DFILESYS
+filesys_INCDIRS=filesys
+
+# filesys-stub: fake filesystem using the unix one
+filesys-stub_CPPFLAGS=-DFILESYS_NEEDED -DFILESYS_STUB
+filesys-stub_INCDIRS=filesys
+
+# network: add network support
+network_DEP_ALT=thread-test userprog
+network_SRC=$(NETWORK_SRC)
+network_CPPFLAGS=-DNETWORK
+network_INCDIRS=network
+
+# vm: add TLB support
+vm_DEP=userprog
+vm_CPPFLAGS=-DUSE_TLB
+
+# Flavors comming from original nachos.
+# *************************************
+# These flavors will be compiled *without* -DCHANGED under the name
+# nachos-"flavor" in the 'build-origin/' directory
+ORIG_FLAVORS=threads userprog filesys network vm
+
+###########################################################################
+#            Original flavors
+###########################################################################
+######### threads
+$(eval $(call define-flavor,threads,thread-test))
+
+######### userprog
+$(eval $(call define-flavor,userprog,userprog filesys-stub))
+
+# if file system done first!
+# $(eval $(call define-flavor,userprog,userprog filesys))
+
+######### filesys
+$(eval $(call define-flavor,filesys,userprog filesys))
+
+# bare bones version
+# $(eval $(call define-flavor,filesys,thread-test filesys))
+
+###########################################################################
+######### network
+$(eval $(call define-flavor,network,thread-test userprog filesys network))
+
+# bare bones version
+# $(eval $(call define-flavor,network,thread-test network))
+
+###########################################################################
+######### vm
+$(eval $(call define-flavor,vm,userprog filesys-stub vm))
+
+# if file sys done first!
+# $(eval $(call define-flavor,vm,userprog filesys vm))
+

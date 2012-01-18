@@ -132,7 +132,7 @@ $(topsrc_dir)/bin/coff2noff:
 .PHONY: mips-progs
 mips-progs:
 
-define nachos-userprog-rules # 1:program 2:uflavor 3:[target]
+define nachos-userprog-rules # 1:program 2:serie 3:[target]
 #$$(warning defining NachOS userprog $3 with program $1)
 
 all: mips-progs
@@ -148,8 +148,8 @@ mips-progs: $3
 $3: TARGET=MIPS
 $3: LDFLAGS+=-Wl,-T,$(topsrc_dir)/test/script -Wl,-N
 # LB: Caution! start.o should appear *before* $^ for the load!
-$3.coff: %.coff: $$(strip $$(addprefix $$(call uflavor-get-PREFIX,$2),$$(call userprog-get-OFILES,$1))) $(topsrc_dir)/test/script
-	$$(lko_V)$$(LINK.o) $$(addprefix $$(call uflavor-get-PREFIX,$2),start.o) \
+$3.coff: %.coff: $$(strip $$(addprefix $$(call serie-get-PREFIX,$2),$$(call userprog-get-OFILES,$1))) $(topsrc_dir)/test/script
+	$$(lko_V)$$(LINK.o) $$(addprefix $$(call serie-get-PREFIX,$2),start.o) \
 		$$(filter-out %start.o,$$(filter %.o,$$^)) $$(LOADLIBES) $$(LDLIBS) -o $$@
 
 # Avoid leaving .coff files after successful compilation
@@ -161,20 +161,20 @@ $3: %: %.coff $$(topsrc_dir)/bin/coff2noff
 clean::
 	$$(RM) $3 $3.coff
 
-uflavor_$2_SOURCES+=$$(call userprog-get-SOURCES,$1)
+serie_$2_SOURCES+=$$(call userprog-get-SOURCES,$1)
 
 $$(foreach source,$$(filter-out %.c %.S,$$(call userprog-get-SOURCES,$1)), \
   $$(warning Ignoring source $$(source) (no rules to compile it)))
 
 endef
 ###############
-define nachos-userprog-obj-rules # 1:uflavor
-#$$(warning defining NachOS userprog uflavor $1)
-  $$(eval $$(call nachos-userprog-obj-rules2,$1,$$(call uflavor-get-PREFIX,$1),$$(call uflavor-get-SOURCES,$1),\
-     $$(call uflavor-get-OFILES,$1)))
+define nachos-userprog-obj-rules # 1:serie
+#$$(warning defining NachOS userprog serie $1)
+  $$(eval $$(call nachos-userprog-obj-rules2,$1,$$(call serie-get-PREFIX,$1),$$(call serie-get-SOURCES,$1),\
+     $$(call serie-get-OFILES,$1)))
 endef
-define nachos-userprog-obj-rules2 # 1:uflavor 2:prefix 3:sources 4:ofiles
-#$$(warning defining NachOS userprog uflavor $1/$2/$3/$4)
+define nachos-userprog-obj-rules2 # 1:serie 2:prefix 3:sources 4:ofiles
+#$$(warning defining NachOS userprog serie $1/$2/$3/$4)
 
 $$(addprefix $2,$4): $$(filter-out .%.d,$$(MAKEFILE_LIST))
 $$(patsubst %.o,.%.d,$$(addprefix $2,$4)): $$(filter-out .%.d,$$(MAKEFILE_LIST))
@@ -188,7 +188,7 @@ clean::
 	$$(RM) $$(patsubst %.o,.%.d,$$(addprefix $2,$4))
 
 # Add include directories from the list in INCDIRS
-$$(addprefix $2,$4): CPPFLAGS += $$(call uflavor-get-CPPFLAGS,$1)
+$$(addprefix $2,$4): CPPFLAGS += $$(call serie-get-CPPFLAGS,$1)
 $$(addprefix $2,$4): CFLAGS += -DIN_USER_MODE -Wall
 
 $$(foreach source,$$(filter %.c,$3), \
@@ -232,10 +232,15 @@ flavor-get-DEFINES=$(flavor_$1_DEFINES)
 flavor-get-INCDIRS=$(flavor_$1_INCDIRS)
 flavor-get-OFILES=$(foreach e,cc S,$(patsubst %.$e,%.o,$(filter %.$e,$(call flavor-get-SOURCES,$1))))
 
-define define-flavor # 1:name 2:base 3:sources 4:defines 5:incdirs
-  flavor_$1_SOURCES=$$(sort $$(call flavor-get-SOURCES,$2) $3) 
-  flavor_$1_DEFINES=$$(call flavor-get-DEFINES,$2) $4 
-  flavor_$1_INCDIRS=$$(call flavor-get-INCDIRS,$2) $5 
+define define-flavor # 1:name 2:features 3:sources 4:defines
+  flavor_$1_FEATURES=$$(sort base $2 $$(foreach f,$2,$$($$f_DEP)))
+  flavor_$1_SOURCES=$$(sort $$(foreach f,$$(flavor_$1_FEATURES),$$($$f_SRC)) $3) 
+  flavor_$1_DEFINES=$$(foreach f,$$(flavor_$1_FEATURES),$$($$f_CPPFLAGS)) $4 
+  flavor_$1_INCDIRS=$$(sort $$(foreach f,$$(flavor_$1_FEATURES),$$($$f_INCDIRS)))
+  #$$(warning flavor $1 defined with features: $$(flavor_$1_FEATURES))
+  #$$(warning flavor $1 defined with sources: $$(flavor_$1_SOURCES))
+  #$$(warning flavor $1 defined with CPPFLAGS: $$(flavor_$1_DEFINES))
+  #$$(warning flavor $1 defined with INCDIRS: $$(flavor_$1_INCDIRS))
   FLAVORS_LIST:=$$(FLAVORS_LIST) $1
 endef
 
@@ -243,29 +248,43 @@ endef
 userprog-get-SOURCES=$(userprog_$1_SOURCES)
 userprog-get-OFILES=$(foreach e,c S,$(patsubst %.$e,%.o,$(filter %.$e,$(call userprog-get-SOURCES,$1))))
 
-define define-userprog # 1:name 2:sources 3:defines 4:incdirs
+define define-userprog # 1:name 2:sources
   userprog_$1_SOURCES=$$(sort $2 start.S)
   USERPROGS_LIST:=$$(USERPROGS_LIST) $1
 endef
 
-uflavor-get-SOURCES=$(sort $(uflavor_$1_SOURCES))
-uflavor-get-PREFIX=$(strip $(uflavor_$1_PREFIX))
-uflavor-get-CPPFLAGS=$(uflavor_$1_DEFINES) $(addprefix -I$(topsrc_dir)/,$(sort $(uflavor_$1_INCDIRS)))
-uflavor-get-OFILES=$(foreach e,c S,$(patsubst %.$e,%.o,$(filter %.$e,$(call uflavor-get-SOURCES,$1))))
+serie-get-SOURCES=$(sort $(serie_$1_SOURCES))
+serie-get-PREFIX=$(strip $(serie_$1_PREFIX))
+serie-get-CPPFLAGS=$(serie_$1_DEFINES) $(addprefix -I$(topsrc_dir)/,$(sort $(serie_$1_INCDIRS)))
+serie-get-OFILES=$(foreach e,c S,$(patsubst %.$e,%.o,$(filter %.$e,$(call serie-get-SOURCES,$1))))
 
-define define-uflavor # 1:uflavor_name 2:prefix 3:defines 4:incdirs
-  uflavor_$1_PREFIX=$2 
-  uflavor_$1_DEFINES=$3 
-  uflavor_$1_INCDIRS=$4 userprog threads
+define define-serie # 1:serie_name 2:prefix 3:defines 4:incdirs
+  serie_$1_PREFIX=$2 
+  serie_$1_DEFINES=$3 
+  serie_$1_INCDIRS=$4 userprog threads
 endef
 
-include $(topsrc_dir)/Makefile.define-flavors
-include $(topsrc_dir)/Makefile.define-userprogs
+#include $(topsrc_dir)/Makefile.define-flavors
+#include $(topsrc_dir)/Makefile.define-userprogs
+include $(topsrc_dir)/Makefile.define-origin
+# defining original programs
+$(foreach p,$(ORIG_USERPROGS),\
+  $(eval $(call define-userprog,$p,$p.c start.S)))
+
+# defining extra programs
+include $(topsrc_dir)/Makefile.define-user
+$(foreach p,$(patsubst %.c,%,\
+		$(filter-out $(USERPROG_NOPROGRAM) \
+			$(addsuffix .c,$(ORIG_USERPROGS)),\
+		$(notdir $(wildcard $(topsrc_dir)/test/*.c)))),\
+	$(eval $(call define-userprog,$p,\
+		$p.c $(USERPROG_LIBS) $($p_EXTRA_SOURCES),,userprog threads)))
+
 
 SERIES?=AUTOLOAD
 
 $(foreach s,$(SERIES),\
-  $(eval $(call define-uflavor,$s,$($s_PREFIX),$($s_CPPFLAGS),userprog threads)) \
+  $(eval $(call define-serie,$s,$($s_PREFIX),$($s_CPPFLAGS),userprog threads)) \
   $(foreach f,$($s_KERNELS),\
     $(eval $(call nachos-kernel-rules,$f,$($s_PREFIX)$f-,nachos$($s_SUFFIX)-$f,$($s_CPPFLAGS))))\
   $(foreach p,$(patsubst all,$(USERPROGS_LIST),$($s_USERPROGS)),\

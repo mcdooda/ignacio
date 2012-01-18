@@ -18,12 +18,15 @@ are done *without* the -DCHANGED flags. It means that they should *always*
 compile if "#ifdef CHANGED" are used correctly.
 
   In the build/ directory, all NachOS flavors listed in USER_FLAVORS are
-compiled. You can edit Makefile.define-flavors to add/remove flavors to this
+compiled. You can edit Makefile.define-user to add/remove flavors to this
 list. The file already contains (commented-out) an example of how to define a
 'step2' flavor for the synchconsole.
   Similarly, all NachOS user programs are compiled. By default, there is one
 program per C source file in test/ directory. You can edit
-Makefile.define-userprogs to add/remove NachOS user programs.
+Makefile.define-user to add/remove NachOS user programs.
+
+  Makefile.define-origin defines flavors and userprogram included in
+the initial version of NachOS. This file should *not* be modified.
 
 
   Some global variable definition (CPPFLAGS, path to mips cross compiler, ...)
