@@ -6,12 +6,12 @@
 #
 # What I propose is to install Debian packages of a GCC MIPS cross-compiler
 # that has been compiled from and on a Debian squeeze (stable)
-# These packages should work on Debian stable (squeeze), testing (wheesly)
-# and unstable (sid). They should probably also work on Ubuntu (not tested,
-# please report feedback).
+# These packages should work on Debian stable (squeeze), testing (wheezy)
+# and unstable (sid). They also work on Ubuntu sometimes requiring to
+# manually install a extra package.
 #
-# Only the AMD64 architecture is supported by these pre-compiled packages, not
-# the i386 one.
+# Only the AMD64 and i386 architecture is supported by these pre-compiled
+# packages, not the i386 one.
 #
 # Just run this script (or look at it and type the commands yourself) to
 # install a MIPS cross-compiler
