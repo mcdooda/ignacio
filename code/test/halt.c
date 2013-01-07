@@ -15,10 +15,7 @@
 int
 main ()
 {
-	int i;
-	i = 5;
-	i = 5 + 8;
-	Halt ();
+    Halt ();
 
     /* not reached */
     return 0;
