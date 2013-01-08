@@ -42,7 +42,7 @@ void SynchConsole::SynchPutString(const char s[]) {
 void SynchConsole::SynchGetString(char *s, int n) {
 	for (int i = 0; i < n; i++)
 		s[i] = SynchGetChar();
-	s[n-1] = '\0';
+	s[n] = '\0';
 }
 
 #endif // CHANGED

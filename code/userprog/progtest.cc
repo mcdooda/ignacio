@@ -114,17 +114,23 @@ ConsoleTest (char *in, char *out)
 }
 
 #ifdef CHANGED
+extern SynchConsole* synchConsole;
 void SynchConsoleTest (char *in, char *out)
 {
 	char ch;
-	SynchConsole *synchconsole = new SynchConsole(in, out);
-	while((ch = synchconsole->SynchGetChar()) != EOF){
-		synchconsole->SynchPutChar(ch);
+// 	SynchConsole* synchConsole = new SynchConsole(in, out);
+	if(in != NULL && out != NULL){
+		delete synchConsole;
+		synchConsole = new SynchConsole(in, out);
+		printf("bite");
 	}
-	synchconsole->SynchPutString("\nFini de lire\n");
-	char buffer[15];
-	synchconsole->SynchGetString(buffer,15);
-	synchconsole->SynchPutString(buffer);
+	while((ch = synchConsole->SynchGetChar()) != EOF){
+		synchConsole->SynchPutChar(ch);
+	}
+	synchConsole->SynchPutString("\nFini de lire\n");
+	char buffer[16];
+	synchConsole->SynchGetString(buffer,15);
+	synchConsole->SynchPutString(buffer);
 }
 #endif //CHANGED
 
