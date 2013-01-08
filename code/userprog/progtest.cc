@@ -118,13 +118,13 @@ void SynchConsoleTest (char *in, char *out)
 {
 	char ch;
 	SynchConsole *synchconsole = new SynchConsole(in, out);
-	while ((ch = synchconsole->SynchGetChar()) != EOF)
+	while((ch = synchconsole->SynchGetChar()) != EOF){
 		synchconsole->SynchPutChar(ch);
-	
-	//char buffer[100];
-	//TODOUX : Agrémenter
-	
-	fprintf(stderr, "Solaris: EOF detected in SynchConsole!\n");
+	}
+	synchconsole->SynchPutString("\nFini de lire\n");
+	char buffer[15];
+	synchconsole->SynchGetString(buffer,15);
+	synchconsole->SynchPutString(buffer);
 }
 #endif //CHANGED
 
