@@ -93,6 +93,6 @@ ConsoleTest (char *in, char *out)
 		writeDone->P ();	// wait for write to finish
 	  }
 	  if (ch == 'q' || ch == EOF)
-		return;		// if q, quit
+		return;		// if q or EOF, quit
     }
 }
