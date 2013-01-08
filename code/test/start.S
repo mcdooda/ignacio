@@ -48,7 +48,6 @@ Halt:
 	syscall
 	j	$31
 	.end Halt
-
 	.globl Exit
 	.ent	Exit
 Exit:
@@ -128,6 +127,14 @@ Yield:
 	syscall
 	j	$31
 	.end Yield
+
+	.globl PutChar
+	.ent	PutChar
+PutChar:
+	addiu $2,$0,SC_PutChar
+	syscall
+	j	$31
+	.end PutChar
 
 /* dummy function to keep gcc happy */
         .globl  __main

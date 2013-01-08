@@ -24,6 +24,9 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+#ifdef CHANGED
+#include "synchconsole.h"
+#endif
 
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
@@ -58,12 +61,12 @@ UpdatePC ()
 //      The result of the system call, if any, must be put back into r2. 
 //
 // And don't forget to increment the pc before returning. (Or else you'll
-// loop making the same system call forever!
+// loop making the same system call forever!)
 //
 //      "which" is the kind of exception.  The list of possible exceptions 
 //      are in machine.h.
 //----------------------------------------------------------------------
-
+/*
 void
 ExceptionHandler (ExceptionType which)
 {
@@ -83,4 +86,44 @@ ExceptionHandler (ExceptionType which)
     // LB: Do not forget to increment the pc before returning!
     UpdatePC ();
     // End of addition
+}
+*/
+#ifdef USER_PROGRAM
+#ifdef CHANGED
+extern SynchConsole* synchConsole;
+#endif
+#endif
+
+void ExceptionHandler(ExceptionType which) {
+	int type = machine->ReadRegister(2);
+#ifndef CHANGED // Noter le if*n*def
+	if ((which == SyscallException) && (type == SC_Halt)) {
+		DEBUG('a', "Shutdown, initiated by user program.\n");
+		interrupt->Halt();
+	} else {
+		printf("Unexpected user mode exception %d %d\n", which, type);
+		ASSERT(FALSE);
+	}
+	UpdatePC();
+#else // CHANGED
+	if (which == SyscallException) {
+		switch (type) {
+			case SC_Halt: {
+				DEBUG('a', "Shutdown, initiated by user program.\n");
+				interrupt->Halt();
+				break;
+			}
+			case SC_PutChar: {
+				char c = machine->ReadRegister(4) & 0xFF;
+				synchConsole->SynchPutChar(c);
+				break;
+			}
+			default: {
+				printf("Unexpected user mode exception %d %d\n", which, type);
+				ASSERT(FALSE);
+			}
+		}
+		UpdatePC();
+	}
+#endif // CHANGED
 }

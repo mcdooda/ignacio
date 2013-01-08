@@ -7,7 +7,10 @@
 
 #include "copyright.h"
 #include "system.h"
-
+#ifdef CHANGED
+//#include "../userprog/synchconsole.h"
+#include "../userprog/synchconsole.h"
+#endif
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
@@ -29,7 +32,11 @@ SynchDisk *synchDisk;
 
 #ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
 Machine *machine;		// user program memory and registers
-#endif
+#ifdef CHANGED
+SynchConsole *synchConsole;
+#endif //CHANGED
+#endif //USER_PROGRAM
+
 
 #ifdef NETWORK
 PostOffice *postOffice;
@@ -157,6 +164,9 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
+#ifdef CHANGED
+	synchConsole = new SynchConsole(NULL, NULL);
+#endif
 #endif
 
 #ifdef FILESYS
@@ -186,6 +196,9 @@ Cleanup ()
 
 #ifdef USER_PROGRAM
     delete machine;
+#ifdef CHANGED
+	delete synchConsole;
+#endif //CHANGED
 #endif
 
 #ifdef FILESYS_NEEDED
@@ -199,6 +212,7 @@ Cleanup ()
     delete timer;
     delete scheduler;
     delete interrupt;
-
+	
+	
     Exit (0);
 }
