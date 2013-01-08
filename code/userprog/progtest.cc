@@ -11,6 +11,7 @@
 #include "copyright.h"
 #include "system.h"
 #include "console.h"
+#include "synchconsole.h"
 #include "addrspace.h"
 #include "synch.h"
 
@@ -47,7 +48,6 @@ StartProcess (char *filename)
 
 // Data structures needed for the console test.  Threads making
 // I/O requests wait on a Semaphore to delay until the I/O completes.
-
 static Console *console;
 static Semaphore *readAvail;
 static Semaphore *writeDone;
@@ -112,3 +112,19 @@ ConsoleTest (char *in, char *out)
 	}
 #endif
 }
+
+#ifdef CHANGED
+void SynchConsoleTest (char *in, char *out)
+{
+	char ch;
+	SynchConsole *synchconsole = new SynchConsole(in, out);
+	while ((ch = synchconsole->SynchGetChar()) != EOF)
+		synchconsole->SynchPutChar(ch);
+	
+	//char buffer[100];
+	//TODOUX : Agrémenter
+	
+	fprintf(stderr, "Solaris: EOF detected in SynchConsole!\n");
+}
+#endif //CHANGED
+

@@ -42,7 +42,7 @@ THREAD_SRC      :=      main.cc list.cc scheduler.cc synch.cc synchlist.cc \
                         stats.cc sysdep.cc timer.cc switch.S
 
 USERPROG_SRC    :=      addrspace.cc bitmap.cc exception.cc progtest.cc console.cc \
-                        machine.cc mipssim.cc translate.cc
+                        machine.cc mipssim.cc translate.cc synchconsole.cc
 
 VM_SRC          :=
 
