@@ -12,5 +12,14 @@ void print(char c, int n)
 int main()
 {
 	print('a',4);
+        char c = GetChar();
+        
+        //TODO EOF = -1 mais je sais pas quoi inclure pour que ca existe
+        while(c != -1)
+        {
+            PutChar(c);
+            c = GetChar();
+        }
+
         return 18;
 }

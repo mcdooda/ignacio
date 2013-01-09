@@ -126,6 +126,18 @@ void ExceptionHandler(ExceptionType which) {
                 interrupt->Exit(code);
                 break;
             }
+            case SC_GetChar:
+            {
+                //TODO Que fait-on en fin de fichier ? rien pour l'instant..
+                int c = synchConsole->SynchGetChar();
+                machine->WriteRegister(2,c);
+                break;
+            }
+            case SC_GetString:
+            {
+                //TODO
+                break;
+            }
             default:
             {
                 printf("Unexpected user mode exception %d %d\n", which, type);

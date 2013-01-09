@@ -30,6 +30,11 @@
 #define SC_Fork		9
 #define SC_Yield	10
 #define SC_PutChar	11
+#define SC_GetChar      13
+#define SC_GetString    14
+#define SC_PutInt       15
+#define SC_GetInt       16
+//TODO : verifier les nombres
 
 #ifdef IN_USER_MODE
 
@@ -130,6 +135,14 @@ void Fork (void (*func) ());
 void Yield ();
 
 void PutChar(char c);
+
+char GetChar();
+
+char* GetString();
+
+void PutInt(int i);
+
+int GetInt();
 
 #endif // IN_USER_MODE
 
