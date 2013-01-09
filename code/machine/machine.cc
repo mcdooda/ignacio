@@ -212,9 +212,21 @@ int Machine::ReadRegister(int num)
     }
 
 void Machine::WriteRegister(int num, int value)
-    {
+	{
 	ASSERT((num >= 0) && (num < NumTotalRegs));
 	// DEBUG('m', "WriteRegister %d, value %d\n", num, value);
 	registers[num] = value;
-    }
-
+	}
+#ifdef CHANGED
+void Machine::CopyStringFromMachine(int adr, char *str, int size)
+	{
+		for(int i=0;i<size;i++){ 
+			ReadMem(adr,1,(int*)&str[i]);
+			adr+=sizeof(char);
+			if(str[i]=='\0'){
+				break;
+			}
+		}
+		str[size] = '\0';
+	}
+#endif

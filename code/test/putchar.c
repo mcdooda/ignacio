@@ -7,6 +7,7 @@ void print(char c, int n)
 		PutChar(c+i);
 	}
 	PutChar('\n');
+	PutString("test\n");
 }
 
 int main()
