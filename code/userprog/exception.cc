@@ -35,12 +35,12 @@
 
 static void
 UpdatePC() {
-    int pc = machine->ReadRegister(PCReg);
-    machine->WriteRegister(PrevPCReg, pc);
-    pc = machine->ReadRegister(NextPCReg);
-    machine->WriteRegister(PCReg, pc);
-    pc += 4;
-    machine->WriteRegister(NextPCReg, pc);
+	int pc = machine->ReadRegister(PCReg);
+	machine->WriteRegister(PrevPCReg, pc);
+	pc = machine->ReadRegister(NextPCReg);
+	machine->WriteRegister(PCReg, pc);
+	pc += 4;
+	machine->WriteRegister(NextPCReg, pc);
 }
 
 
@@ -70,22 +70,22 @@ UpdatePC() {
 void
 ExceptionHandler (ExceptionType which)
 {
-    int type = machine->ReadRegister (2);
+	int type = machine->ReadRegister (2);
 
-    if ((which == SyscallException) && (type == SC_Halt))
-      {
-          DEBUG ('a', "Shutdown, initiated by user program.\n");
-          interrupt->Halt ();
-      }
-    else
-      {
-          printf ("Unexpected user mode exception %d %d\n", which, type);
-          ASSERT (FALSE);
-      }
+	if ((which == SyscallException) && (type == SC_Halt))
+	  {
+		  DEBUG ('a', "Shutdown, initiated by user program.\n");
+		  interrupt->Halt ();
+	  }
+	else
+	  {
+		  printf ("Unexpected user mode exception %d %d\n", which, type);
+		  ASSERT (FALSE);
+	  }
 
-    // LB: Do not forget to increment the pc before returning!
-    UpdatePC ();
-    // End of addition
+	// LB: Do not forget to increment the pc before returning!
+	UpdatePC ();
+	// End of addition
 }
  */
 #ifdef USER_PROGRAM
@@ -95,44 +95,43 @@ extern SynchConsole* synchConsole;
 #endif
 
 void ExceptionHandler(ExceptionType which) {
-    int type = machine->ReadRegister(2);
+	int type = machine->ReadRegister(2);
 #ifndef CHANGED // Noter le if*n*def
-    if ((which == SyscallException) && (type == SC_Halt)) {
-        DEBUG('a', "Shutdown, initiated by user program.\n");
-        interrupt->Halt();
-    } else {
-        printf("Unexpected user mode exception %d %d\n", which, type);
-        ASSERT(FALSE);
-    }
-    UpdatePC();
+	if ((which == SyscallException) && (type == SC_Halt)) {
+		DEBUG('a', "Shutdown, initiated by user program.\n");
+		interrupt->Halt();
+	} else {
+		printf("Unexpected user mode exception %d %d\n", which, type);
+		ASSERT(FALSE);
+	}
+	UpdatePC();
 #else // CHANGED
-    if (which == SyscallException) {
-        switch (type) {
-            case SC_Halt:
-            {
-                DEBUG('a', "Shutdown, initiated by user program.\n");
-                interrupt->Halt();
-                break;
-            }
-            case SC_PutChar:
-            {
-                char c = machine->ReadRegister(4) & 0xFF;
-                synchConsole->SynchPutChar(c);
-                break;
-            }
-            case SC_Exit:
-            {
-                int code = machine->ReadRegister(4);
-                interrupt->Exit(code);
-                break;
-            }
-            case SC_GetChar:
-            {
-                //TODO Que fait-on en fin de fichier ? rien pour l'instant..
-                int c = synchConsole->SynchGetChar();
-                machine->WriteRegister(2, c);
-                break;
-            }
+	if (which == SyscallException) {
+		switch (type) {
+			case SC_Halt:
+			{
+				DEBUG('a', "Shutdown, initiated by user program.\n");
+				interrupt->Halt();
+				break;
+			}
+			case SC_PutChar:
+			{
+				char c = machine->ReadRegister(4) & 0xFF;
+				synchConsole->SynchPutChar(c);
+				break;
+			}
+			case SC_Exit:
+			{
+				int code = machine->ReadRegister(4);
+				interrupt->Exit(code);
+				break;
+			}
+			case SC_GetChar:
+			{
+				int c = synchConsole->SynchGetChar();
+				machine->WriteRegister(2, c & 0xFF);
+				break;
+			}
             case SC_PutString:
             {
                 int adds = machine->ReadRegister(4);
@@ -141,18 +140,23 @@ void ExceptionHandler(ExceptionType which) {
                 synchConsole->SynchPutString(buff);
                 break;
             }
-            case SC_GetString:
-            {
-                //TODO
-                break;
-            }
-            default:
-            {
-                printf("Unexpected user mode exception %d %d\n", which, type);
-                ASSERT(FALSE);
-            }
-        }
-        UpdatePC();
-    }
+			case SC_GetString:
+			{
+				int string = machine->ReadRegister(4);
+				char strTmp[MAX_STRING_SIZE]; //TODO Antoine a dit min avec size ?
+				int size = machine->ReadRegister(5);
+				synchConsole->SynchGetString(strTmp, size);
+				machine->CopyStringToMachine(string,strTmp,size);
+				
+				break;
+			}
+			default:
+			{
+				printf("Unexpected user mode exception %d %d\n", which, type);
+				ASSERT(FALSE);
+			}
+		}
+		UpdatePC();
+	}
 #endif // CHANGED
 }
