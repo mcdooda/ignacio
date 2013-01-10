@@ -130,16 +130,17 @@ void ExceptionHandler(ExceptionType which) {
             {
                 //TODO Que fait-on en fin de fichier ? rien pour l'instant..
                 int c = synchConsole->SynchGetChar();
-                machine->WriteRegister(2,c);
+                machine->WriteRegister(2, c);
                 break;
             }
-			case SC_PutString: {
-				int adds = machine->ReadRegister(4);
-				char str[20];
-				machine->CopyStringFromMachine(adds,str,19);
-				synchConsole->SynchPutString(str);
-				break;
-			}
+            case SC_PutString:
+            {
+                int adds = machine->ReadRegister(4);
+                char buff[MAX_STRING_SIZE];
+                machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
+                synchConsole->SynchPutString(buff);
+                break;
+            }
             case SC_GetString:
             {
                 //TODO
