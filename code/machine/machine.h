@@ -181,7 +181,9 @@ class Machine {
 
     TranslationEntry *pageTable;
     unsigned int pageTableSize;
-
+#ifdef CHANGED
+	void CopyStringFromMachine(int adr, char *str, int size);
+#endif
   private:
     bool singleStep;		// drop back into the debugger after each
 				// simulated instruction

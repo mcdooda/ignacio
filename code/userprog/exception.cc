@@ -132,6 +132,13 @@ void ExceptionHandler(ExceptionType which) {
                 machine->WriteRegister(2,c & 0xFF);
                 break;
             }
+			case SC_PutString: {
+				int adds = machine->ReadRegister(4);
+				char str[20];
+				machine->CopyStringFromMachine(adds,str,19);
+				synchConsole->SynchPutString(str);
+				break;
+			}
             case SC_GetString:
             {
                 char* string = machine->ReadRegister(4);
