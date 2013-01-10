@@ -123,13 +123,17 @@ void SynchConsoleTest (char *in, char *out)
 		delete synchConsole;
 		synchConsole = new SynchConsole(in, out);
 	}
-	while((ch = synchConsole->SynchGetChar()) != EOF){
+//	while((ch = synchConsole->SynchGetChar()) != EOF){
+//		synchConsole->SynchPutChar(ch);
+	while(!synchConsole->feof()) {
+		//TODO ÿ lu que si dédoublé
+		ch = synchConsole->SynchGetChar();
 		synchConsole->SynchPutChar(ch);
 	}
-	synchConsole->SynchPutString("\nFini de lire\n");
-	char buffer[16];
-	synchConsole->SynchGetString(buffer,15);
-	synchConsole->SynchPutString(buffer);
+//	synchConsole->SynchPutString("\nTest de SynchGetString/SynchPutString :\n");
+//	char buffer[16];
+//	synchConsole->SynchGetString(buffer,16);
+//	synchConsole->SynchPutString(buffer);
 }
 #endif //CHANGED
 

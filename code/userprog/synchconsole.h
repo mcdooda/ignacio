@@ -30,8 +30,6 @@ class SynchConsole : public Console {
 		// Unix fgets(3S)
 		void SynchGetString(char *s, int n);
 		
-		bool feof();
-
 };
 
 

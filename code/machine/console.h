@@ -55,7 +55,9 @@ class Console {
 // internal emulation routines -- DO NOT call these. 
     void WriteDone();	 	// internal routines to signal I/O completion
     void CheckCharAvail();
-
+#ifdef CHANGED
+	bool feof();
+#endif
   private:
     int readFileNo;			// UNIX file emulating the keyboard 
     int writeFileNo;			// UNIX file emulating the display
@@ -70,6 +72,9 @@ class Console {
     char incoming;    			// Contains the character to be read,
 					// if there is one available. 
 					// Otherwise contains EOF.
+#ifdef CHANGED
+	bool end;
+#endif
 };
 
 #endif // CONSOLE_H
