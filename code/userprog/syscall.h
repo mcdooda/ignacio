@@ -147,7 +147,6 @@ char* GetString();
 void PutInt(int i);
 
 int GetInt();
->>>>>>> fa414183d04f3368d8727132c43c4d9202d40075
 
 #endif // IN_USER_MODE
 
