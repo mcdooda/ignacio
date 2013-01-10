@@ -146,8 +146,25 @@ void ExceptionHandler(ExceptionType which) {
 				char strTmp[MAX_STRING_SIZE]; //TODO Antoine a dit min avec size ?
 				int size = machine->ReadRegister(5);
 				synchConsole->SynchGetString(strTmp, size);
-				machine->CopyStringToMachine(string,strTmp,size);
-				
+				machine->CopyStringToMachine(string, strTmp, size);
+
+				break;
+			}
+			case SC_PutInt:
+			{
+				int n = machine->ReadRegister(4);
+				char str[12];
+				snprintf(str, 12, "%d", n);
+				synchConsole->SynchPutString(str);
+				break;
+			}
+			case SC_GetInt:
+			{
+				char str[12];
+				int n;
+				synchConsole->SynchGetString(str,12);
+				sscanf(str, "%d", &n);
+				machine->WriteRegister(2, n);
 				break;
 			}
 			default:
