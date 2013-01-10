@@ -26,6 +26,7 @@
 #include "syscall.h"
 #ifdef CHANGED
 #include "synchconsole.h"
+#include "usermachine.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -90,6 +91,7 @@ ExceptionHandler (ExceptionType which)
  */
 #ifdef USER_PROGRAM
 #ifdef CHANGED
+extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
 #endif
 #endif
@@ -136,7 +138,7 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				int adds = machine->ReadRegister(4);
 				char buff[MAX_STRING_SIZE];
-				machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
+				userMachine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
 				synchConsole->SynchPutString(buff);
 				break;
 			}
@@ -146,7 +148,7 @@ void ExceptionHandler(ExceptionType which) {
 				char strTmp[MAX_STRING_SIZE]; //TODO Antoine a dit min avec size ?
 				int size = machine->ReadRegister(5);
 				synchConsole->SynchGetString(strTmp, size);
-				machine->CopyStringToMachine(string, strTmp, size);
+				userMachine->CopyStringToMachine(string, strTmp, size);
 
 				break;
 			}

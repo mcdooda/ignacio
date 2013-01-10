@@ -48,15 +48,17 @@ StartProcess (char *filename)
 
 // Data structures needed for the console test.  Threads making
 // I/O requests wait on a Semaphore to delay until the I/O completes.
-static Console *console;
 static Semaphore *readAvail;
 static Semaphore *writeDone;
-
+#ifdef CHANGED
+extern SynchConsole* synchConsole;
+#endif
 //----------------------------------------------------------------------
 // ConsoleInterruptHandlers
 //      Wake up the thread that requested the I/O.
 //----------------------------------------------------------------------
 
+static Console *console;
 static void
 ReadAvail (int arg)
 {
@@ -67,7 +69,6 @@ WriteDone (int arg)
 {
     writeDone->V ();
 }
-
 //----------------------------------------------------------------------
 // ConsoleTest
 //      Test the console by echoing characters typed at the input onto
@@ -78,12 +79,26 @@ void
 ConsoleTest (char *in, char *out)
 {
     char ch;
-
+	
+#ifdef CHANGED
+	delete synchConsole;
+	synchConsole = NULL;
+#endif
+	
     console = new Console (in, out, ReadAvail, WriteDone, 0);
     readAvail = new Semaphore ("read avail", 0);
     writeDone = new Semaphore ("write done", 0);
-
-#ifdef CHANGED
+#ifndef CHANGED
+	for (;;)
+	{
+	  readAvail->P ();	// wait for character to arrive
+	  ch = console->GetChar ();
+	  console->PutChar (ch);	// echo it!
+	  writeDone->P ();	// wait for write to finish
+	  if (ch == 'q')
+		return;		// if q, quit
+	}
+#else
     for (;;)
     {
 	  readAvail->P ();	// wait for character to arrive
@@ -100,29 +115,14 @@ ConsoleTest (char *in, char *out)
 	  if (ch == 'q' || ch == EOF)
 		return;		// if q or EOF, quit
     }
-#else
-	for (;;)
-	{
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  console->PutChar (ch);	// echo it!
-	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q')
-		return;		// if q, quit
-	}
 #endif
 }
 
 #ifdef CHANGED
-extern SynchConsole* synchConsole;
 void SynchConsoleTest (char *in, char *out)
 {
 	char ch;
-// 	SynchConsole* synchConsole = new SynchConsole(in, out);
-	if(in != NULL && out != NULL){
-		delete synchConsole;
-		synchConsole = new SynchConsole(in, out);
-	}
+
 	while((ch = synchConsole->SynchGetChar()) != EOF){
 		synchConsole->SynchPutChar(ch);
 	}
