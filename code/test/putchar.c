@@ -11,6 +11,7 @@ void print(char c, int n) {
 int main() {
     char c;
     print('a', 4);
+    
     c = GetChar();
     
     //TODO : EOF = -1 mais je sais pas quoi inclure pour que ca existe
