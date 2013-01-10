@@ -13,5 +13,5 @@ void print(char c, int n)
 int main()
 {
 	print('a',4);
-	Halt();
+        return 18;
 }

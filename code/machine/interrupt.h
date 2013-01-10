@@ -92,6 +92,7 @@ class Interrupt {
 					// next interrupt
 
     void Halt(); 			// quit and print out stats
+    void Exit(int code); 		// quit a program in nachOs
     
     void YieldOnReturn();		// cause a context switch on return 
 					// from an interrupt handler

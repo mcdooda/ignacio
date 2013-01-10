@@ -248,6 +248,21 @@ Interrupt::Halt()
     Cleanup();     // Never returns.
 }
 
+#ifdef CHANGED
+//----------------------------------------------------------------------
+// Interrupt::Exit
+// 	Shut down Nachos cleanly, printing out performance statistics.
+//----------------------------------------------------------------------
+void
+Interrupt::Exit(int code)
+{
+    //TODOUX ajouter le pid du prog
+    printf("code retour : %d\n\n",code);
+
+}
+#endif
+
+
 //----------------------------------------------------------------------
 // Interrupt::Schedule
 // 	Arrange for the CPU to be interrupted when simulated time
