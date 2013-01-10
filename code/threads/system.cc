@@ -8,8 +8,8 @@
 #include "copyright.h"
 #include "system.h"
 #ifdef CHANGED
-//#include "../userprog/synchconsole.h"
 #include "../userprog/synchconsole.h"
+#include "../userprog/usermachine.h"
 #endif
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -34,6 +34,7 @@ SynchDisk *synchDisk;
 Machine *machine;		// user program memory and registers
 #ifdef CHANGED
 SynchConsole *synchConsole;
+UserMachine *userMachine;
 #endif //CHANGED
 #endif //USER_PROGRAM
 
@@ -87,6 +88,10 @@ Initialize (int argc, char **argv)
     int argCount;
     const char *debugArgs = "";
     bool randomYield = FALSE;
+#ifdef CHANGED
+	char* in = NULL;
+	char* out = NULL;
+#endif
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
@@ -120,6 +125,16 @@ Initialize (int argc, char **argv)
 		randomYield = TRUE;
 		argCount = 2;
 	    }
+#ifdef CHANGED
+	  else if(!strcmp (*argv, "-in")){
+		in = *(argv + 1);
+		argCount = 2;
+	  }
+	  else if(!strcmp (*argv, "-out")){
+		out = *(argv + 1);
+		argCount = 2;
+	  }
+#endif
 #ifdef USER_PROGRAM
 	  if (!strcmp (*argv, "-s"))
 	      debugUserProg = TRUE;
@@ -165,7 +180,8 @@ Initialize (int argc, char **argv)
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
 #ifdef CHANGED
-	synchConsole = new SynchConsole(NULL, NULL);
+	userMachine = new UserMachine();
+	synchConsole = new SynchConsole(in, out);
 #endif
 #endif
 
@@ -197,6 +213,7 @@ Cleanup ()
 #ifdef USER_PROGRAM
     delete machine;
 #ifdef CHANGED
+	delete userMachine;
 	delete synchConsole;
 #endif //CHANGED
 #endif

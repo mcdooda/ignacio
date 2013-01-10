@@ -51,5 +51,6 @@ extern PostOffice *postOffice;
 
 #ifdef CHANGED
 #define MAX_STRING_SIZE 20 //TODO mettre une valeur maximale de string réfléchie
+#define MAX_INTSTR_SIZE 12
 #endif
 #endif // SYSTEM_H

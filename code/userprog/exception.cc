@@ -26,6 +26,7 @@
 #include "syscall.h"
 #ifdef CHANGED
 #include "synchconsole.h"
+#include "usermachine.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -90,6 +91,7 @@ ExceptionHandler (ExceptionType which)
  */
 #ifdef USER_PROGRAM
 #ifdef CHANGED
+extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
 #endif
 #endif
@@ -136,33 +138,33 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				int adds = machine->ReadRegister(4);
 				char buff[MAX_STRING_SIZE];
-				machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
+				userMachine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
 				synchConsole->SynchPutString(buff);
 				break;
 			}
 			case SC_GetString:
 			{
 				int string = machine->ReadRegister(4);
-				char strTmp[MAX_STRING_SIZE]; //TODO Antoine a dit min avec size ?
 				int size = machine->ReadRegister(5);
+				size = (size > MAX_STRING_SIZE ? MAX_STRING_SIZE : size);
+				char strTmp[size];
 				synchConsole->SynchGetString(strTmp, size);
-				machine->CopyStringToMachine(string, strTmp, size);
-
+				userMachine->CopyStringToMachine(string, strTmp, size);
 				break;
 			}
 			case SC_PutInt:
 			{
 				int n = machine->ReadRegister(4);
-				char str[12];
-				snprintf(str, 12, "%d", n);
+				char str[MAX_INTSTR_SIZE];
+				snprintf(str, MAX_INTSTR_SIZE, "%d", n);
 				synchConsole->SynchPutString(str);
 				break;
 			}
 			case SC_GetInt:
 			{
-				char str[12];
+				char str[MAX_INTSTR_SIZE];
 				int n;
-				synchConsole->SynchGetString(str,12);
+				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
 				sscanf(str, "%d", &n);
 				machine->WriteRegister(2, n);
 				break;

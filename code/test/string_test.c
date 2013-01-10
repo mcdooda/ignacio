@@ -3,15 +3,12 @@
 int main() {
     char buffer[10];
 
-
-    GetString(buffer, 10);
-
-    while (buffer[0] != -1) {
+    do {
+		GetString(buffer, 10);
         PutChar('<');
         PutString(buffer);
         PutChar('>');
-        GetString(buffer, 10);
-    }
+    } while (buffer[0] != -1);
 
-    return 18;
+    return 0;
 }
