@@ -15,11 +15,9 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile) :
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
-// 	console = ...
 }
 
 SynchConsole::~SynchConsole() {
-// 	delete console;
 	delete writeDone;
 	delete readAvail;
 }
@@ -43,6 +41,12 @@ void SynchConsole::SynchGetString(char *s, int n) {
 	for (int i = 0; i < n; i++)
 		s[i] = SynchGetChar();
 	s[n] = '\0';
+}
+
+bool SynchConsole::feof()
+{
+//	return incoming != EOF && !PollFile(readFileNo);
+	return false;
 }
 
 #endif // CHANGED

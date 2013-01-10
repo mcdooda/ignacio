@@ -30,8 +30,8 @@ class SynchConsole : public Console {
 		// Unix fgets(3S)
 		void SynchGetString(char *s, int n);
 		
-// 	private:
-// 		Console *console;
+		bool feof();
+
 };
 
 
