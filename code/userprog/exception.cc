@@ -132,14 +132,14 @@ void ExceptionHandler(ExceptionType which) {
 				machine->WriteRegister(2, c & 0xFF);
 				break;
 			}
-            case SC_PutString:
-            {
-                int adds = machine->ReadRegister(4);
-                char buff[MAX_STRING_SIZE];
-                machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
-                synchConsole->SynchPutString(buff);
-                break;
-            }
+			case SC_PutString:
+			{
+				int adds = machine->ReadRegister(4);
+				char buff[MAX_STRING_SIZE];
+				machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
+				synchConsole->SynchPutString(buff);
+				break;
+			}
 			case SC_GetString:
 			{
 				int string = machine->ReadRegister(4);
