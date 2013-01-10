@@ -61,8 +61,5 @@ void SynchConsole::SynchGetString(char *s, int n) {
 	getString->V();
 }
 
-bool SynchConsole::feof() {
-	//	return incoming != EOF && !PollFile(readFileNo);
-	return false;
-}
+
 #endif // CHANGED
