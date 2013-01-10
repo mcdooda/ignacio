@@ -49,4 +49,7 @@ extern SynchDisk *synchDisk;
 extern PostOffice *postOffice;
 #endif
 
+#ifdef CHANGED
+#define MAX_STRING_SIZE 20 //TODO mettre une valeur maximale de string réfléchie
+#endif
 #endif // SYSTEM_H
