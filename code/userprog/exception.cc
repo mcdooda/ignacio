@@ -135,15 +135,15 @@ void ExceptionHandler(ExceptionType which) {
 			case SC_PutString:
 			{
 				int adds = machine->ReadRegister(4);
-				char str[20];
-				machine->CopyStringFromMachine(adds, str, 20);
-				synchConsole->SynchPutString(str);
+				char buff[MAX_STRING_SIZE];
+				machine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
+				synchConsole->SynchPutString(buff);
 				break;
 			}
 			case SC_GetString:
 			{
 				int string = machine->ReadRegister(4);
-				char strTmp[20];
+				char strTmp[MAX_STRING_SIZE]; //TODO Antoine a dit min avec size ?
 				int size = machine->ReadRegister(5);
 				synchConsole->SynchGetString(strTmp, size);
 				machine->CopyStringToMachine(string, strTmp, size);

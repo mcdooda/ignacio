@@ -4,4 +4,9 @@ code/bin/coff2noff
 code/bin/*.o
 code/bin/.*.d
 *~
+<<<<<<< HEAD
+code/nbproject/private/
+code/nbproject/
+=======
 /code/nbproject/private/
+>>>>>>> 34daf2a6cf0144ec8a8ab9ec49608141a35a220a
