@@ -34,7 +34,7 @@
 #define SC_GetString    14
 #define SC_PutInt       15
 #define SC_GetInt       16
-//TODO : verifier les nombres
+//TODO: verifier les nombres
 
 #ifdef IN_USER_MODE
 
@@ -138,7 +138,7 @@ void PutChar(char c);
 
 char GetChar();
 
-char* GetString();
+void GetString(char *s, int n);
 
 void PutInt(int i);
 

@@ -122,7 +122,6 @@ void SynchConsoleTest (char *in, char *out)
 	if(in != NULL && out != NULL){
 		delete synchConsole;
 		synchConsole = new SynchConsole(in, out);
-		printf("bite");
 	}
 	while((ch = synchConsole->SynchGetChar()) != EOF){
 		synchConsole->SynchPutChar(ch);

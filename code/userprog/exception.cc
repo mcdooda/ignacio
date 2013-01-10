@@ -128,14 +128,14 @@ void ExceptionHandler(ExceptionType which) {
             }
             case SC_GetChar:
             {
-                //TODO Que fait-on en fin de fichier ? rien pour l'instant..
                 int c = synchConsole->SynchGetChar();
-                machine->WriteRegister(2,c);
+                machine->WriteRegister(2,c & 0xFF);
                 break;
             }
             case SC_GetString:
             {
-                //TODO
+                char* string = machine->ReadRegister(4);
+		
                 break;
             }
             default:
