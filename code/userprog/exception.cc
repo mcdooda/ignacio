@@ -106,18 +106,33 @@ void ExceptionHandler(ExceptionType which) {
     }
     UpdatePC();
 #else // CHANGED
-	if (which == SyscallException) {
-		switch (type) {
-			case SC_Halt: {
-				DEBUG('a', "Shutdown, initiated by user program.\n");
-				interrupt->Halt();
-				break;
-			}
-			case SC_PutChar: {
-				char c = machine->ReadRegister(4) & 0xFF;
-				synchConsole->SynchPutChar(c);
-				break;
-			}
+    if (which == SyscallException) {
+        switch (type) {
+            case SC_Halt:
+            {
+                DEBUG('a', "Shutdown, initiated by user program.\n");
+                interrupt->Halt();
+                break;
+            }
+            case SC_PutChar:
+            {
+                char c = machine->ReadRegister(4) & 0xFF;
+                synchConsole->SynchPutChar(c);
+                break;
+            }
+            case SC_Exit:
+            {
+                int code = machine->ReadRegister(4);
+                interrupt->Exit(code);
+                break;
+            }
+            case SC_GetChar:
+            {
+                //TODO Que fait-on en fin de fichier ? rien pour l'instant..
+                int c = synchConsole->SynchGetChar();
+                machine->WriteRegister(2,c);
+                break;
+            }
 			case SC_PutString: {
 				int adds = machine->ReadRegister(4);
 				char str[20];
@@ -125,18 +140,18 @@ void ExceptionHandler(ExceptionType which) {
 				synchConsole->SynchPutString(str);
 				break;
 			}
-			case SC_Exit:
-			{
-				int code = machine->ReadRegister(4);
-				interrupt->Exit(code);
-				break;
-			}
-			default: {
-				printf("Unexpected user mode exception %d %d\n", which, type);
-				ASSERT(FALSE);
-			}
-		}
-		UpdatePC();
-	}
+            case SC_GetString:
+            {
+                //TODO
+                break;
+            }
+            default:
+            {
+                printf("Unexpected user mode exception %d %d\n", which, type);
+                ASSERT(FALSE);
+            }
+        }
+        UpdatePC();
+    }
 #endif // CHANGED
 }
