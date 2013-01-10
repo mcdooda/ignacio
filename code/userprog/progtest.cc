@@ -128,7 +128,7 @@ void SynchConsoleTest (char *in, char *out)
 	}
 	synchConsole->SynchPutString("\nFini de lire\n");
 	char buffer[16];
-	synchConsole->SynchGetString(buffer,15);
+	synchConsole->SynchGetString(buffer,16);
 	synchConsole->SynchPutString(buffer);
 }
 #endif //CHANGED
