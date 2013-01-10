@@ -4,3 +4,4 @@ code/bin/coff2noff
 code/bin/*.o
 code/bin/.*.d
 *~
+/code/nbproject/private/
