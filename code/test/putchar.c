@@ -9,7 +9,7 @@ void print(char c, int n) {
 }
 
 int main() {
-    char c;
+    int c;
     print('a', 4);
     
     c = GetChar();

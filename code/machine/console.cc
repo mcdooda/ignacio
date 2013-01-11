@@ -56,6 +56,7 @@ Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail,
     incoming = EOF;
 #ifdef CHANGED
 	end = false;
+	flagEOF = false;
 #endif
     // start polling for incoming packets
     interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
@@ -96,13 +97,19 @@ Console::CheckCharAvail()
 			ConsoleReadInt);
 
     // do nothing if character is already buffered, or none to be read
+#ifndef CHANGED
     if ((incoming != EOF) || !PollFile(readFileNo))
-	return;	  
+#else
+    if ((incoming == EOF && flagEOF) || (incoming != EOF) || !PollFile(readFileNo))
+#endif
+		return;	  
 
     // otherwise, read character and tell user about it
     n = ReadPartial(readFileNo, &c, sizeof(char));
     incoming = (n == 1 ? c : EOF);
 #ifdef CHANGED
+	if(n == 1 && incoming == EOF)
+		flagEOF = true;
 	if(n == 0)
 		end = true;
 #endif
@@ -135,6 +142,10 @@ char
 Console::GetChar()
 {
    char ch = incoming;
+#ifdef CHANGED
+   if(incoming == EOF)
+	   flagEOF = false;
+#endif
    incoming = EOF;
    return ch;
 }
@@ -158,7 +169,12 @@ Console::PutChar(char ch)
 #ifdef CHANGED
 bool Console::feof()
 {
-	//TODO réinit end si il est vrai
 	return end;
+}
+
+void Console::ClearErr()
+{
+	end = false;
+	flagEOF = false;
 }
 #endif

@@ -22,7 +22,7 @@ class SynchConsole : public Console {
 		void SynchPutChar(const char ch);
 		
 		// Unix getchar(3S)
-		char SynchGetChar();
+		int SynchGetChar();
 		
 		// Unix puts(3S)
 		void SynchPutString(const char *s);

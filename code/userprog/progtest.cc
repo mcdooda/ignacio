@@ -121,23 +121,18 @@ ConsoleTest (char *in, char *out)
 #ifdef CHANGED
 void SynchConsoleTest (char *in, char *out)
 {
-	char ch;
-// 	SynchConsole* synchConsole = new SynchConsole(in, out);
-	if(in != NULL && out != NULL){
+	int ch;
+	if(in != NULL && out != NULL) {
 		delete synchConsole;
 		synchConsole = new SynchConsole(in, out);
 	}
-//	while((ch = synchConsole->SynchGetChar()) != EOF){
-//		synchConsole->SynchPutChar(ch);
-	while(!synchConsole->feof()) {
-		//TODO ÿ lu que si dédoublé
-		ch = synchConsole->SynchGetChar();
+	while((ch = synchConsole->SynchGetChar()) != EOF)
 		synchConsole->SynchPutChar(ch);
-	}
-//	synchConsole->SynchPutString("\nTest de SynchGetString/SynchPutString :\n");
-//	char buffer[16];
-//	synchConsole->SynchGetString(buffer,16);
-//	synchConsole->SynchPutString(buffer);
+	// 2ème façon de vérifier si EOF
+//	while(!synchConsole->feof()) {
+//		ch = synchConsole->SynchGetChar();
+//		synchConsole->SynchPutChar(ch);
+//	}
 }
 #endif //CHANGED
 

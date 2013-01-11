@@ -35,9 +35,12 @@ void SynchConsole::SynchPutChar(const char ch) {
 	writeDone->P();
 }
 
-char SynchConsole::SynchGetChar() {
+int SynchConsole::SynchGetChar() {
 	readAvail->P();
-	return GetChar();
+	if(feof())
+		return EOF;
+	else
+		return (unsigned char)GetChar();
 }
 
 void SynchConsole::SynchPutString(const char s[]) {
@@ -49,9 +52,9 @@ void SynchConsole::SynchGetString(char *s, int n) {
 	getString->P();
 	int i;
 	for (i = 0; i < n - 1; i++) {
-		s[i] = SynchGetChar();
-		if (s[i] == EOF) {
-			printf("7");
+		int c = SynchGetChar();
+		s[i] = c;
+		if (c == EOF) {
 			i--;
 			break;
 		} else if (s[i] == '\n' || s[i] == '\0')

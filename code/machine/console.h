@@ -56,7 +56,8 @@ class Console {
     void WriteDone();	 	// internal routines to signal I/O completion
     void CheckCharAvail();
 #ifdef CHANGED
-	bool feof();
+	bool feof();		// retourne vrai si la fin du fichier est atteinte
+	void ClearErr();	// permet de réinitialiser les flags de fin de fichier
 #endif
   private:
     int readFileNo;			// UNIX file emulating the keyboard 
@@ -73,7 +74,8 @@ class Console {
 					// if there is one available. 
 					// Otherwise contains EOF.
 #ifdef CHANGED
-	bool end;
+	bool end;		// flag indiquant qu'il n'y a plus de caractères à lire
+	bool flagEOF;	// flag indiquant que le caractère spécial 'ÿ' (0xff) est en cours de lecture
 #endif
 };
 

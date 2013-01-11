@@ -131,7 +131,7 @@ void ExceptionHandler(ExceptionType which) {
 			case SC_GetChar:
 			{
 				int c = synchConsole->SynchGetChar();
-				userMachine->SetReturn(c & 0xFF);
+				userMachine->SetReturn(c);
 				break;
 			}
 			case SC_PutString:
