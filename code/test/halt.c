@@ -12,10 +12,17 @@
 
 #include "syscall.h"
 
+void SimpleThread(void* which) {
+    int i = 42;
+    i = 43;
+    PutString("qlo");
+}
+
 int
-main ()
-{
-    Halt ();
+main() {
+    PutChar('a');
+    UserThreadCreate(SimpleThread,(void*)5);
+    Halt();
 
     /* not reached */
     return 0;

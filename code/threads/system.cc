@@ -88,12 +88,12 @@ Initialize (int argc, char **argv)
     int argCount;
     const char *debugArgs = "";
     bool randomYield = FALSE;
+
+#ifdef USER_PROGRAM
 #ifdef CHANGED
 	char* in = NULL;
 	char* out = NULL;
 #endif
-
-#ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
 #endif
 #ifdef FILESYS_NEEDED
@@ -125,6 +125,7 @@ Initialize (int argc, char **argv)
 		randomYield = TRUE;
 		argCount = 2;
 	    }
+#ifdef USER_PROGRAM
 #ifdef CHANGED
 	  else if(!strcmp (*argv, "-in")){
 		in = *(argv + 1);
@@ -135,7 +136,6 @@ Initialize (int argc, char **argv)
 		argCount = 2;
 	  }
 #endif
-#ifdef USER_PROGRAM
 	  if (!strcmp (*argv, "-s"))
 	      debugUserProg = TRUE;
 #endif
