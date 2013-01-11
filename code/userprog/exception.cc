@@ -116,45 +116,43 @@ void ExceptionHandler(ExceptionType which) {
 				interrupt->Halt();
 				break;
 			}
-			case SC_PutChar:
-			{
-				char c = machine->ReadRegister(4) & 0xFF;
-				synchConsole->SynchPutChar(c);
-				break;
-			}
 			case SC_Exit:
 			{
-				int code = machine->ReadRegister(4);
+				int code = userMachine->GetIntArg(1);
 				interrupt->Exit(code);
+				break;
+			}
+			case SC_PutChar:
+			{
+				char c = userMachine->GetCharArg(1);
+				synchConsole->SynchPutChar(c);
 				break;
 			}
 			case SC_GetChar:
 			{
 				int c = synchConsole->SynchGetChar();
-				machine->WriteRegister(2, c & 0xFF);
+				userMachine->SetReturn(c & 0xFF);
 				break;
 			}
 			case SC_PutString:
 			{
-				int adds = machine->ReadRegister(4);
-				char buff[MAX_STRING_SIZE];
-				userMachine->CopyStringFromMachine(adds, buff, MAX_STRING_SIZE);
-				synchConsole->SynchPutString(buff);
+				char str[MAX_STRING_SIZE];
+				userMachine->GetStringArg(1, str);
+				synchConsole->SynchPutString(str);
 				break;
 			}
 			case SC_GetString:
 			{
-				int string = machine->ReadRegister(4);
-				int size = machine->ReadRegister(5);
+				int size = userMachine->GetIntArg(2);
 				size = (size > MAX_STRING_SIZE ? MAX_STRING_SIZE : size);
 				char strTmp[size];
 				synchConsole->SynchGetString(strTmp, size);
-				userMachine->CopyStringToMachine(string, strTmp, size);
+				userMachine->SetOutArg(1, strTmp);
 				break;
 			}
 			case SC_PutInt:
 			{
-				int n = machine->ReadRegister(4);
+				int n = userMachine->GetIntArg(1);
 				char str[MAX_INTSTR_SIZE];
 				snprintf(str, MAX_INTSTR_SIZE, "%d", n);
 				synchConsole->SynchPutString(str);
@@ -162,12 +160,11 @@ void ExceptionHandler(ExceptionType which) {
 			}
 			case SC_GetInt:
 			{
-				int adr = machine->ReadRegister(4);
 				char str[MAX_INTSTR_SIZE];
-				int n;
 				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
+				int n;
 				sscanf(str, "%d", &n);
-				userMachine->CopyDataToMachine(adr,&n,sizeof(int));
+				userMachine->SetOutArg(1, n);
 				break;
 			}
 			default:

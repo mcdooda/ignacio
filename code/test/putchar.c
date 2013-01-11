@@ -20,5 +20,5 @@ int main() {
         c = GetChar();
     }
 
-    return 18;
+    return 0;
 }
