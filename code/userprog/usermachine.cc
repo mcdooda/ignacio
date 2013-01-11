@@ -6,10 +6,10 @@
 
 extern Machine* machine;
 
-void UserMachine::CopyStringFromMachine(int adr, char *str, int size) {
+void UserMachine::CopyStringFromMachine(int addr, char *str, int size) {
 	for (int i = 0; i < size - 1; i++) {
-		machine->ReadMem(adr, 1, (int*) &str[i]);
-		adr += sizeof (char);
+		machine->ReadMem(addr, 1, (int*) &str[i]);
+		addr += sizeof (char);
 		if (str[i] == '\0') {
 			break;
 		}
@@ -17,20 +17,27 @@ void UserMachine::CopyStringFromMachine(int adr, char *str, int size) {
 	str[size - 1] = '\0';
 }
 
-void UserMachine::CopyStringToMachine(int adr, char *str, int size) {
+void UserMachine::CopyStringToMachine(int addr, char *str, int size) {
 	for (int i = 0; i < size; i++) {
-		machine->WriteMem(adr, 1, str[i]);
-		adr += sizeof (char);
+		machine->WriteMem(addr, 1, str[i]);
+		addr += sizeof (char);
 		if (str[i] == '\0') {
 			break;
 		}
 	}
 }
 
-void UserMachine::CopyDataToMachine(int adr, void *str, int size) {
+void UserMachine::CopyDataFromMachine(int addr, void *data, int size) {
 	for (int i = 0; i < size; i++) {
-		machine->WriteMem(adr, 1, ((char*) str)[i]);
-		adr += sizeof (char);
+		machine->ReadMem(addr, 1, (int*)((char*)data)[i]);
+		addr += sizeof (char);
+	}
+}
+
+void UserMachine::CopyDataToMachine(int addr, void *data, int size) {
+	for (int i = 0; i < size; i++) {
+		machine->WriteMem(addr, 1, ((char*)data)[i]);
+		addr += sizeof (char);
 	}
 }
 
@@ -59,7 +66,7 @@ void UserMachine::SetOutArg(int arg, int i) {
 
 void UserMachine::SetOutArg(int arg, char* str) {
 	int addr = machine->ReadRegister(arg + 3);
-	int size = strlen(str);
+	int size = strlen(str) + 1;
 	CopyStringToMachine(addr, str, size);
 }
 

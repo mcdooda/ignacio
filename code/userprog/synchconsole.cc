@@ -37,30 +37,34 @@ void SynchConsole::SynchPutChar(const char ch) {
 
 int SynchConsole::SynchGetChar() {
 	readAvail->P();
-	if(feof())
+	if (feof())
 		return EOF;
 	else
-		return (unsigned char)GetChar();
+		return (unsigned char) GetChar();
 }
 
 void SynchConsole::SynchPutString(const char s[]) {
-	for (int i = 0; s[i] != '\0'; i++)
+	for (int i = 0; s[i] != '\0'; i++) {
 		SynchPutChar(s[i]);
+	}
 }
 
 void SynchConsole::SynchGetString(char *s, int n) {
 	getString->P();
-	int i;
-	for (i = 0; i < n - 1; i++) {
+	for (int i = 0; i < n - 1; i++) {
 		int c = SynchGetChar();
-		s[i] = c;
-		if (c == EOF) {
-			i--;
+		if (c == '\n') {
+			s[i] = '\n';
+			s[i + 1] = '\0';
 			break;
-		} else if (s[i] == '\n' || s[i] == '\0')
+		} else if (c == '\0' || c == EOF) {
+			s[i] = '\0';
 			break;
+		} else {
+			s[i] = c;
+		}
 	}
-	s[i + 1] = '\0';
+	s[n - 1] = '\0';
 	getString->V();
 }
 

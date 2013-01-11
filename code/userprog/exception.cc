@@ -163,8 +163,9 @@ void ExceptionHandler(ExceptionType which) {
 				char str[MAX_INTSTR_SIZE];
 				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
 				int n;
-				sscanf(str, "%d", &n);
+				int numRead = sscanf(str, "%d", &n);
 				userMachine->SetOutArg(1, n);
+				userMachine->SetReturn(numRead > 0);
 				break;
 			}
 			default:

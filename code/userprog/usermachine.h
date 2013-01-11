@@ -5,9 +5,10 @@
 
 class UserMachine {
 public:
-	void CopyStringFromMachine(int adr, char *str, int size);
-	void CopyStringToMachine(int adr, char *str, int size);
-	void CopyDataToMachine(int adr, void *data, int size);
+	void CopyStringFromMachine(int addr, char *str, int size);
+	void CopyStringToMachine(int addr, char *str, int size);
+	void CopyDataFromMachine(int addr, void *data, int size);
+	void CopyDataToMachine(int addr, void *data, int size);
 	
 	char GetCharArg(int arg);
 	int GetIntArg(int arg);
