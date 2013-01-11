@@ -26,5 +26,12 @@ void UserMachine::CopyStringToMachine(int adr, char *str, int size) {
 	}
 }
 
+void UserMachine::CopyDataToMachine(int adr, void *str, int size) {
+	for (int i = 0; i < size; i++) {
+		machine->WriteMem(adr, 1, ((char*)str)[i]);
+		adr += sizeof (char);
+	}
+}
+
 #endif // CHANGED
 

@@ -7,6 +7,7 @@ class UserMachine {
 public:
 	void CopyStringFromMachine(int adr, char *str, int size);
 	void CopyStringToMachine(int adr, char *str, int size);
+	void CopyDataToMachine(int adr, void *data, int size);
 
 };
 

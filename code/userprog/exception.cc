@@ -162,11 +162,12 @@ void ExceptionHandler(ExceptionType which) {
 			}
 			case SC_GetInt:
 			{
+				int adr = machine->ReadRegister(4);
 				char str[MAX_INTSTR_SIZE];
 				int n;
 				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
 				sscanf(str, "%d", &n);
-				machine->WriteRegister(2, n);
+				userMachine->CopyDataToMachine(adr,&n,sizeof(int));
 				break;
 			}
 			default:
