@@ -3,6 +3,7 @@
 #include "usermachine.h"
 #include "machine.h"
 #include "system.h"
+#include <stdio.h>
 
 extern Machine* machine;
 
@@ -29,14 +30,14 @@ void UserMachine::CopyStringToMachine(int addr, char *str, int size) {
 
 void UserMachine::CopyDataFromMachine(int addr, void *data, int size) {
 	for (int i = 0; i < size; i++) {
-		//machine->ReadMem(addr, 1, (int*)((char*)data)[i]);
+		machine->ReadMem(addr, 1, (int*)((char*)data + i));
 		addr += sizeof (char);
 	}
 }
 
 void UserMachine::CopyDataToMachine(int addr, void *data, int size) {
 	for (int i = 0; i < size; i++) {
-		machine->WriteMem(addr, 1, ((char*)data)[i]);
+		machine->WriteMem(addr, 1, ((char*) data)[i]);
 		addr += sizeof (char);
 	}
 }
@@ -75,6 +76,8 @@ void UserMachine::SetReturn(char c) {
 }
 
 void UserMachine::SetReturn(int i) {
+	printf("q");
+
 	machine->WriteRegister(2, i);
 }
 

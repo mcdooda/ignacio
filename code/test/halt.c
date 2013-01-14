@@ -13,17 +13,50 @@
 #include "syscall.h"
 
 void SimpleThread(void* which) {
-    int i = 42;
-    i = 43;
-    PutString("qlo");
+	int* i = (int*) which;
+	for (; *i > 0; (*i)--) {
+/*
+		PutChar('*');
+*/
+		PutInt(*i);
+/*
+		PutChar('\n');
+*/
+	}
+	UserThreadExit();
 }
 
 int
 main() {
-    PutChar('a');
-    UserThreadCreate(SimpleThread,(void*)5);
-    Halt();
+	int i = 100;
+	int j = 100;
+	int tid;
+	PutChar('a');
+	PutInt(i);
+	PutInt(j);
+	tid = UserThreadCreate(SimpleThread, (void*) &i);
+/*
+	tid += 5;
+	tid -= 5;
+*/
+	
+	PutChar('T');
+	PutInt(tid);
+	PutChar('T');
+	
+	
+	for (j = 100; j > 0; j--) {
+		PutInt(j);
+		PutChar('\n');
+	}
 
-    /* not reached */
-    return 0;
+	UserThreadJoin(tid);
+
+	PutString("i = ");
+	PutInt(i);
+	PutString("j = ");
+	PutInt(j);
+
+	/* not reached */
+	return 0;
 }

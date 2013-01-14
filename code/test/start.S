@@ -193,6 +193,14 @@ UserThreadExit:
 	j	$31
 	.end UserThreadExit
 
+	.globl UserThreadJoin
+	.ent	UserThreadJoin
+UserThreadJoin:
+	addiu $2,$0,SC_UserThreadJoin
+	syscall
+	j	$31
+	.end UserThreadJoin
+
 
 /* dummy function to keep gcc happy */
         .globl  __main
@@ -200,4 +208,3 @@ UserThreadExit:
 __main:
         j       $31
         .end    __main
-
