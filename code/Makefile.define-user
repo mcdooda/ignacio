@@ -16,7 +16,7 @@
 # List of C files that are not userspace programs (in test/ subdirectory)
 # => add here C files that are user-space libraries
 # all other C files will be compiled as a userspace nachos program
-USERPROG_NOPROGRAM=putchar putstring
+USERPROG_NOPROGRAM=putchar putstring es
 
 # source files that must be included in any userspace nachos program
 USERPROG_LIBS=start.S

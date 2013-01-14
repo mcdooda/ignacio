@@ -22,8 +22,7 @@ int
 main() {
     PutChar('a');
     UserThreadCreate(SimpleThread,(void*)5);
-    Halt();
-
+	
     /* not reached */
     return 0;
 }
