@@ -29,7 +29,7 @@ void UserMachine::CopyStringToMachine(int addr, char *str, int size) {
 
 void UserMachine::CopyDataFromMachine(int addr, void *data, int size) {
 	for (int i = 0; i < size; i++) {
-		//machine->ReadMem(addr, 1, (int*)((char*)data)[i]);
+		machine->ReadMem(addr, 1, (int*)((char*)data + i));
 		addr += sizeof (char);
 	}
 }
