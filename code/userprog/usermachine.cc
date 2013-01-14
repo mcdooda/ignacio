@@ -76,8 +76,6 @@ void UserMachine::SetReturn(char c) {
 }
 
 void UserMachine::SetReturn(int i) {
-	printf("q");
-
 	machine->WriteRegister(2, i);
 }
 

@@ -13,50 +13,40 @@
 #include "syscall.h"
 
 void SimpleThread(void* which) {
-	int* i = (int*) which;
-	for (; *i > 0; (*i)--) {
-/*
-		PutChar('*');
-*/
-		PutInt(*i);
-/*
-		PutChar('\n');
-*/
-	}
-	UserThreadExit();
+    char* ch = (char*) which;
+    int i;
+    for (i = 0; i < 10; i++) {
+        PutChar(*ch);
+        PutInt(i);
+        PutChar('\n');
+    }
+    UserThreadExit();
 }
 
 int
 main() {
-	int i = 100;
-	int j = 100;
-	int tid;
-	PutChar('a');
-	PutInt(i);
-	PutInt(j);
-	tid = UserThreadCreate(SimpleThread, (void*) &i);
-/*
-	tid += 5;
-	tid -= 5;
-*/
-	
-	PutChar('T');
-	PutInt(tid);
-	PutChar('T');
-	
-	
-	for (j = 100; j > 0; j--) {
-		PutInt(j);
-		PutChar('\n');
-	}
+    char c1 = 'a';
+    char c2 = 'b';
+    char c3 = 'c';
+    int j;
+    int tid1;
+    int tid2;
+    int tid3;
 
-	UserThreadJoin(tid);
+    tid1 = UserThreadCreate(SimpleThread, (void*) &c1);
+    tid2 = UserThreadCreate(SimpleThread, (void*) &c2);
+    tid3 = UserThreadCreate(SimpleThread, (void*) &c3);
 
-	PutString("i = ");
-	PutInt(i);
-	PutString("j = ");
-	PutInt(j);
+    for (j = 0; j < 10; j++) {
+        PutChar('m');
+        PutInt(j);
+        PutChar('\n');
+    }
 
-	/* not reached */
-	return 0;
+    UserThreadJoin(tid1);
+    UserThreadJoin(tid2);
+    UserThreadJoin(tid3);
+
+    /* not reached */
+    return 0;
 }

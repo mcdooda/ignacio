@@ -55,18 +55,15 @@ static int NewThreadId() {
     while (userThreads.find(id) != userThreads.end()) {
         id++;
     }
-    printf("\nNewThreadId id = %d\n", id);
     return id;
 }
 
 static int SaveUserThread(UserThread* ut) {
-    printf("SaveUserThread id = %d\n", ut->GetId());
     userThreads[ut->GetId()] = ut;
     return ut->GetId();
 }
 
 static void DeleteUserThread(int id) {
-    printf("DeleteUserThread id = %d\n", id);
     std::map<int, UserThread*>::iterator it = userThreads.find(id);
     delete it->second;
     userThreads.erase(it);
@@ -88,10 +85,11 @@ static void StartUserThread(int id) {
     machine->WriteRegister(4, ut->GetArg());
     machine->WriteRegister(PCReg, ut->GetF());
     machine->WriteRegister(NextPCReg, ut->GetF() + 4);
-    machine->WriteRegister(StackReg, machine->ReadRegister(PCReg) + 2 * PageSize);
-    printf("StartUserThread thread = %p\n", currentThread);
+    
+    //machine->WriteRegister(StackReg, machine->ReadRegister(PCReg) + 4 * PageSize);
+    
+    machine->WriteRegister(StackReg, currentThread->space->GetNextFreeStack());
     machine->Run();
-    printf("StartUserThread thread = %p\n", currentThread);
 }
 
 int do_UserThreadCreate(int f, int arg) {
@@ -104,18 +102,15 @@ int do_UserThreadCreate(int f, int arg) {
 
 void do_UserThreadExit() {
     UserThread* ut = GetUserThread(currentThread);
-    printf("\nexit id = %d\n", ut->GetId());
     ut->GetSem()->V();
     currentThread->Finish();
 }
 
 void do_UserThreadJoin(int id) {
-    printf("\njoin id = %d\n", id);
     UserThread* ut = userThreads[id];
     ut->GetSem()->P();
     int i;
     machine->ReadMem(ut->GetArg(), 4, &i);
-    printf("\njoin arg = %d id = %d\n", i, id);
     DeleteUserThread(ut->GetId());
 }
 

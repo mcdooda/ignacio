@@ -174,7 +174,6 @@ void ExceptionHandler(ExceptionType which) {
 				int f = userMachine->GetIntArg(1);
 				int arg = userMachine->GetIntArg(2);
 				int id = do_UserThreadCreate(f, arg);
-				printf("SC_UserThreadCreate id = %d thread = %p\n", id, currentThread);
 				userMachine->SetReturn(id);
 				break;
 			}
