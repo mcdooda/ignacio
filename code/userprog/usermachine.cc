@@ -3,6 +3,7 @@
 #include "usermachine.h"
 #include "machine.h"
 #include "system.h"
+#include <stdio.h>
 
 extern Machine* machine;
 
@@ -36,7 +37,7 @@ void UserMachine::CopyDataFromMachine(int addr, void *data, int size) {
 
 void UserMachine::CopyDataToMachine(int addr, void *data, int size) {
 	for (int i = 0; i < size; i++) {
-		machine->WriteMem(addr, 1, ((char*)data)[i]);
+		machine->WriteMem(addr, 1, ((char*) data)[i]);
 		addr += sizeof (char);
 	}
 }
