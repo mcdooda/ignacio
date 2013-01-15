@@ -115,8 +115,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 				noffH.initData.size, noffH.initData.inFileAddr);
 	}
 
-
+#ifdef CHANGED
 	InitBitMap();
+#endif
 }
 
 //----------------------------------------------------------------------
@@ -128,7 +129,9 @@ AddrSpace::~AddrSpace() {
 	// LB: Missing [] for delete
 	// delete pageTable;
 	delete [] pageTable;
+#ifdef CHANGED
 	delete bm;
+#endif
 	// End of modification
 }
 
@@ -190,27 +193,26 @@ void AddrSpace::RestoreState() {
 	machine->pageTableSize = numPages;
 }
 
-void AddrSpace::InitBitMap() {
-	bm = new BitMap(NbPagesStack);
-	AllocateStackPages(NbPagesStack - 1, ThreadNbPages);
-}
-//TODO Est-ce que l'argument nPages est vraiment nécessaire ?
+#ifdef CHANGED
 
-void AddrSpace::AllocateStackPages(int stackBottom, int nPages) {
-	for (int i = 0; i < nPages; i++) {
-		ASSERT(!bm->Test(stackBottom - i));
-	}
-	for (int i = 0; i < nPages; i++) {
-		bm->Mark(stackBottom - i);
-	}
+void AddrSpace::InitBitMap() {
+	bm = new BitMap(NbStackSlot);
+	bm->Mark(NbStackSlot - 1);
+}
+
+int AddrSpace::GetSlotAddr(int stackSlot) {
+	return (numPages * PageSize) - (stackSlot * (PageSize * ThreadNbPages));
 }
 
 int AddrSpace::GetNextFreeStack() {
-	for (int i = 1; i < NbPagesStack; i += ThreadNbPages) {
-		if (!bm->Test(NbPagesStack - i)) {
-			AllocateStackPages(NbPagesStack - i, ThreadNbPages);
-			return (numPages * PageSize) - (i * PageSize);
+	int addr = -1;
+	for (int i = 1; addr == -1 && i < NbStackSlot; i++) {
+		int currentSlot = NbStackSlot - i;
+		if (!bm->Test(currentSlot)) {
+			bm->Mark(currentSlot);
+			addr = GetSlotAddr(currentSlot);
 		}
 	}
-	return -1;
+	return addr;
 }
+#endif

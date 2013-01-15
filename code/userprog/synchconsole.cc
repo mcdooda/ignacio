@@ -47,13 +47,16 @@ void SynchConsole::SynchPutChar(const char ch) {
 }
 
 int SynchConsole::SynchGetChar() {
-	semGetChar->P();
 	readAvail->P();
-	if (feof())
-		return EOF;
-	else
-		return (unsigned char) GetChar();
+	semGetChar->P();
+	unsigned char c;
+	if (feof()) {
+		c = EOF;
+	} else {
+		c = GetChar();
+	}
 	semGetChar->V();
+	return c;
 }
 
 void SynchConsole::SynchPutString(const char s[]) {
