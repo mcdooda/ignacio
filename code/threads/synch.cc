@@ -97,84 +97,84 @@ Semaphore::V() {
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
 #ifdef CHANGED
-Lock::Lock(const char *debugName) {
+
+Lock::Lock(const char *debugName) :
+sem("lock sem", 1) {
 	name = debugName;
-	sem = new Semaphore("lock sem", 1);
 }
 
 Lock::~Lock() {
-	delete t;
-	delete sem;
+
 }
 
 void
 Lock::Acquire() {
-	sem->P();
+	sem.P();
 	t = currentThread;
 }
 
 void
 Lock::Release() {
 	ASSERT(isHeldByCurrentThread());
-	sem->V();
+	sem.V();
 
 }
 
-bool 
+bool
 Lock::isHeldByCurrentThread() {
 	return t == currentThread;
 }
 
-Condition::Condition(const char *debugName) {
+Condition::Condition(const char *debugName) :
+sem("cond sem", 1) {
 	name = debugName;
-	sem = new Semaphore("cond sem", 1);
 	queue = new List;
 }
 
 Condition::~Condition() {
-	delete sem;
 	delete queue;
 }
 
 void
 Condition::Wait(Lock * conditionLock) {
-	sem->P();
+	sem.P();
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
 	ASSERT(conditionLock->isHeldByCurrentThread());
 	conditionLock->Release();
 	queue->Append((void *) currentThread);
-	sem->V();
+	sem.V();
 	currentThread->Sleep();
-	sem->P();
+	sem.P();
 	conditionLock->Acquire();
-	sem->V();
+	sem.V();
 	(void) interrupt->SetLevel(oldLevel);
 }
 
 void
 Condition::Signal(Lock * conditionLock) {
-	sem->P();
+	sem.P();
 	Thread *t = (Thread *) queue->Remove();
-	if(t != NULL){
+	if (t != NULL) {
 		scheduler->ReadyToRun(t);
 	}
-	sem->V();
+	sem.V();
 }
 
 void
 Condition::Broadcast(Lock * conditionLock) {
-	sem->P();
+	sem.P();
 	Thread *t;
-	while(!queue->IsEmpty()){
+	while (!queue->IsEmpty()) {
 		t = (Thread *) queue->Remove();
-		if(t != NULL){
+		if (t != NULL) {
 			scheduler->ReadyToRun(t);
 		}
 		conditionLock->Acquire();
 	}
-	sem->V();
+	sem.V();
 }
 #else
+
 Lock::Lock(const char *debugName) {
 }
 

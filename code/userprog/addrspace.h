@@ -22,7 +22,7 @@
 
 #define UserStackSize		4096	// increase this as necessary!
 #define ThreadNbPages       4
-#define NbPagesStack        (UserStackSize  / PageSize)
+#define NbPagesStack        (UserStackSize / PageSize)
 #define NbStackSlot			(NbPagesStack / ThreadNbPages)
 
 class AddrSpace {
@@ -37,8 +37,10 @@ public:
 
 	void SaveState(); // Save/restore address space-specific
 	void RestoreState(); // info on a context switch 
+#ifdef CHANGED
 	int GetNextFreeStack();
-
+	void FreeStackSlot(int stackBottom);
+#endif
 
 private:
 	TranslationEntry * pageTable; // Assume linear page table translation
