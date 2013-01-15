@@ -209,7 +209,6 @@ int AddrSpace::GetNextFreeStack() {
 	for (int i = 1; i < NbPagesStack; i += ThreadNbPages) {
 		if (!bm->Test(NbPagesStack - i)) {
 			AllocateStackPages(NbPagesStack - i, ThreadNbPages);
-		} else {
 			return (numPages * PageSize) - (i * PageSize);
 		}
 	}
