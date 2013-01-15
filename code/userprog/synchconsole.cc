@@ -49,7 +49,7 @@ void SynchConsole::SynchPutChar(const char ch) {
 int SynchConsole::SynchGetChar() {
 	readAvail->P();
 	semGetChar->P();
-	unsigned char c;
+	int c;
 	if (feof()) {
 		c = EOF;
 	} else {
