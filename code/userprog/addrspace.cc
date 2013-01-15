@@ -51,11 +51,19 @@ static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 	char buff[numBytes];
 	executable->ReadAt (buff, numBytes, position);
 	
-	//TODO
+	// sauvegarde
+	TranslationEntry *pt = machine->pageTable;
+	unsigned np = machine->pageTableSize;
 	
+	machine->pageTable = pageTable;
+	machine->pageTableSize = numPages;
+
+	for(int i = 0; i < numBytes; i++)
+		machine->WriteMem(virtualaddr+i, 1, buff[i]);
 	
-	//Copier buff[] à l'adresse &(machine->mainMemory[virtualaddr]);
-	bcopy(buff, &(machine->mainMemory[virtualaddr]), numBytes);
+	// restauration
+	machine->pageTable = pt;
+	machine->pageTableSize = np;
 }
 #endif
 
@@ -101,7 +109,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
 		pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
-		pageTable[i].physicalPage = i;
+		pageTable[i].physicalPage = i+1;
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
@@ -203,6 +211,8 @@ AddrSpace::InitRegisters() {
 void
 AddrSpace::SaveState() {
 	//TODO peut etre mettre ici les bitmap machin
+//	pageTable = machine->pageTable;
+//	numPages = machine->pageTableSize;
 }
 
 //----------------------------------------------------------------------
