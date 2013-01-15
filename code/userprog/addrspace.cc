@@ -19,8 +19,14 @@
 #include "system.h"
 #include "addrspace.h"
 #include "noff.h"
+#include "usermachine.h"
+#include "frameprovider.h"
 
 #include <strings.h>		/* for bzero */
+
+#ifdef CHANGED
+extern FrameProvider *frameProvider;
+#endif
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -109,7 +115,11 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
 		pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
-		pageTable[i].physicalPage = i+1;
+#ifndef CHANGED
+		pageTable[i].physicalPage = i;
+#else
+		pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
+#endif
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
@@ -120,8 +130,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 	// zero out the entire address space, to zero the unitialized data segment 
 	// and the stack segment
+#ifndef CHANGED
 	bzero(machine->mainMemory, size);
-
+#endif
 	// then, copy in the code and data segments into memory
 	if (noffH.code.size > 0) {
 		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
@@ -130,6 +141,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
 				noffH.code.size, noffH.code.inFileAddr);
 #else
+		userMachine->GetCharArg(21);
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
 #endif
