@@ -87,6 +87,10 @@ class Lock
 
   private:
     const char *name;		// for debugging
+#ifdef CHANGED
+	Thread *t;			// thread owner of the lock
+	Semaphore *sem;
+#endif // CHANGED
     // plus some other stuff you'll need to define
 };
 
@@ -143,6 +147,10 @@ class Condition
 
   private:
     const char *name;
+#ifdef CHANGED
+	Semaphore *sem;
+	List *queue;
+#endif // CHANGED
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H
