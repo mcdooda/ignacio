@@ -43,9 +43,9 @@ main() {
         PutChar('\n');
     }
 
-    UserThreadJoin(tid1);
-    UserThreadJoin(tid2);
     UserThreadJoin(tid3);
+    UserThreadJoin(tid2);
+    UserThreadJoin(tid1);
 
     /* not reached */
     return 0;

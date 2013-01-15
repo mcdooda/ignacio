@@ -44,7 +44,7 @@ class AddrSpace
     // address space
     BitMap* bm;
     void InitBitMap();
-    int AllocateStackPages(int stackBottom, int nPages);
+    void AllocateStackPages(int stackBottom, int nPages);
 };
 
 #endif // ADDRSPACE_H
