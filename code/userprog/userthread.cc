@@ -42,10 +42,20 @@ public:
 		return t;
 	}
 
+	int GetStackBottom() {
+		return stackBottom;
+	}
+
+	void SetStackBottom(int sb) {
+		stackBottom = sb;
+	}
+
+
 private:
 	int f;
 	int arg;
 	int id;
+	int stackBottom;
 	Semaphore sem;
 	Thread* t;
 };
@@ -103,13 +113,14 @@ static UserThread* GetUserThread(int id) {
 static void StartUserThread(int id) {
 	int freeStackPointer;
 	UserThread* ut = GetUserThread(id);
+	ut->GetThread()->space->InitRegisters();
 	machine->WriteRegister(4, ut->GetArg());
 	machine->WriteRegister(PCReg, ut->GetF());
 	machine->WriteRegister(NextPCReg, ut->GetF() + 4);
 
-	//machine->WriteRegister(StackReg, machine->ReadRegister(PCReg) + 4 * PageSize);
 	semFreeStack.P();
 	freeStackPointer = currentThread->space->GetNextFreeStack();
+	ut->SetStackBottom(freeStackPointer);
 	semFreeStack.V();
 	if (freeStackPointer != -1) {
 		machine->WriteRegister(StackReg, freeStackPointer);
@@ -126,12 +137,14 @@ int do_UserThreadCreate(int f, int arg) {
 	int id = SaveUserThread(new UserThread(f, arg, t));
 	t->Fork(StartUserThread, id);
 	t->space = currentThread->space;
+	
 	semCreate.V();
 	return id;
 }
 
 void do_UserThreadExit() {
 	UserThread* ut = GetUserThread(currentThread);
+	ut->GetThread()->space->FreeStackSlot(ut->GetStackBottom());
 	ut->GetSem()->V();
 	currentThread->Finish();
 }

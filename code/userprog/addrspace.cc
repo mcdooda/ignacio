@@ -22,6 +22,11 @@
 
 #include <strings.h>		/* for bzero */
 
+
+#ifdef CHANGED
+#include <iostream>
+#endif
+
 //----------------------------------------------------------------------
 // SwapHeader
 //      Do little endian to big endian conversion on the bytes in the 
@@ -45,15 +50,15 @@ SwapHeader(NoffHeader * noffH) {
 }
 
 #ifdef CHANGED
+
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
-							int position, TranslationEntry *pageTable, unsigned numPages)
-{
+		int position, TranslationEntry *pageTable, unsigned numPages) {
 	char buff[numBytes];
-	executable->ReadAt (buff, numBytes, position);
-	
+	executable->ReadAt(buff, numBytes, position);
+
 	//TODO
-	
-	
+
+
 	//Copier buff[] à l'adresse &(machine->mainMemory[virtualaddr]);
 	bcopy(buff, &(machine->mainMemory[virtualaddr]), numBytes);
 }
@@ -226,12 +231,12 @@ void AddrSpace::InitBitMap() {
 }
 
 int AddrSpace::GetSlotAddr(int stackSlot) {
-	return (numPages * PageSize) - (stackSlot * (PageSize * ThreadNbPages));
+	return (numPages * PageSize) - ((stackSlot + 1) * (PageSize * ThreadNbPages));
 }
 
 int AddrSpace::GetNextFreeStack() {
 	int addr = -1;
-	for (int i = 1; addr == -1 && i < NbStackSlot; i++) {
+	for (int i = 1; addr == -1 && i <= NbStackSlot; i++) {
 		int currentSlot = NbStackSlot - i;
 		if (!bm->Test(currentSlot)) {
 			bm->Mark(currentSlot);
@@ -240,4 +245,17 @@ int AddrSpace::GetNextFreeStack() {
 	}
 	return addr;
 }
+
+void AddrSpace::FreeStackSlot(int stackBottom) {
+//	for (int i = stackBottom; i > (stackBottom + (PageSize * ThreadNbPages)); i -= 4)
+//		machine->WriteMem(i, 4, 0);
+//	for(unsigned int i=(numPages * PageSize); i > (numPages * PageSize) - ((8 + 1) * (PageSize * ThreadNbPages)) ; i-=4){
+//		int j;
+//		machine->ReadMem(i,4,&j);
+//		printf("%d.",j);
+//	}
+//	std::cout << "stackBottom = " << stackBottom << " stackslot = " << (NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages << std::endl;
+	bm->Clear((NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages);
+}
+
 #endif
