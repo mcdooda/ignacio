@@ -1,54 +1,53 @@
 #include "syscall.h"
 
 #define printf(format, ...) \
-	{ \
+	{\
 		void* __args[] = { __VA_ARGS__ };\
-		user_printf(format, __args); \
+		user_printf(format, __args);\
 	}
 #define scanf(format, ...) \
-	{ \
+	{\
 		void* __args[] = { __VA_ARGS__ };\
-		user_scanf(format, __args); \
+		user_scanf(format, __args);\
 	}
 
 void user_printf(const char* str, void** args);
 int user_scanf(const char* str, void** args);
 
-void user_printf(const char *str, void** args){
+void user_printf(const char *str, void** args) {
 	char c;
 	char* s;
 	int d;
 	void* p;
-	
+
 	int arg = 0;
-	int i=0;
-	while(str[i]!='\0'){
-		if(str[i]!='%'){
+	int i = 0;
+	while (str[i] != '\0') {
+		if (str[i] != '%') {
 			PutChar(str[i]);
-		}
-		else{
+		} else {
 			i++;
 			p = args[arg];
 			arg++;
-			switch(str[i]){
-				case '%' :
+			switch (str[i]) {
+				case '%':
 					PutChar('%');
 					break;
 				case 'c':
-					c = *(char*)p;
+					c = *(char*) p;
 					PutChar((char) c);
 					break;
-					
+
 				case 's':
-					s = (char*)p;
+					s = (char*) p;
 					PutString(s);
 					break;
 				case 'd':
-					d = *(int*)p;
+					d = *(int*) p;
 					PutInt(d);
 					break;
-				default :
-					return ;
+				default:
+					return;
 			}
 		}
 		i++;
@@ -59,30 +58,30 @@ int user_scanf(const char *str, void** args) {
 	char* s;
 	int* d;
 	void* p;
-	
+
 	int arg = 0;
-	int i=0;
-	while(str[i]!='\0'){
+	int i = 0;
+	while (str[i] != '\0') {
 		if (str[i] == '%') {
 			i++;
 			p = args[arg];
 			arg++;
-			switch(str[i]){
+			switch (str[i]) {
 				case 'c':
-					s = (char*)p;
+					s = (char*) p;
 					*s = GetChar();
 					break;
-					
+
 				case 's':
-					s = (char*)p;
+					s = (char*) p;
 					GetString(s, 20); //TODO MAX_STRING_SIZE
 					break;
 				case 'd':
-					d = (int*)p;
+					d = (int*) p;
 					GetInt(d);
 					break;
-				default :
-				return -1;
+				default:
+					return -1;
 			}
 		}
 		i++;
@@ -90,7 +89,7 @@ int user_scanf(const char *str, void** args) {
 	return arg;
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[]) {
 	int i, j, k;
 	char str[20];
 	char c;
@@ -103,7 +102,7 @@ int main(int argc, char* argv[]){
 	printf("Entrez un caractere :\n");
 	scanf("%c", &c);
 	printf("Le caractere est : %c\n", &c);
-	
+
 	return 0;
 }
 
