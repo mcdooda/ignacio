@@ -17,7 +17,7 @@
 
 #include "copyright.h"
 #include "utility.h"
-#include "openfile.h"
+#include "../filesys/openfile.h"
 
 // Definitions helpful for representing a bitmap as an array of integers
 #define BitsInByte 	8

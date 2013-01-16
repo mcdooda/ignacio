@@ -19,12 +19,14 @@
 #include "system.h"
 #include "addrspace.h"
 #include "noff.h"
+#include "usermachine.h"
+#include "frameprovider.h"
 
 #include <strings.h>		/* for bzero */
 
-
 #ifdef CHANGED
 #include <iostream>
+extern FrameProvider *frameProvider;
 #endif
 
 //----------------------------------------------------------------------
@@ -50,17 +52,24 @@ SwapHeader(NoffHeader * noffH) {
 }
 
 #ifdef CHANGED
-
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 		int position, TranslationEntry *pageTable, unsigned numPages) {
 	char buff[numBytes];
-	executable->ReadAt(buff, numBytes, position);
+	executable->ReadAt (buff, numBytes, position);
+	
+	// sauvegarde
+	TranslationEntry *pt = machine->pageTable;
+	unsigned np = machine->pageTableSize;
+	
+	machine->pageTable = pageTable;
+	machine->pageTableSize = numPages;
 
-	//TODO
-
-
-	//Copier buff[] à l'adresse &(machine->mainMemory[virtualaddr]);
-	bcopy(buff, &(machine->mainMemory[virtualaddr]), numBytes);
+	for(int i = 0; i < numBytes; i++)
+		machine->WriteMem(virtualaddr+i, 1, buff[i]);
+	
+	// restauration
+	machine->pageTable = pt;
+	machine->pageTableSize = np;
 }
 #endif
 
@@ -106,7 +115,11 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
 		pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
+#ifndef CHANGED
 		pageTable[i].physicalPage = i;
+#else
+		pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
+#endif
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
@@ -117,8 +130,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 	// zero out the entire address space, to zero the unitialized data segment 
 	// and the stack segment
+#ifndef CHANGED
 	bzero(machine->mainMemory, size);
-
+#endif
 	// then, copy in the code and data segments into memory
 	if (noffH.code.size > 0) {
 		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
@@ -208,6 +222,8 @@ AddrSpace::InitRegisters() {
 void
 AddrSpace::SaveState() {
 	//TODO peut etre mettre ici les bitmap machin
+//	pageTable = machine->pageTable;
+//	numPages = machine->pageTableSize;
 }
 
 //----------------------------------------------------------------------

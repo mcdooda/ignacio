@@ -10,6 +10,7 @@
 #ifdef CHANGED
 #include "../userprog/synchconsole.h"
 #include "../userprog/usermachine.h"
+#include "../userprog/frameprovider.h"
 #endif
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -35,6 +36,7 @@ Machine *machine;		// user program memory and registers
 #ifdef CHANGED
 SynchConsole *synchConsole;
 UserMachine *userMachine;
+FrameProvider *frameProvider;
 #endif //CHANGED
 #endif //USER_PROGRAM
 
@@ -182,6 +184,7 @@ Initialize (int argc, char **argv)
 #ifdef CHANGED
 	userMachine = new UserMachine();
 	synchConsole = new SynchConsole(in, out);
+	frameProvider = new FrameProvider();
 #endif
 #endif
 
@@ -215,6 +218,7 @@ Cleanup ()
 #ifdef CHANGED
 	delete userMachine;
 	delete synchConsole;
+	delete frameProvider;
 #endif //CHANGED
 #endif
 
