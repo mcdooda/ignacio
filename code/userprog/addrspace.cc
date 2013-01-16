@@ -111,6 +111,11 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n",
 			numPages, size);
+#ifdef CHANGED
+	//TODO gérer si plus de page
+	ASSERT(frameProvider->NumAvailFrame() >= numPages);
+#endif
+		
 	// first, set up the translation 
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
@@ -118,7 +123,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #ifndef CHANGED
 		pageTable[i].physicalPage = i;
 #else
-		pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
+		pageTable[i].physicalPage = frameProvider->GetEmptyFrame(true);
 #endif
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
@@ -170,12 +175,14 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 //----------------------------------------------------------------------
 
 AddrSpace::~AddrSpace() {
+#ifdef CHANGED
+	delete bm;
+	for(unsigned int i = 0; i < numPages; i++)
+		frameProvider->ReleaseFrame(pageTable[i].physicalPage);
+#endif
 	// LB: Missing [] for delete
 	// delete pageTable;
 	delete [] pageTable;
-#ifdef CHANGED
-	delete bm;
-#endif
 	// End of modification
 }
 

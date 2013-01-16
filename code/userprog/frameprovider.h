@@ -10,7 +10,7 @@ public:
 	~FrameProvider();
 	
 	// permet de récupérer un cadre libre et initialisé à 0
-	unsigned int GetEmptyFrame();
+	unsigned int GetEmptyFrame(bool random = false);
 	// permet de libérer un cadre obtenu par GetEmptyFrame
 	void ReleaseFrame(unsigned int num);
 	// permet de demander combien de cadres restent disponibles
