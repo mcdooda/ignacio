@@ -1,6 +1,6 @@
 #ifdef CHANGED
 #include "frameprovider.h"
-//#include "usermachine.h"
+#include "system.h"
 
 FrameProvider::FrameProvider() :
 bm(NumPhysPages) {
@@ -14,7 +14,7 @@ unsigned int FrameProvider::GetEmptyFrame() {
 	int num = bm.Find();
 	if (num != -1) {
 		bm.Mark(num);
-		bzero(machine->mainMemory[num * PageSize], PageSize);
+		bzero(&(machine->mainMemory[num * PageSize]), PageSize);
 	}
 	return num;
 }

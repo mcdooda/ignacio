@@ -141,7 +141,6 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]),
 				noffH.code.size, noffH.code.inFileAddr);
 #else
-		userMachine->GetCharArg(21);
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
 #endif
