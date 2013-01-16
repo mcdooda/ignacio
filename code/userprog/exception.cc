@@ -114,13 +114,13 @@ void ExceptionHandler(ExceptionType which) {
 			case SC_Halt:
 			{
 				DEBUG('a', "Shutdown, initiated by user program.\n");
-				FinishThreads();
+				JoinUserThreads();
 				interrupt->Halt();
 				break;
 			}
 			case SC_Exit:
 			{
-				FinishThreads();
+				JoinUserThreads();
 				int code = userMachine->GetIntArg(1);
 				interrupt->Exit(code);
 				break;
