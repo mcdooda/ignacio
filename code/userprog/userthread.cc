@@ -64,6 +64,7 @@ static Semaphore semCreate("do_UserThreadCreate", 1);
 static Semaphore semThreads("userThreads", 1);
 static Semaphore semThreadId("NewThreadId", 1);
 static Semaphore semFreeStack("GetFreeStackSpace", 1);
+static Semaphore semJoin("UserThreadJoin", 1);
 static int nextTid = 1;
 static std::map<int, UserThread*> userThreads;
 
@@ -105,7 +106,11 @@ static UserThread* GetUserThread(Thread* thread) {
 
 static UserThread* GetUserThread(int id) {
 	semThreads.P();
-	UserThread* ut = userThreads[id];
+	std::map<int, UserThread*>::iterator it = userThreads.find(id);
+	UserThread* ut = NULL;
+	if (it != userThreads.end()) {
+		ut = it->second;
+	}
 	semThreads.V();
 	return ut;
 }
@@ -137,7 +142,6 @@ int do_UserThreadCreate(int f, int arg) {
 	int id = SaveUserThread(new UserThread(f, arg, t));
 	t->Fork(StartUserThread, id);
 	t->space = currentThread->space;
-	
 	semCreate.V();
 	return id;
 }
@@ -150,22 +154,25 @@ void do_UserThreadExit() {
 }
 
 void do_UserThreadJoin(int id) {
-	UserThread* ut = GetUserThread(id);
-	ut->GetSem()->P();
-	int i;
-	machine->ReadMem(ut->GetArg(), 4, &i);
-	DeleteUserThread(ut);
+	UserThread* ut = GetUserThread(id); // thread safe!
+	// pas thread safe!
+	if (ut != NULL) {
+		std::cout << "Attente du thread #" << id << std::endl;
+		ut->GetSem()->P();
+		std::cout << "OK thread #" << id << std::endl;
+		int i;
+		machine->ReadMem(ut->GetArg(), 4, &i);
+		DeleteUserThread(ut);
+	} else {
+		std::cout << "Le thread #" << id << " n'existe pas" << std::endl;
+	}
 }
 
 void JoinUserThreads() {
-	semThreads.P();
-	for (std::map<int, UserThread*>::iterator it = userThreads.begin(); it != userThreads.end(); it++) {
-		UserThread* ut = it->second;
-		ut->GetThread()->Finish();
-		DeleteUserThread(ut);
+	std::map<int, UserThread*> threads = userThreads;
+	for (std::map<int, UserThread*>::iterator it = threads.begin(); it != threads.end(); it++) {
+		do_UserThreadJoin(it->first);
 	}
-	userThreads.clear();
-	semThreads.V();
 }
 
 #endif
