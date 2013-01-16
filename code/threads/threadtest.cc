@@ -19,6 +19,8 @@ Condition *cons = new Condition("cons");
 Condition *prod = new Condition("prod");
 int max = 5;
 int taille = 0;
+int nb_cons = 0;
+int nb_prod = 0;
 #endif // CHANGED
 
 //----------------------------------------------------------------------
@@ -52,34 +54,45 @@ void MutexTest(int which){
 }
 
 void Producteur(int which){
-	for(int i=0; i<10; i++){
+	for(int i=0; i<3; i++){
 //	while(true){
 		mutex->Acquire();
 		while(taille != 0){
+			nb_prod++;
 			printf("*** producteur %d en attente\n", which);
 			prod->Wait(mutex);
 			printf("*** producteur %d libéré\n", which);
+			nb_prod--;
 		}
 		taille+=max;
 		printf("producteur %d taille %d\n", which, taille);
-		cons->Signal(mutex);
+		if(nb_cons >0)
+			cons->Signal(mutex);
+		if(nb_prod > 0)
+			prod->Signal(mutex);
 		mutex->Release();
+			
 		currentThread->Yield ();
 	}
 }
 
 void Consommateur(int which){
-	for(int i=0; i<10; i++){
+	for(int i=0; i<3; i++){
 //	while(true){
 		mutex->Acquire();
 		while(taille == 0){
+			nb_cons++;
 			printf("*** consommateur %d en attente\n", which);
 			cons->Wait(mutex);
 			printf("*** consommateur %d libéré\n", which);
+			nb_cons--;
 		}
 		taille--;
 		printf("consommateur %d taille %d\n", which, taille);
-		prod->Signal(mutex);
+		if(nb_prod > 0)
+			prod->Signal(mutex);
+		if(nb_cons >0)
+			cons->Signal(mutex);
 		mutex->Release();
 		currentThread->Yield ();
 	}

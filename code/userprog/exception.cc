@@ -94,6 +94,7 @@ ExceptionHandler (ExceptionType which)
 #ifdef CHANGED
 extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
+extern void StartProcess(char* file);
 #endif
 #endif
 
@@ -188,6 +189,13 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				int id = userMachine->GetIntArg(1);
 				do_UserThreadJoin(id);
+				break;
+			}
+			case SC_ForkExec:
+			{
+				char strTmp[MAX_STRING_SIZE];
+				userMachine->GetStringArg(1, strTmp);
+				StartProcess(strTmp);
 				break;
 			}
 			default:
