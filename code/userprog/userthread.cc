@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "system.h"
 #include "synch.h"
+#include "threadsafecounter.h"
 #include <map>
 #include <iostream>
 //#include <stdlib>
@@ -15,7 +16,8 @@ class UserThread {
 public:
 
 	UserThread(int function, int argument, Thread* thread) :
-	sem("UserThread", 0) {
+	sem("UserThread", 0),
+	semStart("StartThread", 0) {
 		f = function;
 		arg = argument;
 		t = thread;
@@ -38,6 +40,10 @@ public:
 		return &sem;
 	}
 
+	Semaphore* GetSemStart() {
+		return &semStart;
+	}
+
 	Thread* GetThread() {
 		return t;
 	}
@@ -50,6 +56,9 @@ public:
 		stackBottom = sb;
 	}
 
+	bool Failed() {
+		return stackBottom == -1;
+	}
 
 private:
 	int f;
@@ -57,6 +66,7 @@ private:
 	int id;
 	int stackBottom;
 	Semaphore sem;
+	Semaphore semStart;
 	Thread* t;
 };
 
@@ -65,6 +75,8 @@ static Semaphore semThreads("userThreads", 1);
 static Semaphore semThreadId("NewThreadId", 1);
 static Semaphore semFreeStack("GetFreeStackSpace", 1);
 static Semaphore semJoin("UserThreadJoin", 1);
+static ThreadSafeCounter threadCounter(0);
+
 static int nextTid = 1;
 static std::map<int, UserThread*> userThreads;
 
@@ -127,21 +139,30 @@ static void StartUserThread(int id) {
 	freeStackPointer = currentThread->space->GetNextFreeStack();
 	ut->SetStackBottom(freeStackPointer);
 	semFreeStack.V();
+	ut->GetSemStart()->V();
 	if (freeStackPointer != -1) {
 		machine->WriteRegister(StackReg, freeStackPointer);
 		machine->Run();
 	} else {
-		std::cout << "Creation du thread impossible" << std::endl;
+		std::cout << "creation du thread impossible" << std::endl;
 		do_UserThreadExit();
 	}
 }
 
 int do_UserThreadCreate(int f, int arg) {
-	semCreate.P();
+	semCreate.P(); //TODO: verifier la safe-threadry
 	Thread *t = new Thread("forked thread user");
-	int id = SaveUserThread(new UserThread(f, arg, t));
+	UserThread* ut = new UserThread(f, arg, t);
+	int id = SaveUserThread(ut);
 	t->Fork(StartUserThread, id);
-	t->space = currentThread->space;
+	ut->GetSemStart()->P();
+	if (ut->Failed()) {
+		id = -1;
+		DeleteUserThread(ut);
+	} else {
+		t->space = currentThread->space;
+		++threadCounter;
+	}
 	semCreate.V();
 	return id;
 }
@@ -150,6 +171,7 @@ void do_UserThreadExit() {
 	UserThread* ut = GetUserThread(currentThread);
 	ut->GetThread()->space->FreeStackSlot(ut->GetStackBottom());
 	ut->GetSem()->V();
+	--threadCounter;
 	currentThread->Finish();
 }
 
@@ -157,18 +179,15 @@ void do_UserThreadJoin(int id) {
 	UserThread* ut = GetUserThread(id); // thread safe!
 	// pas thread safe!
 	if (ut != NULL) {
-		std::cout << "Attente du thread #" << id << std::endl;
 		ut->GetSem()->P();
-		std::cout << "OK thread #" << id << std::endl;
 		int i;
 		machine->ReadMem(ut->GetArg(), 4, &i);
 		DeleteUserThread(ut);
-	} else {
-		std::cout << "Le thread #" << id << " n'existe pas" << std::endl;
 	}
 }
 
 void JoinUserThreads() {
+	threadCounter.waitUntilValue(0);
 	std::map<int, UserThread*> threads = userThreads;
 	for (std::map<int, UserThread*>::iterator it = threads.begin(); it != threads.end(); it++) {
 		do_UserThreadJoin(it->first);

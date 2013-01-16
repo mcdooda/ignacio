@@ -24,6 +24,7 @@ void Thread2(void* arg) {
 	}
 	PutChar('Q');
 	UserThreadJoin(tid);
+	PutChar('Z');
 	UserThreadExit();
 }
 
