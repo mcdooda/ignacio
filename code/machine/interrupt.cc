@@ -256,7 +256,7 @@ Interrupt::Halt()
 void
 Interrupt::Exit(int code)
 {
-    //TODOUX ajouter le pid du prog
+    //TODO ajouter le pid du prog
     printf("code retour : %d\n\n",code);
 
 }
