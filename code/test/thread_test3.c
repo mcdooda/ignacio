@@ -14,20 +14,14 @@ void Thread(void* arg) {
 	PutChar('\n');
 	(*i)--;
 	if (*i > 0) {
-		int tid = UserThreadCreate(Thread, arg);
-		UserThreadJoin(tid);
+		UserThreadCreate(Thread, arg);
 	}
-	UserThreadExit();
 }
 
 int main(int argc, char** argv) {
 	int i = 7;
 
-	int tid = UserThreadCreate(Thread, &i);
-	UserThreadJoin(tid);
-	i = 7;
-	tid = UserThreadCreate(Thread, &i);
-	UserThreadJoin(tid);
+	UserThreadCreate(Thread, &i);
 
 	return 0;
 }

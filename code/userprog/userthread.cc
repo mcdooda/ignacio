@@ -82,11 +82,11 @@ static int SaveUserThread(UserThread* ut) {
 	return ut->GetId();
 }
 
-static void DeleteUserThread(int id) {
+static void DeleteUserThread(UserThread* ut) {
 	semThreads.P();
-	std::map<int, UserThread*>::iterator it = userThreads.find(id);
-	delete it->second;
+	std::map<int, UserThread*>::iterator it = userThreads.find(ut->GetId());
 	userThreads.erase(it);
+	delete ut;
 	semThreads.V();
 }
 
@@ -154,7 +154,18 @@ void do_UserThreadJoin(int id) {
 	ut->GetSem()->P();
 	int i;
 	machine->ReadMem(ut->GetArg(), 4, &i);
-	DeleteUserThread(ut->GetId());
+	DeleteUserThread(ut);
+}
+
+void JoinUserThreads() {
+	semThreads.P();
+	for (std::map<int, UserThread*>::iterator it = userThreads.begin(); it != userThreads.end(); it++) {
+		UserThread* ut = it->second;
+		ut->GetThread()->Finish();
+		DeleteUserThread(ut);
+	}
+	userThreads.clear();
+	semThreads.V();
 }
 
 #endif
