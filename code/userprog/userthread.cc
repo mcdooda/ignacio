@@ -15,13 +15,19 @@ static int NewThreadId();
 class UserThread {
 public:
 
-	UserThread(int function, int argument, Thread* thread) :
+	UserThread(int function, int argument, int pE, Thread* thread) :
 	sem("UserThread", 0),
 	semStart("StartThread", 0) {
 		f = function;
 		arg = argument;
+		pointerExit = pE;
 		t = thread;
 		id = NewThreadId();
+
+	}
+
+	int GetPointerExit() {
+		return pointerExit;
 	}
 
 	int GetArg() {
@@ -63,11 +69,13 @@ public:
 private:
 	int f;
 	int arg;
+	int pointerExit;
 	int id;
 	int stackBottom;
 	Semaphore sem;
 	Semaphore semStart;
 	Thread* t;
+
 };
 
 static Semaphore semCreate("do_UserThreadCreate", 1);
@@ -134,6 +142,7 @@ static void StartUserThread(int id) {
 	machine->WriteRegister(4, ut->GetArg());
 	machine->WriteRegister(PCReg, ut->GetF());
 	machine->WriteRegister(NextPCReg, ut->GetF() + 4);
+	machine->WriteRegister(RetAddrReg, ut->GetPointerExit());
 
 	semFreeStack.P();
 	freeStackPointer = currentThread->space->GetNextFreeStack();
@@ -149,10 +158,10 @@ static void StartUserThread(int id) {
 	}
 }
 
-int do_UserThreadCreate(int f, int arg) {
+int do_UserThreadCreate(int f, int arg, int pE) {
 	semCreate.P(); //TODO: verifier la safe-threadry
 	Thread *t = new Thread("forked thread user");
-	UserThread* ut = new UserThread(f, arg, t);
+	UserThread* ut = new UserThread(f, arg, pE, t);
 	int id = SaveUserThread(ut);
 	t->Fork(StartUserThread, id);
 	ut->GetSemStart()->P();

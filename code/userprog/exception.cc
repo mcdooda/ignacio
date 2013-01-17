@@ -176,7 +176,8 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				int f = userMachine->GetIntArg(1);
 				int arg = userMachine->GetIntArg(2);
-				int id = do_UserThreadCreate(f, arg);
+				int pointerExit = userMachine->GetIntArg(3);
+				int id = do_UserThreadCreate(f, arg, pointerExit);
 				userMachine->SetReturn(id);
 				break;
 			}
