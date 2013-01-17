@@ -10,6 +10,7 @@
 
 #include "copyright.h"
 #include "system.h"
+#include "filesys.h"
 #include "console.h"
 #include "synchconsole.h"
 #include "addrspace.h"
@@ -52,6 +53,7 @@ static Semaphore *readAvail;
 static Semaphore *writeDone;
 #ifdef CHANGED
 extern SynchConsole* synchConsole;
+extern FileSystem* fileSystem;
 #endif
 //----------------------------------------------------------------------
 // ConsoleInterruptHandlers
@@ -133,6 +135,35 @@ void SynchConsoleTest (char *in, char *out)
 //		ch = synchConsole->SynchGetChar();
 //		synchConsole->SynchPutChar(ch);
 //	}
+}
+extern void Copy (const char *unixFile, const char *nachosFile);
+
+void FileSystemTest (){
+	
+#ifdef FILESYS
+	fileSystem->Print();
+	Copy("../filesys/test/small","small");
+	Copy("../filesys/test/medium","medium");
+//	Copy("../filesys/test/big","big");
+	
+	fileSystem->CreateDirectory("","caca");
+	
+	fileSystem->Create2("caca/fishier",100);
+	
+	
+	printf("\n\n\n-----------------------------\n\n\n");
+	
+	fileSystem->Print();
+
+	printf("\n\n --.-- \n\n");
+	fileSystem->PrintDir(".");
+	printf("\n\n --.-- \n\n");
+	printf("\n\n --caca-- \n\n");
+	fileSystem->PrintDir("caca");
+	printf("\n\n --caca-- \n\n");
+	
+#endif
+	
 }
 #endif //CHANGED
 
