@@ -94,7 +94,7 @@ ExceptionHandler (ExceptionType which)
 #ifdef CHANGED
 extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
-extern void StartProcess(char* file);
+extern int StartProcessExec(char* file);
 #endif
 #endif
 
@@ -195,7 +195,8 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-				StartProcess(strTmp);
+				int pid = StartProcessExec(strTmp);
+				userMachine->SetReturn(pid);
 				break;
 			}
 			default:

@@ -110,6 +110,17 @@ Thread::Fork (VoidFunctionPtr func, int arg)
     (void) interrupt->SetLevel (oldLevel);
 }
 
+#ifdef CHANGED
+void Thread::ForkExec(VoidFunctionPtr func, int pid) {
+	DEBUG('t', "Forking process \"%s\" with pid = 0x%x\n", name, pid);
+
+	StackAllocate(func, pid);
+
+	IntStatus oldLevel = interrupt->SetLevel(IntOff);
+	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts are disabled!
+	(void) interrupt->SetLevel(oldLevel);
+}
+#endif
 //----------------------------------------------------------------------
 // Thread::CheckOverflow
 //      Check a thread's stack to see if it has overrun the space

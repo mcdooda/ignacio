@@ -141,7 +141,9 @@ int do_UserThreadCreate(int f, int arg) {
 	Thread *t = new Thread("forked thread user");
 	int id = SaveUserThread(new UserThread(f, arg, t));
 	t->Fork(StartUserThread, id);
+	//TODO inutile ?
 	t->space = currentThread->space;
+	//
 	semCreate.V();
 	return id;
 }

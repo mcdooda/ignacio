@@ -27,7 +27,6 @@ unsigned int FrameProvider::GetEmptyFrame(bool random) {
 		}
 
 		if (num != -1) {
-			bm.Mark(num);
 			// Mise à zéro des bits de la page
 			bzero(&(machine->mainMemory[num * PageSize]), PageSize);
 		}
