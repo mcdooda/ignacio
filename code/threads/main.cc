@@ -60,6 +60,9 @@ extern void ThreadTest (void), Copy (const char *unixFile, const char *nachosFil
 extern void Print (char *file), PerformanceTest (void);
 extern void StartProcess (char *file), ConsoleTest (char *in, char *out), SynchConsoleTest (char *in, char *out);
 extern void MailTest (int networkID);
+#ifdef CHANGED
+extern void FileSystemTest();
+#endif
 
 //----------------------------------------------------------------------
 // main
@@ -129,6 +132,11 @@ main (int argc, char **argv)
 		// Nachos will loop forever waiting 
 		// for console input
 	    }
+	  else if (!strcmp (*argv, "-f")){
+		  FileSystemTest();
+		  interrupt->Halt ();	// once we start the console, then 
+	  }
+	  
 #endif // CHANGED
 #endif // USER_PROGRAM
 #ifdef FILESYS

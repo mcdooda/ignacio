@@ -10,6 +10,7 @@
 
 #include "copyright.h"
 #include "system.h"
+#include "filesys.h"
 #include "console.h"
 #include "synchconsole.h"
 #include "addrspace.h"
@@ -25,28 +26,26 @@ static Lock *lock = new Lock("progtest");
 //----------------------------------------------------------------------
 
 void
-StartProcess (char *filename)
-{
-    OpenFile *executable = fileSystem->Open (filename);
-    AddrSpace *space;
+StartProcess(char *filename) {
+	OpenFile *executable = fileSystem->Open(filename);
+	AddrSpace *space;
 
-    if (executable == NULL)
-      {
-	  printf ("Unable to open file %s\n", filename);
-	  return;
-      }
-    space = new AddrSpace (executable);
-    currentThread->space = space;
+	if (executable == NULL) {
+		printf("Unable to open file %s\n", filename);
+		return;
+	}
+	space = new AddrSpace(executable);
+	currentThread->space = space;
 
-    delete executable;		// close file
+	delete executable; // close file
 
-    space->InitRegisters ();	// set the initial register values
-    space->RestoreState ();	// load page table register
+	space->InitRegisters(); // set the initial register values
+	space->RestoreState(); // load page table register
 
-    machine->Run ();		// jump to the user progam
-    ASSERT (FALSE);		// machine->Run never returns;
-    // the address space exits
-    // by doing the syscall "exit"
+	machine->Run(); // jump to the user progam
+	ASSERT(FALSE); // machine->Run never returns;
+	// the address space exits
+	// by doing the syscall "exit"
 }
 
 // Data structures needed for the console test.  Threads making
@@ -55,6 +54,7 @@ static Semaphore *readAvail;
 static Semaphore *writeDone;
 #ifdef CHANGED
 extern SynchConsole* synchConsole;
+extern FileSystem* fileSystem;
 #endif
 //----------------------------------------------------------------------
 // ConsoleInterruptHandlers
@@ -62,15 +62,15 @@ extern SynchConsole* synchConsole;
 //----------------------------------------------------------------------
 
 static Console *console;
+
 static void
-ReadAvail (int arg)
-{
-    readAvail->V ();
+ReadAvail(int arg) {
+	readAvail->V();
 }
+
 static void
-WriteDone (int arg)
-{
-    writeDone->V ();
+WriteDone(int arg) {
+	writeDone->V();
 }
 //----------------------------------------------------------------------
 // ConsoleTest
@@ -79,63 +79,110 @@ WriteDone (int arg)
 //----------------------------------------------------------------------
 
 void
-ConsoleTest (char *in, char *out)
-{
-    char ch;
-	
+ConsoleTest(char *in, char *out) {
+	char ch;
+
 #ifdef CHANGED
 	delete synchConsole;
 	synchConsole = NULL;
 #endif
-	
-    console = new Console (in, out, ReadAvail, WriteDone, 0);
-    readAvail = new Semaphore ("read avail", 0);
-    writeDone = new Semaphore ("write done", 0);
+
+	console = new Console(in, out, ReadAvail, WriteDone, 0);
+	readAvail = new Semaphore("read avail", 0);
+	writeDone = new Semaphore("write done", 0);
 #ifndef CHANGED
-	for (;;)
-	{
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  console->PutChar (ch);	// echo it!
-	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q')
-		return;		// if q, quit
+	for (;;) {
+		readAvail->P(); // wait for character to arrive
+		ch = console->GetChar();
+		console->PutChar(ch); // echo it!
+		writeDone->P(); // wait for write to finish
+		if (ch == 'q')
+			return; // if q, quit
 	}
 #else
-    for (;;)
-    {
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  if(ch != EOF)
-	  {
-		console->PutChar ('<');
-		writeDone->P ();
-		console->PutChar (ch);	// echo it!
-		writeDone->P ();
-		console->PutChar ('>');
-		writeDone->P ();	// wait for write to finish
-	  }
-	  if (ch == 'q' || ch == EOF)
-		return;		// if q or EOF, quit
-    }
+	for (;;) {
+		readAvail->P(); // wait for character to arrive
+		ch = console->GetChar();
+		if (ch != EOF) {
+			console->PutChar('<');
+			writeDone->P();
+			console->PutChar(ch); // echo it!
+			writeDone->P();
+			console->PutChar('>');
+			writeDone->P(); // wait for write to finish
+		}
+		if (ch == 'q' || ch == EOF)
+			return; // if q or EOF, quit
+	}
 #endif
 }
 
 #ifdef CHANGED
-void SynchConsoleTest (char *in, char *out)
-{
+
+void SynchConsoleTest(char *in, char *out) {
 	int ch;
-	if(in != NULL && out != NULL) {
+	if (in != NULL && out != NULL) {
 		delete synchConsole;
 		synchConsole = new SynchConsole(in, out);
 	}
-	while((ch = synchConsole->SynchGetChar()) != EOF)
+	while ((ch = synchConsole->SynchGetChar()) != EOF)
 		synchConsole->SynchPutChar(ch);
 	// 2ème façon de vérifier si EOF
-//	while(!synchConsole->feof()) {
-//		ch = synchConsole->SynchGetChar();
-//		synchConsole->SynchPutChar(ch);
-//	}
+	//	while(!synchConsole->feof()) {
+	//		ch = synchConsole->SynchGetChar();
+	//		synchConsole->SynchPutChar(ch);
+	//	}
+}
+extern void Copy(const char *unixFile, const char *nachosFile);
+
+void FileSystemTest() {
+
+#ifdef FILESYS
+
+	//	fileSystem->MinimalisticPrint();
+	//	fileSystem->CreateDirectory("caca");
+	//	fileSystem->MinimalisticPrint();
+	//	fileSystem->SetDirectory("caca/");
+	//	Copy("../filesys/test/small", "small");
+	//	fileSystem->MinimalisticPrint();
+	//	fileSystem->CreateDirectory("caca");
+	//	fileSystem->MinimalisticPrint();
+	//	fileSystem->SetDirectory("caca/");
+	//	fileSystem->MinimalisticPrint();
+	//	Copy("../filesys/test/medium", "medium");
+	//	fileSystem->MinimalisticPrint();
+	//	fileSystem->SetDirectory("../");
+	//	fileSystem->Create("bite", 100);
+	//	fileSystem->MinimalisticPrint();
+
+	printf("1 ");
+	fileSystem->MinimalisticPrint();
+	fileSystem->CreateDirectory("caca");
+	fileSystem->SetDirectory("caca/");
+	Copy("../filesys/test/small", "pipi");
+	printf("2 ");
+	fileSystem->CreateDirectory("bebe");
+	fileSystem->SetDirectory("bebe/");
+	Copy("../filesys/test/small", "prout");
+	fileSystem->MinimalisticPrint();
+	fileSystem->SetDirectory("../");
+	Copy("../filesys/test/small", "petit");
+
+	printf("3 ");
+	fileSystem->MinimalisticPrint();
+
+	printf("4 ");
+	fileSystem->SetDirectory("bebe/");
+	Copy("../filesys/test/small", "small");
+	fileSystem->MinimalisticPrint();
+	
+		printf("\n\nuuuuuuuuuuuuuuuuuuuuuuuu\n\n");
+	fileSystem->SetDirectory("../");
+	fileSystem->SetDirectory("../");
+	fileSystem->MinimalisticPrint();
+
+#endif
+
 }
 
 //----------------------------------------------------------------------

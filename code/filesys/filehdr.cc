@@ -132,7 +132,15 @@ FileHeader::Print()
     int i, j, k;
     char *data = new char[SectorSize];
 
+#ifdef CHANGED
+	printf("FileHeader contents.  File type: %s  File size: %d.  File blocks:\n", FileHeader::GetTypeName(type), numBytes);	
+	for (unsigned int l = 0; l < sizeof(FileHeader); l++) {
+		printf("%02x ", ((unsigned char*)this)[l]);
+	}
+	printf("\n");
+#else
     printf("FileHeader contents.  File size: %d.  File blocks:\n", numBytes);
+#endif
     for (i = 0; i < numSectors; i++)
 	printf("%d ", dataSectors[i]);
     printf("\nFile contents:\n");

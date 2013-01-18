@@ -1,10 +1,3 @@
-/* 
- * File:   thread_test2.c
- * Author: gervaila
- *
- * Created on 15 janvier 2013, 11:38
- */
-
 #include "syscall.h"
 
 void Thread(void* arg) {
@@ -24,6 +17,7 @@ void Thread2(void* arg) {
 	}
 	PutChar('Q');
 	UserThreadJoin(tid);
+	PutChar('Z');
 	UserThreadExit();
 }
 
