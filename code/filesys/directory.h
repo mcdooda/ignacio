@@ -71,7 +71,10 @@ class Directory {
 					//  of the directory -- all the file
 					//  names and their contents.
 	
-	void SubDirectory(int size);
+#ifdef CHANGED
+	char** GetFileNames(int* numFiles);
+	void MinimalisticPrint(int tabs);
+#endif
 
   private:
     int tableSize;			// Number of directory entries

@@ -17,7 +17,11 @@
 #include "disk.h"
 #include "bitmap.h"
 
+#ifndef CHANGED
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
+#else
+#define NumDirect 	((SectorSize - 3 * sizeof(int)) / sizeof(int))
+#endif
 #define MaxFileSize 	(NumDirect * SectorSize)
 
 // The following class defines the Nachos "file header" (in UNIX terms,  
@@ -36,31 +40,69 @@
 // reading it from disk.
 
 class FileHeader {
-  public:
-    bool Allocate(BitMap *bitMap, int fileSize);// Initialize a file header, 
-						//  including allocating space 
-						//  on disk for the file data
-    void Deallocate(BitMap *bitMap);  		// De-allocate this file's 
-						//  data blocks
+public:
+#ifdef CHANGED
+	enum FileType {
+		FILE,
+		DIRECTORY,
+		SYMLINK
+	};
+#endif
+	bool Allocate(BitMap *bitMap, int fileSize); // Initialize a file header, 
+	//  including allocating space 
+	//  on disk for the file data
+	void Deallocate(BitMap *bitMap); // De-allocate this file's 
+	//  data blocks
 
-    void FetchFrom(int sectorNumber); 	// Initialize file header from disk
-    void WriteBack(int sectorNumber); 	// Write modifications to file header
-					//  back to disk
+	void FetchFrom(int sectorNumber); // Initialize file header from disk
+	void WriteBack(int sectorNumber); // Write modifications to file header
+	//  back to disk
 
-    int ByteToSector(int offset);	// Convert a byte offset into the file
-					// to the disk sector containing
-					// the byte
+	int ByteToSector(int offset); // Convert a byte offset into the file
+	// to the disk sector containing
+	// the byte
 
-    int FileLength();			// Return the length of the file 
-					// in bytes
+	int FileLength(); // Return the length of the file 
+	// in bytes
 
-    void Print();			// Print the contents of the file.
+	void Print(); // Print the contents of the file.
 
-  private:
-    int numBytes;			// Number of bytes in the file
-    int numSectors;			// Number of data sectors in the file
-    int dataSectors[NumDirect];		// Disk sector numbers for each data 
-					// block in the file
+#ifdef CHANGED
+	inline static const char* GetTypeName(FileType t) {
+		switch (t) {
+			case FILE:
+				return "FILE";
+				break;
+			case DIRECTORY:
+				return "DIR";
+				break;
+			case SYMLINK:
+				return "SYMLINK";
+				break;
+			default:
+				return "UNKNOWN";
+				break;
+		}
+	}
+
+	inline void SetType(FileType t) {
+		type = t;
+	}
+
+	inline FileType GetType() {
+		return type;
+	}
+#endif
+
+private:
+	int numBytes; // Number of bytes in the file
+	int numSectors; // Number of data sectors in the file
+#ifdef CHANGED
+	FileType type;
+#endif
+	int dataSectors[NumDirect]; // Disk sector numbers for each data 
+	// block in the file
+
 };
 
 #endif // FILEHDR_H

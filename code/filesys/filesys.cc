@@ -52,6 +52,10 @@
 #include "filesys.h"
 #include "openfile.h"
 
+#ifdef CHANGED
+#include <string>
+#endif
+
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -107,6 +111,9 @@ FileSystem::FileSystem(bool format) {
 
 		DEBUG('f', "Writing headers back to disk.\n");
 		mapHdr->WriteBack(FreeMapSector);
+#ifdef CHANGED
+		dirHdr->SetType(FileHeader::DIRECTORY);
+#endif
 		dirHdr->WriteBack(DirectorySector);
 
 		// OK to open the bitmap and directory files now
@@ -172,8 +179,13 @@ FileSystem::FileSystem(bool format) {
 //	"initialSize" -- size of file to be created
 //----------------------------------------------------------------------
 
-bool
-FileSystem::Create(const char *name, int initialSize) {
+#ifndef CHANGED
+
+bool FileSystem::Create(const char *name, int initialSize) {
+#else
+
+bool FileSystem::Create(const char *name, int initialSize, FileHeader::FileType type) {
+#endif
 	Directory *directory;
 	BitMap *freeMap;
 	FileHeader *hdr;
@@ -202,6 +214,10 @@ FileSystem::Create(const char *name, int initialSize) {
 			else {
 				success = TRUE;
 				// everthing worked, flush all changes back to disk
+#ifdef CHANGED
+
+				hdr->SetType(type);
+#endif
 				hdr->WriteBack(sector);
 				directory->WriteBack(directoryFile);
 				freeMap->WriteBack(freeMapFile);
@@ -329,7 +345,7 @@ FileSystem::Print() {
 
 	directory->FetchFrom(directoryFile);
 	directory->Print();
-
+	printf("\n");
 	delete bitHdr;
 	delete dirHdr;
 	delete freeMap;
@@ -338,81 +354,117 @@ FileSystem::Print() {
 
 #ifdef CHANGED
 
-bool FileSystem::CreateDirectory(const char *path, const char *name) {
+// {name[strlen(name) - 1] == '/'} -> {change le dossier courant}
 
-	Create(name, DirectoryFileSize);
-	Directory *d = new Directory(NumDirEntries);
+void FileSystem::SetDirectory(const char* name) {
+	char* slash = NULL;
+	char* dir = (char*) name;
 
-	OpenFile* newDirectory = Open(name);
-
-	for (int i = 0; i < 200; i++) {
-		newDirectory->Write("", 1);
+	if (name[0] == '/') {
+		directoryFile = new OpenFile(DirectorySector);
+		dir++;
 	}
 
+	while ((slash = strchr(dir, '/')) != NULL) {
+		char dirName[FileNameMaxLen + 1];
+		int n = slash - dir;
+		strncpy(dirName, dir, n);
+		dirName[n] = '\0';
+		dir = slash + 1;
 
-	d->WriteBack(newDirectory);
-
-	return 1;
+		/*if (strcmp(dirName, ".") == 0) {
+			// nothing to do
+		} else if (strcmp(dirName, "..") == 0) {
+			// go up
+			//TODO
+		} else {*/
+		directoryFile = Open(dirName);
+		printf("directoryFile: %s %p\n", dirName, directoryFile);
+		/*}*/
+	}
 }
 
-bool
-FileSystem::Create2(const char *name, int initialSize) {
-	Directory *directory;
-	BitMap *freeMap;
-	FileHeader *hdr;
-	int sector;
-	bool success;
-	char dirName[FileNameMaxLen + 1];
-	char fileName[FileNameMaxLen + 1];
-	OpenFile* dirFile = directoryFile;
+void FileSystem::MinimalisticPrint() {
 
-	DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
+	printf("---------------------------\n");
+	OpenFile* of = directoryFile;
+	SetDirectory("/");
+	PrintRecursiveList(directoryFile, 0, 1000);
+	directoryFile = of;
+	//	printf("---------------------------\n");
+	//	PrintRecursiveList(directoryFile, 0);
 
-	char *c;
-	if ((c = strchr((char*) name, '/')) != NULL) {
-		strncpy(dirName, name, c - name);
-		dirName[c - name] = '\0';
-		strncpy(fileName, c + 1, strlen(name)-(c - name + 1));
-		fileName[strlen(name)-(c - name + 1)] = '\0';
-		dirFile = Open(dirName);
-	} else {//PEut etre garder ca
-		strcpy(fileName, name);
-		//dirFile = directoryFile;
-	}
-	printf("\n\n\n\ndossier = %s, fichier = %s,\n\n\n\n", dirName, fileName);
+}
 
-
-	directory = new Directory(NumDirEntries);
-	directory->FetchFrom(dirFile);
-
-
-	if (directory->Find(fileName) != -1)
-		success = FALSE; // file is already in directory
-	else {
-		freeMap = new BitMap(NumSectors);
-		freeMap->FetchFrom(freeMapFile);
-		sector = freeMap->Find(); // find a sector to hold the file header
-		if (sector == -1)
-			success = FALSE; // no free block for file header 
-		else if (!directory->Add(fileName, sector))
-			success = FALSE; // no space in directory
-		else {
-			hdr = new FileHeader;
-			if (!hdr->Allocate(freeMap, initialSize))
-				success = FALSE; // no space on disk for data
-			else {
-				success = TRUE;
-				// everthing worked, flush all changes back to disk
-				hdr->WriteBack(sector);
-				directory->WriteBack(dirFile);
-				freeMap->WriteBack(freeMapFile);
-			}
-			delete hdr;
+void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
+	if (maxDepth == 0) {
+		for (int j = 0; j < tabs; j++) {
+			printf("    ");
 		}
-		delete freeMap;
+		printf("*TOO DEEP*\n");
+	} else {
+		Directory *d = new Directory(NumDirEntries);
+		d->FetchFrom(of);
+		int numFiles;
+		char** fileNames = d->GetFileNames(&numFiles);
+		for (int i = 0; i < numFiles; i++) {
+			for (int j = 0; j < tabs - 1; j++) {
+				printf("    ");
+			}
+			if (tabs > 0)
+				printf("  | ");
+			int sector = d->Find(fileNames[i]);
+			FileHeader* fh = new FileHeader();
+			fh->FetchFrom(sector);
+			printf("%s %s\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()));
+			if (fh->GetType() == FileHeader::DIRECTORY) {
+				OpenFile* openFile = new OpenFile(sector);
+				PrintRecursiveList(openFile, tabs + 1, maxDepth - 1);
+				delete openFile;
+			}
+			delete fh;
+		}
+		delete fileNames;
+		delete d;
 	}
-	delete directory;
-	return success;
+}
+
+bool FileSystem::CreateDirectory(const char *name) {
+
+	Create(name, DirectoryFileSize, FileHeader::DIRECTORY);
+	Directory *d = new Directory(NumDirEntries);
+	OpenFile* newDirectory = Open(name);
+	d->WriteBack(newDirectory);
+	delete d;
+	
+	//TODO : new Directory
+
+	OpenFile* dirParent = directoryFile;
+
+	SetDirectory((std::string(name) + "/").c_str()); // changes directoryFile!
+
+	Create(".", DirectoryFileSize, FileHeader::SYMLINK);
+	Create("..", DirectoryFileSize, FileHeader::SYMLINK);
+
+	OpenFile* ppFile = Open("..");
+	Directory *ppFutur = new Directory(NumDirEntries);
+	ppFutur->FetchFrom(dirParent);
+	ppFutur->WriteBack(ppFile);
+	delete ppFutur;
+	delete ppFile;
+
+	OpenFile* pFile = Open(".");
+	Directory *pFutur = new Directory(NumDirEntries);
+	pFutur->FetchFrom(newDirectory);
+	pFutur->WriteBack(pFile);
+	delete pFutur;
+	delete pFile;
+	delete newDirectory;
+
+	delete directoryFile;
+	directoryFile = dirParent;
+
+	return 1;
 }
 
 void

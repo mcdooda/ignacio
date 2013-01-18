@@ -97,6 +97,7 @@ vm_CPPFLAGS=-DUSE_TLB
 # These flavors will be compiled *without* -DCHANGED under the name
 # nachos-"flavor" in the 'build-origin/' directory
 ORIG_FLAVORS=threads userprog filesys network vm
+#ORIG_FLAVORS=filesys
 
 ###########################################################################
 #            Original flavors
