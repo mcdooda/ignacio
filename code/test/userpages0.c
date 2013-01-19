@@ -4,14 +4,14 @@
 
 const int N = 10; // Choose it large enough!
 
-void puts(char *s) {
+void puts_(char *s) {
 	char *p;
 	for (p = s; *p != '\0'; p++) PutChar(*p);
 }
 
 void f(void *s) {
 	int i;
-	for (i = 0; i < N; i++) puts((char *) s);
+	for (i = 0; i < N; i++) puts_((char *) s);
 }
 
 int main() {
