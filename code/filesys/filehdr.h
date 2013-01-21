@@ -17,10 +17,14 @@
 #include "disk.h"
 #include "bitmap.h"
 
+#ifdef CHANGED
+#include "directory.h"
+#endif
+
 #ifndef CHANGED
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
 #else
-#define NumDirect 	((SectorSize - 3 * sizeof(int)) / sizeof(int))
+#define NumDirect 	((SectorSize - 3 * sizeof(int) - (FileNameMaxLen + 1) * sizeof(char)) / sizeof(int))
 #endif
 #define MaxFileSize 	(NumDirect * SectorSize)
 
@@ -42,6 +46,7 @@
 class FileHeader {
 public:
 #ifdef CHANGED
+
 	enum FileType {
 		FILE,
 		DIRECTORY,
@@ -68,30 +73,17 @@ public:
 	void Print(); // Print the contents of the file.
 
 #ifdef CHANGED
-	inline static const char* GetTypeName(FileType t) {
-		switch (t) {
-			case FILE:
-				return "FILE";
-				break;
-			case DIRECTORY:
-				return "DIR";
-				break;
-			case SYMLINK:
-				return "SYMLINK";
-				break;
-			default:
-				return "UNKNOWN";
-				break;
-		}
-	}
+	static const char* GetTypeName(FileType t);
 
-	inline void SetType(FileType t) {
-		type = t;
-	}
+	void SetType(FileType t);
 
-	inline FileType GetType() {
-		return type;
-	}
+	FileType GetType();
+
+	void SetLinkSector(int sector);
+	int GetLinkSector();
+
+	void SetName(const char* n);
+	const char* GetName();
 #endif
 
 private:
@@ -99,6 +91,7 @@ private:
 	int numSectors; // Number of data sectors in the file
 #ifdef CHANGED
 	FileType type;
+	char name[FileNameMaxLen + 1];
 #endif
 	int dataSectors[NumDirect]; // Disk sector numbers for each data 
 	// block in the file

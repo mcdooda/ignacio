@@ -102,7 +102,6 @@ public:
 	void Print(); // List all the files and their contents
 
 #ifdef CHANGED
-	void PrintDir(const char *name); // List all the files and their contents
 	void PrintRecursiveList(OpenFile* of, int tabs, int maxDepth);
 	void MinimalisticPrint();
 	bool CreateDirectory(const char *name);

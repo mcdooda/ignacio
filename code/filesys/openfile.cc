@@ -194,3 +194,9 @@ OpenFile::Length()
 { 
     return hdr->FileLength(); 
 }
+
+#ifdef CHANGED
+FileHeader* OpenFile::GetFileHeader(){
+	return hdr;
+}
+#endif

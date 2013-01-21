@@ -133,6 +133,31 @@ FileSystem::FileSystem(bool format) {
 		freeMap->WriteBack(freeMapFile); // flush changes to disk
 		directory->WriteBack(directoryFile);
 
+
+#ifdef CHANGED
+
+
+		//Creer un lien symbolique vers le dossier courant
+		Create(".", DirectoryFileSize, FileHeader::SYMLINK);
+		Create("..", DirectoryFileSize, FileHeader::SYMLINK);
+		directory->FetchFrom(directoryFile);
+		int dSector = directory->Find(".");
+		FileHeader* dfh = new FileHeader;
+		dfh->FetchFrom(dSector);
+		dfh->SetLinkSector(DirectorySector);
+		dfh->WriteBack(dSector);
+		delete dfh;
+
+		//Creer un lien symbolique vers le dossier parent
+		int ddSector = directory->Find("..");
+		//Pas bon : ----------->>>>>>>>
+		FileHeader* ddfh = new FileHeader;
+		ddfh->FetchFrom(ddSector);
+		ddfh->SetLinkSector(DirectorySector);
+		ddfh->WriteBack(ddSector);
+		delete ddfh;
+#endif
+
 		if (DebugIsEnabled('f')) {
 			freeMap->Print();
 			directory->Print();
@@ -215,7 +240,7 @@ bool FileSystem::Create(const char *name, int initialSize, FileHeader::FileType 
 				success = TRUE;
 				// everthing worked, flush all changes back to disk
 #ifdef CHANGED
-
+				hdr->SetName(name);
 				hdr->SetType(type);
 #endif
 				hdr->WriteBack(sector);
@@ -361,6 +386,7 @@ void FileSystem::SetDirectory(const char* name) {
 	char* dir = (char*) name;
 
 	if (name[0] == '/') {
+		delete directoryFile;
 		directoryFile = new OpenFile(DirectorySector);
 		dir++;
 	}
@@ -372,15 +398,27 @@ void FileSystem::SetDirectory(const char* name) {
 		dirName[n] = '\0';
 		dir = slash + 1;
 
-		/*if (strcmp(dirName, ".") == 0) {
+		//TODO: faire un truc generique pour les liens symboliques
+		if (strcmp(dirName, ".") == 0) {
 			// nothing to do
 		} else if (strcmp(dirName, "..") == 0) {
-			// go up
+			Directory* d = new Directory(NumDirEntries);
+			d->FetchFrom(directoryFile);
+			int ddSector = d->Find("..");
+			delete d;
+
+			FileHeader* dfh = new FileHeader;
+			dfh->FetchFrom(ddSector);
+			int parentSector = dfh->GetLinkSector();
+			delete dfh;
+
+			delete directoryFile;
+			directoryFile = new OpenFile(parentSector);
 			//TODO
-		} else {*/
-		directoryFile = Open(dirName);
-		printf("directoryFile: %s %p\n", dirName, directoryFile);
-		/*}*/
+		} else {
+			directoryFile = Open(dirName);
+			printf("directoryFile: %s %p\n", dirName, directoryFile);
+		}
 	}
 }
 
@@ -416,7 +454,11 @@ void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
 			int sector = d->Find(fileNames[i]);
 			FileHeader* fh = new FileHeader();
 			fh->FetchFrom(sector);
-			printf("%s %s\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()));
+			if (fh->GetType() == FileHeader::SYMLINK) {
+				printf("%s %s -> %d\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()), fh->GetLinkSector());
+			} else {
+				printf("%s %s\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()));
+			}
 			if (fh->GetType() == FileHeader::DIRECTORY) {
 				OpenFile* openFile = new OpenFile(sector);
 				PrintRecursiveList(openFile, tabs + 1, maxDepth - 1);
@@ -430,58 +472,58 @@ void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
 }
 
 bool FileSystem::CreateDirectory(const char *name) {
-
+	//Crée le nouveau dossier et écrit une structure de données Directory dedans
+	Directory *d;
 	Create(name, DirectoryFileSize, FileHeader::DIRECTORY);
-	Directory *d = new Directory(NumDirEntries);
+	d = new Directory(NumDirEntries);
 	OpenFile* newDirectory = Open(name);
 	d->WriteBack(newDirectory);
 	delete d;
-	
-	//TODO : new Directory
 
-	OpenFile* dirParent = directoryFile;
 
-	SetDirectory((std::string(name) + "/").c_str()); // changes directoryFile!
+	//Récupère le numero de secteur du header du nouveau dossier
+	d = new Directory(NumDirEntries);
+	d->FetchFrom(directoryFile);
+	int newDirectorySector = d->Find(name);
 
+
+	//Récupère le numéro de secteur du header du dossier parent
+	FileHeader* fh = new FileHeader;
+	int sector = d->Find(".");
+	fh->FetchFrom(sector);
+	int sectorParent = fh->GetLinkSector();
+	delete d;
+	delete fh;
+
+	//Descend dans le nouveau dossier pour créer "." et ".."
+	SetDirectory((std::string(name) + "/").c_str());
+
+	//Récupère les numéros de secteur des dossier "." et ".."
 	Create(".", DirectoryFileSize, FileHeader::SYMLINK);
 	Create("..", DirectoryFileSize, FileHeader::SYMLINK);
+	d = new Directory(NumDirEntries);
+	d->FetchFrom(directoryFile);
 
-	OpenFile* ppFile = Open("..");
-	Directory *ppFutur = new Directory(NumDirEntries);
-	ppFutur->FetchFrom(dirParent);
-	ppFutur->WriteBack(ppFile);
-	delete ppFutur;
-	delete ppFile;
+	//Creer un lien symbolique vers le dossier courant
+	int dSector = d->Find(".");
+	FileHeader* dfh = new FileHeader;
+	dfh->FetchFrom(dSector);
+	dfh->SetLinkSector(newDirectorySector);
+	dfh->WriteBack(dSector);
+	delete dfh;
 
-	OpenFile* pFile = Open(".");
-	Directory *pFutur = new Directory(NumDirEntries);
-	pFutur->FetchFrom(newDirectory);
-	pFutur->WriteBack(pFile);
-	delete pFutur;
-	delete pFile;
-	delete newDirectory;
-
-	delete directoryFile;
-	directoryFile = dirParent;
+	//Creer un lien symbolique vers le dossier parent
+	int ddSector = d->Find("..");
+	FileHeader* ddfh = new FileHeader;
+	ddfh->FetchFrom(ddSector);
+	ddfh->SetLinkSector(sectorParent);
+	ddfh->WriteBack(ddSector);
+	delete ddfh;
+	
+	delete d;
+	SetDirectory("../");
 
 	return 1;
-}
-
-void
-FileSystem::PrintDir(const char* dir) {
-	Directory *directory = new Directory(NumDirEntries);
-	OpenFile* dirFile;
-
-	if (strcmp(dir, ".") == 0) {
-		directory->FetchFrom(directoryFile);
-		directory->Print();
-
-	} else {
-		dirFile = Open(dir);
-		directory->FetchFrom(dirFile);
-		directory->Print();
-	}
-	delete directory;
 }
 
 #endif

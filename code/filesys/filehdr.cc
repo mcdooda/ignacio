@@ -39,16 +39,15 @@
 //----------------------------------------------------------------------
 
 bool
-FileHeader::Allocate(BitMap *freeMap, int fileSize)
-{ 
-    numBytes = fileSize;
-    numSectors  = divRoundUp(fileSize, SectorSize);
-    if (freeMap->NumClear() < numSectors)
-	return FALSE;		// not enough space
+FileHeader::Allocate(BitMap *freeMap, int fileSize) {
+	numBytes = fileSize;
+	numSectors = divRoundUp(fileSize, SectorSize);
+	if (freeMap->NumClear() < numSectors)
+		return FALSE; // not enough space
 
-    for (int i = 0; i < numSectors; i++)
-	dataSectors[i] = freeMap->Find();
-    return TRUE;
+	for (int i = 0; i < numSectors; i++)
+		dataSectors[i] = freeMap->Find();
+	return TRUE;
 }
 
 //----------------------------------------------------------------------
@@ -58,13 +57,12 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize)
 //	"freeMap" is the bit map of free disk sectors
 //----------------------------------------------------------------------
 
-void 
-FileHeader::Deallocate(BitMap *freeMap)
-{
-    for (int i = 0; i < numSectors; i++) {
-	ASSERT(freeMap->Test((int) dataSectors[i]));  // ought to be marked!
-	freeMap->Clear((int) dataSectors[i]);
-    }
+void
+FileHeader::Deallocate(BitMap *freeMap) {
+	for (int i = 0; i < numSectors; i++) {
+		ASSERT(freeMap->Test((int) dataSectors[i])); // ought to be marked!
+		freeMap->Clear((int) dataSectors[i]);
+	}
 }
 
 //----------------------------------------------------------------------
@@ -75,9 +73,8 @@ FileHeader::Deallocate(BitMap *freeMap)
 //----------------------------------------------------------------------
 
 void
-FileHeader::FetchFrom(int sector)
-{
-    synchDisk->ReadSector(sector, (char *)this);
+FileHeader::FetchFrom(int sector) {
+	synchDisk->ReadSector(sector, (char *) this);
 }
 
 //----------------------------------------------------------------------
@@ -88,9 +85,8 @@ FileHeader::FetchFrom(int sector)
 //----------------------------------------------------------------------
 
 void
-FileHeader::WriteBack(int sector)
-{
-    synchDisk->WriteSector(sector, (char *)this); 
+FileHeader::WriteBack(int sector) {
+	synchDisk->WriteSector(sector, (char *) this);
 }
 
 //----------------------------------------------------------------------
@@ -104,9 +100,8 @@ FileHeader::WriteBack(int sector)
 //----------------------------------------------------------------------
 
 int
-FileHeader::ByteToSector(int offset)
-{
-    return(dataSectors[offset / SectorSize]);
+FileHeader::ByteToSector(int offset) {
+	return (dataSectors[offset / SectorSize]);
 }
 
 //----------------------------------------------------------------------
@@ -115,9 +110,8 @@ FileHeader::ByteToSector(int offset)
 //----------------------------------------------------------------------
 
 int
-FileHeader::FileLength()
-{
-    return numBytes;
+FileHeader::FileLength() {
+	return numBytes;
 }
 
 //----------------------------------------------------------------------
@@ -127,32 +121,76 @@ FileHeader::FileLength()
 //----------------------------------------------------------------------
 
 void
-FileHeader::Print()
-{
-    int i, j, k;
-    char *data = new char[SectorSize];
+FileHeader::Print() {
+	int i, j, k;
+	char *data = new char[SectorSize];
 
 #ifdef CHANGED
-	printf("FileHeader contents.  File type: %s  File size: %d.  File blocks:\n", FileHeader::GetTypeName(type), numBytes);	
-	for (unsigned int l = 0; l < sizeof(FileHeader); l++) {
-		printf("%02x ", ((unsigned char*)this)[l]);
+	printf("FileHeader contents.  File type: %s  File size: %d.  File blocks:\n", FileHeader::GetTypeName(type), numBytes);
+	for (unsigned int l = 0; l < sizeof (FileHeader); l++) {
+		printf("%02x ", ((unsigned char*) this)[l]);
 	}
 	printf("\n");
 #else
-    printf("FileHeader contents.  File size: %d.  File blocks:\n", numBytes);
+	printf("FileHeader contents.  File size: %d.  File blocks:\n", numBytes);
 #endif
-    for (i = 0; i < numSectors; i++)
-	printf("%d ", dataSectors[i]);
-    printf("\nFile contents:\n");
-    for (i = k = 0; i < numSectors; i++) {
-	synchDisk->ReadSector(dataSectors[i], data);
-        for (j = 0; (j < SectorSize) && (k < numBytes); j++, k++) {
-	    if ('\040' <= data[j] && data[j] <= '\176')   // isprint(data[j])
-		printf("%c", data[j]);
-            else
-		printf("\\%x", (unsigned char)data[j]);
+	for (i = 0; i < numSectors; i++)
+		printf("%d ", dataSectors[i]);
+	printf("\nFile contents:\n");
+	for (i = k = 0; i < numSectors; i++) {
+		synchDisk->ReadSector(dataSectors[i], data);
+		for (j = 0; (j < SectorSize) && (k < numBytes); j++, k++) {
+			if ('\040' <= data[j] && data[j] <= '\176') // isprint(data[j])
+				printf("%c", data[j]);
+			else
+				printf("\\%x", (unsigned char) data[j]);
+		}
+		printf("\n");
 	}
-        printf("\n"); 
-    }
-    delete [] data;
+	delete [] data;
 }
+
+#ifdef CHANGED
+
+const char* FileHeader::GetTypeName(FileHeader::FileType t) {
+	switch (t) {
+		case FILE:
+			return "FILE";
+			break;
+		case DIRECTORY:
+			return "DIR";
+			break;
+		case SYMLINK:
+			return "SYMLINK";
+			break;
+		default:
+			return "UNKNOWN";
+			break;
+	}
+}
+
+void FileHeader::SetType(FileHeader::FileType t) {
+	type = t;
+}
+
+FileHeader::FileType FileHeader::GetType() {
+	return type;
+}
+
+void FileHeader::SetLinkSector(int sector){
+	dataSectors[0] = sector;
+}
+
+int FileHeader::GetLinkSector(){
+	return dataSectors[0];
+}
+
+void FileHeader::SetName(const char* n) {
+	strcpy(name, n);
+}
+
+const char* FileHeader::GetName() {
+	return name;
+}
+
+#endif
