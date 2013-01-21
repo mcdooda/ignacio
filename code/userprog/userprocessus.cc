@@ -5,25 +5,24 @@
 #include "system.h"
 #include "synch.h"
 
-class Processus {
-public:
-
-	Processus(char *name) {
-		strcpy(nom, name);
-		t = new Thread(nom);
-	}
-
-	Thread* getThread() {
-		return t;
-	}
-
-private:
-	Thread* t;
-	char nom[50];
-
-};
-
 static Lock mutex("proc mutex");
+
+
+Processus::Processus(char *name) {
+	strcpy(nom, name);
+	t = new Thread(nom);
+}
+
+Processus::Processus(char *name, Thread* th, int pid_, int ppid_){
+	t = th;
+	pid = pid_;
+	ppid = ppid_;
+}
+
+Processus::~Processus(){
+	delete t;
+	delete nom;
+}
 
 static void StartProcessus(int arg){
 	DEBUG('t',"Lancement du processus\n");

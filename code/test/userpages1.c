@@ -20,5 +20,5 @@ int main() {
 	i = UserThreadCreate(f, (void *) THIS);
 */
 	f((void*) THAT);
-	return 0;
+	return 15;
 }

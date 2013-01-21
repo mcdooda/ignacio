@@ -94,6 +94,15 @@ class Thread
     void Fork (VoidFunctionPtr func, int arg);	// Make thread run (*func)(arg)
 #ifdef CHANGED
 	void ForkProcessus (VoidFunctionPtr, int arg); //TODO Donner des executables avec argument dasn le futur
+#ifdef USER_PROGRAM
+	void setPid(int p){
+		pid = p;	
+	}
+	
+	int getPid(){
+		return pid;
+	}
+#endif
 #endif // CHANGED
     void Yield ();		// Relinquish the CPU if any 
     // other thread is runnable
@@ -124,7 +133,6 @@ class Thread
     // (If NULL, don't deallocate stack)
     ThreadStatus status;	// ready, running or blocked
     const char *name;
-
     void StackAllocate (VoidFunctionPtr func, int arg);
     // Allocate a stack for thread.
     // Used internally by Fork()
@@ -135,6 +143,9 @@ class Thread
 // while executing kernel code.
 
     int userRegisters[NumTotalRegs];	// user-level CPU register state
+#ifdef CHANGED
+	int pid;
+#endif
 
   public:
     void SaveUserState ();	// save user-level register state
