@@ -28,6 +28,7 @@
 #include "synchconsole.h"
 #include "usermachine.h"
 #include "userthread.h"
+#include "userprocessus.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -94,7 +95,6 @@ ExceptionHandler (ExceptionType which)
 #ifdef CHANGED
 extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
-extern int StartProcessExec(char* file);
 #endif
 #endif
 
@@ -196,8 +196,8 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-				int pid = StartProcessExec(strTmp);
-				userMachine->SetReturn(pid);
+/*				int pid =*/ do_ForkExec(strTmp);
+//				userMachine->SetReturn(pid);
 				break;
 			}
 			default:

@@ -93,9 +93,9 @@ class Thread
 
     void Fork (VoidFunctionPtr func, int arg);	// Make thread run (*func)(arg)
 #ifdef CHANGED
-    void ForkExec (VoidFunctionPtr func, int id);	// Make thread run (*func)(arg)
-#endif
-	void Yield ();		// Relinquish the CPU if any 
+	void ForkProcessus (VoidFunctionPtr, int arg); //TODO Donner des executables avec argument dasn le futur
+#endif // CHANGED
+    void Yield ();		// Relinquish the CPU if any 
     // other thread is runnable
     void Sleep ();		// Put the thread to sleep and 
     // relinquish the processor

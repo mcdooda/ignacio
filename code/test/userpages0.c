@@ -2,7 +2,7 @@
 #define THIS "aaa"
 #define THAT "bbb"
 
-const int N = 10; // Choose it large enough!
+const int N = 1; // Choose it large enough!
 
 void puts_(char *s) {
 	char *p;
@@ -15,8 +15,10 @@ void f(void *s) {
 }
 
 int main() {
+/*
 	int i;
 	i = UserThreadCreate(f, (void *) THAT);
+*/
 	f((void*) THIS);
 	return 0;
 }

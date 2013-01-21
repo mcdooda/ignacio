@@ -110,17 +110,6 @@ Thread::Fork (VoidFunctionPtr func, int arg)
     (void) interrupt->SetLevel (oldLevel);
 }
 
-#ifdef CHANGED
-void Thread::ForkExec(VoidFunctionPtr func, int pid) {
-	DEBUG('t', "Forking process \"%s\" with pid = 0x%x\n", name, pid);
-
-	StackAllocate(func, pid);
-
-	IntStatus oldLevel = interrupt->SetLevel(IntOff);
-	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts are disabled!
-	(void) interrupt->SetLevel(oldLevel);
-}
-#endif
 //----------------------------------------------------------------------
 // Thread::CheckOverflow
 //      Check a thread's stack to see if it has overrun the space
@@ -415,5 +404,20 @@ Thread::RestoreUserState ()
 	machine->WriteRegister (i, userRegisters[i]);
 }
 #endif
+#ifdef CHANGED
+void
+Thread::ForkProcessus (VoidFunctionPtr func, int arg)
+{
+    DEBUG ('t', "Forking thread \"%s\" with func = 0x%x, arg = %d\n",
+	   name, (int) func, arg);
+
+    StackAllocate (func, arg);
+
+    IntStatus oldLevel = interrupt->SetLevel (IntOff);
+    scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts 
+    // are disabled!
+    (void) interrupt->SetLevel (oldLevel);
+}
+#endif // CHANGED
 
 

@@ -15,10 +15,6 @@
 #include "synchconsole.h"
 #include "addrspace.h"
 #include "synch.h"
-
-#ifdef CHANGED
-static Lock *lock = new Lock("progtest");
-#endif
 //----------------------------------------------------------------------
 // StartProcess
 //      Run a user program.  Open the executable, load it into
@@ -177,50 +173,6 @@ void FileSystemTest() {
 
 #endif
 
-}
-
-//----------------------------------------------------------------------
-// StartProcessExec
-//      Run a user program.  Open the executable, load it into a new memory space
-//      , and jump to it.
-//----------------------------------------------------------------------
-
-static void StartProcExec(int id=0) {
-	machine->Run();
-	ASSERT(false);
-}
-
-int StartProcessExec(char *filename) {
-	lock->Acquire();
-	
-	OpenFile *executable = fileSystem->Open(filename);
-	if (executable == NULL) {
-		printf("Unable to open file %s\n", filename);
-		return -1;
-	}
-	IntStatus oldLevel = interrupt->SetLevel (IntOff);
-	
-	currentThread->space->SaveState();
-	currentThread->SaveUserState();
-	
-	AddrSpace *space = new AddrSpace(executable);
-	delete executable; // close file
-	Thread *t = new Thread(filename);
-
-	t->space = space;
-	t->space->InitRegisters(); // set the initial register values
-//	t->space->RestoreState(); // load page table register
-	t->SaveUserState();
-	t->ForkExec(StartProcExec, 0);
-//	t->ForkExec((VoidFunctionPtr)(t->space->pageTable[t->space->noffH.code.virtualAddr].physicalPage*PageSize),0);
-	
-	currentThread->RestoreUserState();
-	currentThread->space->RestoreState();
-
-	interrupt->SetLevel (oldLevel);
-	lock->Release();
-	
-	return 0;
 }
 #endif //CHANGED
 
