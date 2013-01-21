@@ -4,54 +4,73 @@
 #include "thread.h"
 #include "system.h"
 #include "synch.h"
+
+class Processus {
+public:
+
+	Processus(char *name) {
+		strcpy(nom, name);
+		t = new Thread(nom);
+	}
+
+	Thread* getThread() {
+		return t;
+	}
+
+private:
+	Thread* t;
+	char nom[50];
+
+};
+
 static Lock mutex("proc mutex");
 
-void
-do_ForkExec(char *filename) {
+static void StartProcessus(int arg){
+	DEBUG('t',"Lancement du processus\n");
+	machine->Run();
+	ASSERT(FALSE);
+}
+
+int do_ForkExec(char *filename) {
 	mutex.Acquire();
 
 	OpenFile *executable = fileSystem->Open(filename);
 	if (executable == NULL) {
 		printf("Unable to open file %s\n", filename);
-//		return -1;
-		return ;
+		mutex.Release();
+		return -1;
 	}
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
 	currentThread->space->SaveState();
 	currentThread->SaveUserState();
 
-	Thread *proc = new Thread(filename);
+	Processus *proc = new Processus(filename);
+	Thread *th = proc->getThread();
 	AddrSpace *space = new AddrSpace(executable);
+
 	if (space == NULL) {
 		DEBUG('t', "Mémoire insuffisante pour l'executable %s", filename);
-		delete proc;
+		delete th;
 		delete space;
 		delete executable;
-//		return -1;
-		return ;
+		mutex.Release();
+		return -1;
 	}
 	delete executable; // close file
-	proc->space = space;
-	proc->space->InitRegisters(); // set the initial register values
-	proc->SaveUserState();
-
-	proc->ForkProcessus(StartProcessus, NULL);
-
-	DEBUG('t'," -------------------------------------------------- %p\n",proc);
 	
+	th->space = space;
+	th->space->InitRegisters(); // set the initial register values
+	th->SaveUserState();
+
+	th->ForkProcessus(StartProcessus, NULL);
+
 	currentThread->RestoreUserState();
 	currentThread->space->RestoreState();
 	
 	(void) interrupt->SetLevel(oldLevel);
 	mutex.Release();
 	
-//	return 0;
-}
-
-void StartProcessus(int arg){
-	DEBUG('t',"Lancement du processus\n");
-	machine->Run();
-	ASSERT(FALSE);
+	return 0;
 }
 #endif // CHANGED

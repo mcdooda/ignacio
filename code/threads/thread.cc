@@ -404,9 +404,9 @@ Thread::RestoreUserState ()
 	machine->WriteRegister (i, userRegisters[i]);
 }
 #endif
+
 #ifdef CHANGED
-void
-Thread::ForkProcessus (VoidFunctionPtr func, int arg)
+void Thread::ForkProcessus (VoidFunctionPtr func, int arg)
 {
     DEBUG ('t', "Forking thread \"%s\" with func = 0x%x, arg = %d\n",
 	   name, (int) func, arg);
@@ -414,8 +414,7 @@ Thread::ForkProcessus (VoidFunctionPtr func, int arg)
     StackAllocate (func, arg);
 
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
-    scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts 
-    // are disabled!
+    scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts are disabled!
     (void) interrupt->SetLevel (oldLevel);
 }
 #endif // CHANGED

@@ -2,9 +2,7 @@
 #ifndef USERPROCESSUS_H
 #define	USERPROCESSUS_H
 
-extern void do_ForkExec(char *filename);
-
-void StartProcessus(int arg);
+extern int do_ForkExec(char *filename);
 
 #endif	/* USERPROCESSUS_H */
 #endif // CHANGED
