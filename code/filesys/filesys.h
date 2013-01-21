@@ -38,6 +38,10 @@
 #include "copyright.h"
 #include "openfile.h"
 
+#ifdef CHANGED
+#include "filehdr.h"
+#endif
+
 #ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
 // calls to UNIX, until the real file system
 // implementation is available
@@ -80,8 +84,13 @@ public:
 	// the disk, so initialize the directory
 	// and the bitmap of free blocks.
 
+#ifndef CHANGED
 	bool Create(const char *name, int initialSize); // Create a file (UNIX creat)
-	bool Create2(const char *name, int initialSize);
+#else
+	bool Create(const char* name, int initialSize, FileHeader::FileType type = FileHeader::FILE); // Create a file (UNIX creat)
+#endif
+	
+	void SetDirectory(const char* name);
 
 
 	OpenFile* Open(const char *name); // Open a file (UNIX open)
@@ -91,10 +100,12 @@ public:
 	void List(); // List all the files in the file system
 
 	void Print(); // List all the files and their contents
-	void PrintDir(const char *name); // List all the files and their contents
 
 #ifdef CHANGED
-	bool CreateDirectory(const char *path, const char *name);
+	void PrintDir(const char *name); // List all the files and their contents
+	void PrintRecursiveList(OpenFile* of, int tabs, int maxDepth);
+	void MinimalisticPrint();
+	bool CreateDirectory(const char *name);
 #endif
 
 private:

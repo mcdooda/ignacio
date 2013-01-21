@@ -196,7 +196,8 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-				do_ForkExec(strTmp);
+/*				int pid =*/ do_ForkExec(strTmp);
+//				userMachine->SetReturn(pid);
 				break;
 			}
 			default:

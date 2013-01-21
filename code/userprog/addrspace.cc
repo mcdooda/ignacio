@@ -228,7 +228,6 @@ AddrSpace::InitRegisters() {
 
 void
 AddrSpace::SaveState() {
-	//TODO peut etre mettre ici les bitmap machin
 	pageTable = machine->pageTable;
 	numPages = machine->pageTableSize;
 }

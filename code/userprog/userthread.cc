@@ -169,7 +169,9 @@ int do_UserThreadCreate(int f, int arg, int pE) {
 		id = -1;
 		DeleteUserThread(ut);
 	} else {
+		//TODO inutile ?
 		t->space = currentThread->space;
+		//
 		++threadCounter;
 	}
 	semCreate.V();
