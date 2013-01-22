@@ -97,6 +97,7 @@ ExceptionHandler (ExceptionType which)
 #ifdef CHANGED
 extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
+extern std::map<int, Processus*> processus;
 #endif
 #endif
 
@@ -118,12 +119,16 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				DEBUG('a', "Shutdown, initiated by user program.\n");
 				JoinUserThreads();
+				DEBUG('t',"Processus qui se fini %p - %p : %s\n",processus[currentThread->getPid()], processus[currentThread->getPid()]->getThread(), processus[currentThread->getPid()]->getThread()->getName());
+				processus[currentThread->getPid()]->Exit();
 				interrupt->Halt();
 				break;
 			}
 			case SC_Exit:
 			{
 				JoinUserThreads();
+				DEBUG('t',"Processus qui se fini %p\n",processus[currentThread->getPid()]);
+				processus[currentThread->getPid()]->Exit();
 				int code = userMachine->GetIntArg(1);
 				interrupt->Exit(code);
 				break;
@@ -202,7 +207,6 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(pid);
 				break;
 			}
-#ifdef FILESYS_NEEDED
 			case SC_Create:
 			{
 				char fileName[MAX_STRING_SIZE];
@@ -245,7 +249,20 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(err);
 				break;
 			}
-#endif
+			case SC_AllocEmptyPage:
+			{
+//				unsigned size = userMachine->GetIntArg(1);
+				//TODO
+				userMachine->SetReturn(0);
+				break;
+			}
+			case SC_FreePage:
+			{
+//				unsigned addr = userMachine->GetIntArg(1);
+				//TODO
+				userMachine->SetReturn(0);
+				break;
+			}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);

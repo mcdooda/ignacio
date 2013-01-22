@@ -210,6 +210,22 @@ ForkExec:
 	j	$31
 	.end ForkExec
 
+	.globl AllocEmptyPage
+	.ent	AllocEmptyPage
+AllocEmptyPage:
+	addiu $2,$0,SC_AllocEmptyPage
+	syscall
+	j	$31
+	.end AllocEmptyPage
+
+	.globl FreePage
+	.ent	FreePage
+FreePage:
+	addiu $2,$0,SC_FreePage
+	syscall
+	j	$31
+	.end FreePage
+
 
 /* dummy function to keep gcc happy */
         .globl  __main

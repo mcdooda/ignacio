@@ -72,9 +72,6 @@ int do_ForkExec(char *filename) {
 	Processus *currentProc = processus[currentThread->getPid()];
 	currentProc->AjouterFils(proc);
 	
-	proc->RetirerFils(currentProc);
-	currentProc->RetirerFils(proc);
-	
 	th->space = space;
 	th->space->InitRegisters(); // set the initial register values
 	th->SaveUserState();
@@ -98,6 +95,7 @@ int Processus::AjouterFils(Processus *p){
 	next_pid++;
 	p->setPid(next_pid);
 	p->setPPid(this->getPid());
+	p->getThread()->setPid(p->getPid());
 	
 	this->fils[p->getPid()] = p;
 	nbFilsPlus();
@@ -109,6 +107,7 @@ int Processus::AjouterFils(Processus *p){
 	DEBUG('t',"\n");
 	ajoutProc.Acquire();
 	processus[p->getPid()] = p;
+	this->filspid.insert(filspid.end(),p->getPid());
 	ajoutProc.Release();
 	std::map<int, Processus*> pfile = processus;
 	DEBUG('t',"Table des processus :\n");
@@ -148,19 +147,24 @@ int Processus::WaitFils(int id){
 int Processus::Wait(){
 	mutcond->Acquire();
 	mutlist.Acquire();
+	DEBUG('t',"Nb fils eu: %d\n",filspid.size());
 	if(filspid.size()>0){
 		mutlist.Release();
 		mutmap.Acquire();
 		if(fils.size()>0){
+			DEBUG('t',"Wait --- \n");
 			cond.Wait(mutcond);
 		}
-		mutlist.Release();
 		mutcond->Release();
 		return 0;
 	}
 	mutlist.Release();
 	mutcond->Release();
 	return -1;	
+}
+
+void Processus::Reveiller(){
+	cond.Signal(mutcond);
 }
 
 bool Processus::FilsExiste(int id){
@@ -186,5 +190,14 @@ bool Processus::FilsEnVie(int id){
 		return false;
 	}
 
+}
+
+void Processus::Exit(){
+	DEBUG('t',"%p - %p : %s en attente de ses fils\n",this, this->getThread(), this->getThread()->getName());
+	Wait();
+	DEBUG('t',"Plus de fils\n");
+	processus[this->getPPid()]->Reveiller();
+// 	currentThread->Finish();
+// 	delete this;
 }
 #endif // CHANGED

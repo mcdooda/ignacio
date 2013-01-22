@@ -64,9 +64,13 @@ public:
 	
 	int Wait();
 	
+	void Reveiller();
+	
 	bool FilsExiste(int id);
 
 	bool FilsEnVie(int id);
+	
+	void Exit();
 	
 private:
 	Thread* t;

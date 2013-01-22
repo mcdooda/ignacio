@@ -40,6 +40,12 @@ public:
 #ifdef CHANGED
 	int GetNextFreeStack();
 	void FreeStackSlot(int stackBottom);
+	
+	// alloue n nouvelles frame s vides pour l’espace d’adressage,
+	// valide les n pages suivantes à partir de celle désignée par brk
+	// et les associe à ces cadres, incrémente brk de n
+	// et retourne un pointeur vers la nouvelle zone de données
+	int Sbrk(unsigned n);
 #endif
 
 private:
@@ -50,6 +56,9 @@ private:
 #ifdef CHANGED
 	// address space
 	BitMap* bm;
+	unsigned int brk; // numéro de la prochaine page à allouer dynamiquement
+	unsigned int brkMin; // valeur min de brk, on ne peut plus rien libérer si atteinte
+	unsigned int brkMax; // valeur max de brk, on ne peut plus rien allouer si atteinte
 
 private:
 	void InitBitMap();
