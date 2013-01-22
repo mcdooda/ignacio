@@ -205,6 +205,20 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(pid);
 				break;
 			}
+			case SC_AllocEmptyPage:
+			{
+				unsigned size = userMachine->GetIntArg(1);
+				//TODO
+				userMachine->SetReturn(0);
+				break;
+			}
+			case SC_FreePage:
+			{
+				unsigned addr = userMachine->GetIntArg(1);
+				//TODO
+				userMachine->SetReturn(0);
+				break;
+			}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);

@@ -41,6 +41,10 @@ public:
 	int GetNextFreeStack();
 	void FreeStackSlot(int stackBottom);
 	
+	// alloue n nouvelles frame s vides pour l’espace d’adressage,
+	// valide les n pages suivantes à partir de celle désignée par brk
+	// et les associe à ces cadres, incrémente brk de n
+	// et retourne un pointeur vers la nouvelle zone de données
 	int Sbrk(unsigned n);
 #endif
 

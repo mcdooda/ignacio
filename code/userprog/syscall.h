@@ -39,6 +39,8 @@
 #define SC_UserThreadExit 18
 #define SC_UserThreadJoin 19
 #define SC_ForkExec 20
+#define SC_AllocEmptyPage 21
+#define SC_FreePage 22
 
 #ifdef IN_USER_MODE
 
@@ -160,6 +162,10 @@ void UserThreadJoin(int id);
 
 
 int ForkExec(char *s);
+
+void* AllocEmptyPage(unsigned size);
+
+void FreePage(void *addr);
 
 #endif // IN_USER_MODE
 
