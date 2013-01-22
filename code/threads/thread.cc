@@ -40,6 +40,9 @@ Thread::Thread (const char *threadName)
     status = JUST_CREATED;
 #ifdef USER_PROGRAM
     space = NULL;
+#ifdef CHANGED
+	pid = -1;
+#endif
 #endif
 }
 
@@ -418,6 +421,7 @@ Thread::ForkProcessus (VoidFunctionPtr func, int arg)
     // are disabled!
     (void) interrupt->SetLevel (oldLevel);
 }
+
 #endif // CHANGED
 
 

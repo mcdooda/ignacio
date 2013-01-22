@@ -26,6 +26,9 @@
 #else
 // 3 * sizeof(int) instead of 2 because of the fileType field
 #define NumDirect 	((SectorSize - 3 * sizeof(int)) / sizeof(int))
+
+#define NumIndirection 1
+
 #endif
 #define MaxFileSize 	(NumDirect * SectorSize)
 

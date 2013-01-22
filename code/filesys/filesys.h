@@ -72,7 +72,6 @@ public:
 	bool Remove(char *name) {
 		return Unlink(name) == 0;
 	}
-
 };
 
 #else // FILESYS
@@ -90,9 +89,9 @@ public:
 	bool Create(const char *name, int initialSize); // Create a file (UNIX creat)
 #else
 	bool Create(const char* name, int initialSize, FileHeader::FileType type = FileHeader::FILE); // Create a file (UNIX creat)
+	void SetDirectory(const char* name);
 #endif
 	
-	void SetDirectory(const char* name);
 
 
 	OpenFile* Open(const char *name); // Open a file (UNIX open)

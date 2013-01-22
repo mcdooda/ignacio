@@ -11,6 +11,8 @@
 #include "../userprog/synchconsole.h"
 #include "../userprog/usermachine.h"
 #include "../userprog/frameprovider.h"
+#include "../userprog/userprocessus.h"
+
 #endif
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -37,6 +39,7 @@ Machine *machine;		// user program memory and registers
 SynchConsole *synchConsole;
 UserMachine *userMachine;
 FrameProvider *frameProvider;
+std::map<int, Processus*> processus;
 #endif //CHANGED
 #endif //USER_PROGRAM
 
@@ -182,6 +185,10 @@ Initialize (int argc, char **argv)
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
 #ifdef CHANGED
+	Processus *p = new Processus(currentThread, 0, 0);
+	processus[0] = p;
+	currentThread->setPid(0);
+	
 	userMachine = new UserMachine();
 	synchConsole = new SynchConsole(in, out);
 	frameProvider = new FrameProvider();

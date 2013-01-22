@@ -26,6 +26,9 @@
 
 #include "system.h"
 #include "filehdr.h"
+#ifdef CHANGED
+#include <cmath>
+#endif
 
 //----------------------------------------------------------------------
 // FileHeader::Allocate
@@ -37,6 +40,7 @@
 //	"freeMap" is the bit map of free disk sectors
 //	"fileSize" is the bit map of free disk sectors
 //----------------------------------------------------------------------
+#ifndef CHANGED
 
 bool
 FileHeader::Allocate(BitMap *freeMap, int fileSize) {
@@ -49,13 +53,39 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize) {
 		dataSectors[i] = freeMap->Find();
 	return TRUE;
 }
+#else
 
+bool
+FileHeader::Allocate(BitMap *freeMap, int fileSize) {
+	numBytes = fileSize;
+	numSectors = divRoundUp(fileSize, SectorSize);
+	int numFileHeaders = numSectors / NumDirect;
+	if (freeMap->NumClear() < numSectors + numFileHeaders)
+		return FALSE; // not enough space
+
+	unsigned int numSectorsRestants = numSectors;
+	for (int i = 0; i < numFileHeaders; i++) {
+		dataSectors[i] = freeMap->Find();
+		FileHeader *hdr = new FileHeader;
+		hdr->FetchFrom(dataSectors[i]);
+		for (unsigned int j = 0; j < numSectorsRestants && j < NumDirect; j++) {
+			hdr->dataSectors[j] = freeMap->Find();
+		}
+		hdr->WriteBack(dataSectors[i]);
+		numSectorsRestants -= NumDirect;
+	}
+	return TRUE;
+
+}
+#endif
 //----------------------------------------------------------------------
 // FileHeader::Deallocate
 // 	De-allocate all the space allocated for data blocks for this file.
 //
 //	"freeMap" is the bit map of free disk sectors
 //----------------------------------------------------------------------
+
+#ifndef CHANGED
 
 void
 FileHeader::Deallocate(BitMap *freeMap) {
@@ -64,6 +94,26 @@ FileHeader::Deallocate(BitMap *freeMap) {
 		freeMap->Clear((int) dataSectors[i]);
 	}
 }
+#else
+
+void
+FileHeader::Deallocate(BitMap *freeMap) {
+	int numFileHeaders = numSectors / NumDirect;
+	unsigned int numSectorsRestants = numSectors;
+
+	for (int i = 0; i < numFileHeaders; i++) {
+		FileHeader *hdr = new FileHeader;
+		hdr->FetchFrom(dataSectors[i]);
+
+		for (unsigned int j = 0; j < numSectorsRestants && j < NumDirect; j++) {
+			ASSERT(freeMap->Test((int) hdr->dataSectors[j])); // ought to be marked!
+			freeMap->Clear((int) hdr->dataSectors[j]);
+		}
+		numSectorsRestants -= NumDirect;
+		freeMap->Clear((int) dataSectors[i]);
+	}
+}
+#endif
 
 //----------------------------------------------------------------------
 // FileHeader::FetchFrom
@@ -98,11 +148,29 @@ FileHeader::WriteBack(int sector) {
 //
 //	"offset" is the location within the file of the byte in question
 //----------------------------------------------------------------------
+#ifndef CHANGED
 
 int
 FileHeader::ByteToSector(int offset) {
 	return (dataSectors[offset / SectorSize]);
 }
+#else
+
+int FileHeader::ByteToSector(int offset) {
+	FileHeader *hdr = new FileHeader;
+	int idSector = offset / SectorSize;
+
+	hdr->FetchFrom(idSector / NumDirect);
+
+	return hdr->dataSectors[idSector % NumDirect];
+
+	//TODO A faire en fonction du nombre d'indirection quand je serai moins débile
+	/*for (int i = NumIndirection; i > 0; i--) {
+		//Calcul savant...
+		hdr->FetchFrom(idSector / pow(NumDirect, i));
+	}*/
+}
+#endif
 
 //----------------------------------------------------------------------
 // FileHeader::FileLength
@@ -177,11 +245,11 @@ FileHeader::FileType FileHeader::GetType() {
 	return type;
 }
 
-void FileHeader::SetLinkSector(int sector){
+void FileHeader::SetLinkSector(int sector) {
 	dataSectors[0] = sector;
 }
 
-int FileHeader::GetLinkSector(){
+int FileHeader::GetLinkSector() {
 	return dataSectors[0];
 }
 

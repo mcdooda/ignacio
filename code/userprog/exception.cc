@@ -198,8 +198,8 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-				/*				int pid =*/ do_ForkExec(strTmp);
-				//				userMachine->SetReturn(pid);
+				int pid = do_ForkExec(strTmp);
+				userMachine->SetReturn(pid);
 				break;
 			}
 #ifdef FILESYS_NEEDED

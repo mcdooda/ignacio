@@ -15,11 +15,10 @@ public:
 
 	UserFile(const char* fileName, int f) :
 	fd(f) {
-#ifndef FILESYS_STUB
-		std::cout << "BITE" << std::endl;
 		openFile = fileSystem->OpenPath(fileName);
 		absolutePath = fileSystem->GetAbsolutePath(fileName);
-#endif
+		std::cout << "Creation UserFile :<" << fileName << "> path : <" << absolutePath << ">" << std::endl;
+		
 	}
 
 	void SetFd(int f) {
@@ -58,8 +57,10 @@ int do_Open(const char* fileName) {
 	sem.P();
 	int fd = nextFd;
 	nextFd++;
-	userFiles[fd] = new UserFile(fileName, fd);
-	std::cout << "path = " << userFiles[fd]->GetPath() << std::endl;
+	UserFile* uF = new UserFile(fileName, fd);
+	userFiles[fd] = uF;
+	userFilesPath[std::string(fileName)] = uF;
+	std::cout << "path = <" << uF->GetPath() << ">" << std::endl;
 	sem.V();
 	return fd;
 }
