@@ -26,6 +26,7 @@
 
 #ifdef CHANGED
 #include <iostream>
+#define STRATEGY true
 extern FrameProvider *frameProvider;
 #endif
 
@@ -98,34 +99,57 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		SwapHeader(&noffH);
 	ASSERT(noffH.noffMagic == NOFFMAGIC);
 
+#ifndef CHANGED
 	// how big is address space?
 	size = noffH.code.size + noffH.initData.size + noffH.uninitData.size + UserStackSize; // we need to increase the size
 	// to leave room for the stack
 	numPages = divRoundUp(size, PageSize);
 	size = numPages * PageSize;
+#else
+	unsigned int numPagesCode, numPagesHeap, numPagesStack;
+	// on placera les champs dans des pages différentes
+	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size, PageSize);
+	numPagesHeap = divRoundUp(noffH.uninitData.size, PageSize);
+	numPagesStack = divRoundUp(UserStackSize, PageSize);
+	
+	numPages = numPagesCode + numPagesHeap + numPagesStack;
+	size = numPages * PageSize;
+	brk = brkMin = numPagesCode;
+	brkMax = numPagesCode + numPagesHeap;
+#endif
 
+#ifdef CHANGED
+	// pas assez de pages libres disponibles
+	unsigned *frames = frameProvider->GetEmptyFrames(numPages, STRATEGY);
+	if(frames == NULL) // pas assez de frames libres
+		ASSERT(FALSE);
+#else
 	ASSERT(numPages <= NumPhysPages); // check we're not trying
 	// to run anything too big --
 	// at least until we have
 	// virtual memory
-
+#endif
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n",
 			numPages, size);
-#ifdef CHANGED
-	//TODO gérer si plus de page
-	ASSERT(frameProvider->NumAvailFrame() >= numPages);
-#endif
 		
 	// first, set up the translation 
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
-		pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
+		pageTable[i].virtualPage = i;
 #ifndef CHANGED
-		pageTable[i].physicalPage = i;
-#else
-		pageTable[i].physicalPage = frameProvider->GetEmptyFrame(true);
-#endif
+		pageTable[i].physicalPage = i; // for now, virtual page # = phys page #
 		pageTable[i].valid = TRUE;
+#else
+		if(i<brk || i>=brkMax) {
+			pageTable[i].physicalPage = frames[i];
+			pageTable[i].valid = TRUE;
+		}
+		else {
+		// si la page appartient au tas
+		pageTable[i].physicalPage = -1;
+		pageTable[i].valid = FALSE;
+		}
+#endif
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
 		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
@@ -278,6 +302,26 @@ void AddrSpace::FreeStackSlot(int stackBottom) {
 //	}
 //	std::cout << "stackBottom = " << stackBottom << " stackslot = " << (NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages << std::endl;
 	bm->Clear((NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages);
+}
+
+int AddrSpace::Sbrk(unsigned n) {
+	if(brk + n > brkMax) // tas plein
+		return -1;
+	
+	unsigned *frames = frameProvider->GetEmptyFrames(n, STRATEGY);
+	if(frames == NULL) // pas assez de frames libres
+		return -1;
+	
+	for(unsigned i=0; i<n; i++) {
+		pageTable[brk+i].physicalPage = frames[i];
+		pageTable[brk+i].valid = TRUE;
+	}
+	
+	delete frames;
+	
+	int address = pageTable[brk].virtualPage;
+	brk += n;
+	return address;
 }
 
 #endif

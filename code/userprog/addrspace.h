@@ -40,6 +40,8 @@ public:
 #ifdef CHANGED
 	int GetNextFreeStack();
 	void FreeStackSlot(int stackBottom);
+	
+	int Sbrk(unsigned n);
 #endif
 
 private:
@@ -50,6 +52,9 @@ private:
 #ifdef CHANGED
 	// address space
 	BitMap* bm;
+	unsigned int brk; // numéro de la prochaine page à allouer dynamiquement
+	unsigned int brkMin; // valeur min de brk, on ne peut plus rien libérer si atteinte
+	unsigned int brkMax; // valeur max de brk, on ne peut plus rien allouer si atteinte
 
 private:
 	void InitBitMap();
