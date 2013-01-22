@@ -3,13 +3,14 @@
 #define	USERPROCESSUS_H
 #include <map>
 #include "thread.h"
+#include "synch.h"
 
 class Processus {
 public:
 	
 	Processus(char *name);
 		
-	Processus(char *name, Thread* th, int pid_, int ppid_);
+	Processus(Thread* th, int pid_, int ppid_);
 	
 	~Processus();
 			
@@ -21,15 +22,41 @@ public:
 		return pid;
 	}
 	
+	void setPid(int p){
+		pid = p;
+	}
+	
 	int getPPid(){
 		return ppid;
+	}
+	
+	void setPPid(int p){
+		ppid = p;
 	}
 	
 	char * getName(){
 		return nom;
 	}
+	
+	std::map<int, Processus*> getMapFils(){
+		return fils;	
+	}
+	
+	void nbFilsPlus(){
+		nb_fils ++;
+	}
+	
+	void nbFilsMoins(){
+		nb_fils --;
+	}
+	
+	int getNbFils(){
+		return nb_fils;
+	}
 				
 	int AjouterFils(Processus *p);
+	
+	int RetirerFils(Processus *p);
 	
 	int WaitFils(int pid);
 	
@@ -40,7 +67,9 @@ private:
 	char nom[50];
 	int pid;
 	int ppid;
-	std::map<int, Processus> fils;
+	int nb_fils;
+	std::map<int, Processus*> fils;
+	Lock ajouterFils("mutex");
 	
 	int RetirerFils(int pid);
 };
