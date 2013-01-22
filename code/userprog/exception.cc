@@ -207,14 +207,14 @@ void ExceptionHandler(ExceptionType which) {
 			}
 			case SC_AllocEmptyPage:
 			{
-				unsigned size = userMachine->GetIntArg(1);
+//				unsigned size = userMachine->GetIntArg(1);
 				//TODO
 				userMachine->SetReturn(0);
 				break;
 			}
 			case SC_FreePage:
 			{
-				unsigned addr = userMachine->GetIntArg(1);
+//				unsigned addr = userMachine->GetIntArg(1);
 				//TODO
 				userMachine->SetReturn(0);
 				break;
