@@ -40,7 +40,9 @@
 
 #ifdef CHANGED
 #include "filehdr.h"
+#include <string>
 #endif
+
 
 #ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
 // calls to UNIX, until the real file system
@@ -100,11 +102,14 @@ public:
 	void List(); // List all the files in the file system
 
 	void Print(); // List all the files and their contents
-
 #ifdef CHANGED
 	void PrintRecursiveList(OpenFile* of, int tabs, int maxDepth);
 	void MinimalisticPrint();
 	bool CreateDirectory(const char *name);
+	
+	OpenFile* OpenPath(const char* path);
+	std::string GetCurrentPath();
+	std::string GetAbsolutePath(const char* relativePath);
 #endif
 
 private:

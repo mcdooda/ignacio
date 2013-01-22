@@ -135,41 +135,24 @@ void FileSystemTest() {
 
 #ifdef FILESYS
 
-	Copy("../filesys/test/small","petit");	
-	fileSystem->CreateDirectory("dir1");
-	fileSystem->SetDirectory("dir1/");
-	Copy("../filesys/test/small","small");
-	fileSystem->MinimalisticPrint();
-	fileSystem->SetDirectory("../");
-	Copy("../filesys/test/small","hello");
-	fileSystem->MinimalisticPrint();
+	Copy("../filesys/test/small","small");	
 	
-
-//	printf("1 ");
-//	fileSystem->MinimalisticPrint();
-//	fileSystem->CreateDirectory("caca");
-//	fileSystem->SetDirectory("caca/");
-//	Copy("../filesys/test/small", "pipi");
-//	printf("2 ");
-//	fileSystem->CreateDirectory("bebe");
-//	fileSystem->SetDirectory("bebe/");
-//	Copy("../filesys/test/small", "prout");
-//	fileSystem->MinimalisticPrint();
-//	fileSystem->SetDirectory("../");
-//	Copy("../filesys/test/small", "petit");
-//
-//	printf("3 ");
-//	fileSystem->MinimalisticPrint();
-//
-//	printf("4 ");
-//	fileSystem->SetDirectory("bebe/");
-//	Copy("../filesys/test/small", "small");
-//	fileSystem->MinimalisticPrint();
-//	
-//		printf("\n\nuuuuuuuuuuuuuuuuuuuuuuuu\n\n");
-//	fileSystem->SetDirectory("../");
-//	fileSystem->SetDirectory("../");
-//	fileSystem->MinimalisticPrint();
+	fileSystem->CreateDirectory("Mdir");
+	fileSystem->SetDirectory("Mdir/");
+	Copy("../filesys/test/small","medium");	
+	fileSystem->CreateDirectory("Bdir");
+	fileSystem->SetDirectory("Bdir/");
+	Copy("../filesys/test/small","big");	
+	
+	fileSystem->SetDirectory("../");
+	fileSystem->SetDirectory("../");
+	
+	fileSystem->CreateDirectory("Vdir");
+	fileSystem->SetDirectory("Vdir/");
+	Copy("../filesys/test/small","small");	
+	fileSystem->SetDirectory("../");
+	
+	fileSystem->MinimalisticPrint();
 
 #endif
 

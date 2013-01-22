@@ -74,6 +74,8 @@ class Directory {
 #ifdef CHANGED
 	char** GetFileNames(int* numFiles);
 	void MinimalisticPrint(int tabs);
+	
+	const char* GetName(int sector);
 #endif
 
   private:

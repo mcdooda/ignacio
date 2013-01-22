@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
 	tidB = UserThreadCreate(Thread, &b);
 	tidC = UserThreadCreate(Thread, &c);
 
+	
 
 	UserThreadJoin(tidA);
 	UserThreadJoin(tidB);

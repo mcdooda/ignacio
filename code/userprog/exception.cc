@@ -24,11 +24,13 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+
 #ifdef CHANGED
 #include "synchconsole.h"
 #include "usermachine.h"
 #include "userthread.h"
 #include "userprocessus.h"
+#include "userfile.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -196,10 +198,54 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-/*				int pid =*/ do_ForkExec(strTmp);
-//				userMachine->SetReturn(pid);
+				/*				int pid =*/ do_ForkExec(strTmp);
+				//				userMachine->SetReturn(pid);
 				break;
 			}
+#ifdef FILESYS_NEEDED
+			case SC_Create:
+			{
+				char fileName[MAX_STRING_SIZE];
+				userMachine->GetStringArg(1, fileName);
+				do_Create(fileName);
+				break;
+			}
+			case SC_Open:
+			{
+				char fileName[MAX_STRING_SIZE];
+				userMachine->GetStringArg(1, fileName);
+				int fd = do_Open(fileName);
+				userMachine->SetReturn(fd);
+				break;
+			}
+			case SC_Read:
+			{
+				char buf[MAX_STRING_SIZE];
+				int count = userMachine->GetIntArg(2);
+				int fd = userMachine->GetIntArg(3);
+				int numRead = do_Read(fd, buf, count);
+				userMachine->SetOutArg(1, buf);
+				userMachine->SetReturn(numRead);
+				break;
+			}
+			case SC_Write:
+			{
+				char buf[MAX_STRING_SIZE];
+				userMachine->GetStringArg(1, buf);
+				int count = userMachine->GetIntArg(2);
+				int fd = userMachine->GetIntArg(3);
+				int numWritten = do_Write(fd, buf, count);
+				userMachine->SetReturn(numWritten);
+				break;
+			}
+			case SC_Close:
+			{
+				int fd = userMachine->GetIntArg(1);
+				int err = do_Close(fd);
+				userMachine->SetReturn(err);
+				break;
+			}
+#endif
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);

@@ -54,6 +54,7 @@
 
 #ifdef CHANGED
 #include <string>
+#include <iostream>
 #endif
 
 
@@ -240,7 +241,6 @@ bool FileSystem::Create(const char *name, int initialSize, FileHeader::FileType 
 				success = TRUE;
 				// everthing worked, flush all changes back to disk
 #ifdef CHANGED
-				hdr->SetName(name);
 				hdr->SetType(type);
 #endif
 				hdr->WriteBack(sector);
@@ -416,14 +416,15 @@ void FileSystem::SetDirectory(const char* name) {
 			directoryFile = new OpenFile(parentSector);
 			//TODO
 		} else {
+			OpenFile* of = directoryFile;
 			directoryFile = Open(dirName);
+			delete of;
 			printf("directoryFile: %s %p\n", dirName, directoryFile);
 		}
 	}
 }
 
 void FileSystem::MinimalisticPrint() {
-
 	printf("---------------------------\n");
 	OpenFile* of = directoryFile;
 	SetDirectory("/");
@@ -431,7 +432,6 @@ void FileSystem::MinimalisticPrint() {
 	directoryFile = of;
 	//	printf("---------------------------\n");
 	//	PrintRecursiveList(directoryFile, 0);
-
 }
 
 void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
@@ -519,11 +519,81 @@ bool FileSystem::CreateDirectory(const char *name) {
 	ddfh->SetLinkSector(sectorParent);
 	ddfh->WriteBack(ddSector);
 	delete ddfh;
-	
+
 	delete d;
 	SetDirectory("../");
 
 	return 1;
 }
 
+OpenFile* FileSystem::OpenPath(const char* path) {
+	OpenFile* oldDirectory = Open(".");
+
+	SetDirectory(path);
+	const char* slash = strrchr(path, '/');
+	OpenFile* of = Open(slash + 1);
+
+	delete directoryFile;
+	directoryFile = oldDirectory;
+	return of;
+}
+
+std::string FileSystem::GetCurrentPath() {
+	OpenFile* oldDirectory = Open(".");
+
+	OpenFile* currentO = Open(".");
+	OpenFile* currentParentO = Open("..");
+	//	Directory *dirCurrent = new Directory(NumDirEntries);
+	Directory *dirCurrentP = new Directory(NumDirEntries);
+
+	//	dirCurrent->FetchFrom(currentO);
+	dirCurrentP->FetchFrom(currentParentO);
+
+	FileHeader* fhCur = currentO->GetFileHeader();
+	FileHeader* fhPar = currentParentO->GetFileHeader();
+
+	std::string path = "/";
+
+	while (fhCur->GetLinkSector() != fhPar->GetLinkSector()) {
+
+		const char* currentDirName = dirCurrentP->GetName(fhCur->GetLinkSector());
+		std::cout << "currentDirName = " << currentDirName << std::endl;
+		path = "/" + std::string(currentDirName) + path;
+		delete currentDirName;
+
+		SetDirectory("../");
+
+		currentO = Open(".");
+		currentParentO = Open("..");
+
+		dirCurrentP->FetchFrom(currentParentO);
+
+		fhCur = currentO->GetFileHeader();
+		fhPar = currentParentO->GetFileHeader();
+	}
+
+	// TODO: eviter de perdre la memoire dans la nature
+	delete currentO;
+	delete currentParentO;
+	delete dirCurrentP;
+	delete fhCur;
+	delete fhPar;
+	delete directoryFile;
+	directoryFile = oldDirectory;
+
+	return path;
+}
+
+std::string FileSystem::GetAbsolutePath(const char* relativePath) {
+	if (relativePath[0] == '/') {
+		return std::string(relativePath);
+	} else {
+		std::string currentPath = GetCurrentPath();
+		std::string path = currentPath + relativePath;
+
+		return path;
+	}
+}
+
 #endif
+

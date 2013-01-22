@@ -185,12 +185,4 @@ int FileHeader::GetLinkSector(){
 	return dataSectors[0];
 }
 
-void FileHeader::SetName(const char* n) {
-	strcpy(name, n);
-}
-
-const char* FileHeader::GetName() {
-	return name;
-}
-
 #endif

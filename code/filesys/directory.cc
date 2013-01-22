@@ -213,5 +213,13 @@ void Directory::MinimalisticPrint(int tabs) {
 		}
 }
 
+const char* Directory::GetName(int sector) {
+	for (int i = 0; i < tableSize; i++)
+		if (table[i].inUse && table[i].sector == sector)
+			return table[i].name;
+
+	return NULL;
+}
+
 #endif
 
