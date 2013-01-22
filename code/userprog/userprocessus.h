@@ -2,7 +2,9 @@
 #ifndef USERPROCESSUS_H
 #define	USERPROCESSUS_H
 #include <map>
+#include <list>
 #include "thread.h"
+#include "synch.h"
 
 class Processus {
 public:
@@ -31,9 +33,13 @@ public:
 				
 	int AjouterFils(Processus *p);
 	
-	int WaitFils(int pid);
+	int WaitFils(int id);
 	
 	int Wait();
+	
+	bool FilsExiste(int id);
+
+	bool FilsEnVie(int id);
 	
 private:
 	Thread* t;
@@ -41,7 +47,11 @@ private:
 	int pid;
 	int ppid;
 	std::map<int, Processus> fils;
-	
+	Lock mutmap;
+	Lock mutlist;
+	Lock *mutcond;
+	Condition cond;
+	std::list<int> filspid;
 	int RetirerFils(int pid);
 };
 
