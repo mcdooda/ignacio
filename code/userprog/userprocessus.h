@@ -2,6 +2,7 @@
 #ifndef USERPROCESSUS_H
 #define	USERPROCESSUS_H
 #include <map>
+#include <list>
 #include "thread.h"
 #include "synch.h"
 
@@ -58,9 +59,14 @@ public:
 	
 	int RetirerFils(Processus *p);
 	
-	int WaitFils(int pid);
+	int WaitFils(int id);
+
 	
 	int Wait();
+	
+	bool FilsExiste(int id);
+
+	bool FilsEnVie(int id);
 	
 private:
 	Thread* t;
@@ -69,9 +75,12 @@ private:
 	int ppid;
 	int nb_fils;
 	std::map<int, Processus*> fils;
-	Lock ajouterFils("mutex");
-	
-	int RetirerFils(int pid);
+	Lock addFils;
+	Lock mutmap;
+	Lock mutlist;
+	Lock *mutcond;
+	Condition cond;
+	std::list<int> filspid;
 };
 
 extern int do_ForkExec(char *filename);
