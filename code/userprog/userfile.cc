@@ -15,10 +15,11 @@ public:
 
 	UserFile(const char* fileName, int f) :
 	fd(f) {
+#ifdef FILESYS
 		openFile = fileSystem->OpenPath(fileName);
 		absolutePath = fileSystem->GetAbsolutePath(fileName);
 		std::cout << "Creation UserFile :<" << fileName << "> path : <" << absolutePath << ">" << std::endl;
-		
+#endif
 	}
 
 	void SetFd(int f) {
