@@ -97,7 +97,6 @@ ExceptionHandler (ExceptionType which)
 #ifdef CHANGED
 extern UserMachine* userMachine;
 extern SynchConsole* synchConsole;
-extern std::map<int, Processus*> processus;
 #endif
 #endif
 
@@ -119,16 +118,14 @@ void ExceptionHandler(ExceptionType which) {
 			{
 				DEBUG('a', "Shutdown, initiated by user program.\n");
 				JoinUserThreads();
-				DEBUG('t',"Processus qui se fini %p - %p : %s\n",processus[currentThread->getPid()], processus[currentThread->getPid()]->getThread(), processus[currentThread->getPid()]->getThread()->getName());
-				processus[currentThread->getPid()]->Exit();
+				exitProc(GetPid(currentThread));
 				interrupt->Halt();
 				break;
 			}
 			case SC_Exit:
 			{
 				JoinUserThreads();
-				DEBUG('t',"Processus qui se fini %p\n",processus[currentThread->getPid()]);
-				processus[currentThread->getPid()]->Exit();
+				exitProc(GetPid(currentThread));
 				int code = userMachine->GetIntArg(1);
 				interrupt->Exit(code);
 				break;
