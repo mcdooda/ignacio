@@ -15,6 +15,10 @@
 #include "synchconsole.h"
 #include "addrspace.h"
 #include "synch.h"
+#include "syscall.h"
+#ifdef CHANGED
+#include "userprocessus.h"
+#endif
 
 //----------------------------------------------------------------------
 // StartProcess
@@ -132,31 +136,61 @@ void SynchConsoleTest(char *in, char *out) {
 }
 extern void Copy(const char *unixFile, const char *nachosFile);
 
-void FileSystemTest() {
-
 #ifdef FILESYS
 
-	Copy("../filesys/test/small","small");	
-	
+void FileSystemTest() {
+	Copy("../filesys/test/small", "small");
+
 	fileSystem->CreateDirectory("Mdir");
 	fileSystem->SetDirectory("Mdir/");
-	Copy("../filesys/test/small","medium");	
+	Copy("../filesys/test/small", "medium");
 	fileSystem->CreateDirectory("Bdir");
 	fileSystem->SetDirectory("Bdir/");
-	Copy("../filesys/test/small","big");	
-	
+	Copy("../filesys/test/small", "big");
+
 	fileSystem->SetDirectory("../");
 	fileSystem->SetDirectory("../");
-	
+
 	fileSystem->CreateDirectory("Vdir");
 	fileSystem->SetDirectory("Vdir/");
-	Copy("../filesys/test/small","small");	
+	Copy("../filesys/test/small", "small");
 	fileSystem->SetDirectory("../");
-	
+
+	fileSystem->MinimalisticPrint();
+}
+
+void ConsoleUser() {
+
+	//	Copy("../filesys/test/small", "halt");
+
+	Copy("../build/halt", "halt");
+	Copy("../build/console", "console");
 	fileSystem->MinimalisticPrint();
 
-#endif
+	char* cons = (char*) "console";
+	StartProcess(cons);
+
+
+	//	OpenFile* of = fileSystem->Open("halt");
+
+
+
+
+
+
+
+
+	//	fileSystem->Print();
+	//	char buf[100];
+	//	if (of != NULL) {
+	//		printf("fichier ouvert\n");
+	//		of->Read(buf, 50);
+	//		printf("%s",buf);
+	//	} else {
+	//		printf("fichier non ouvert\n");
+	//	}
 
 }
+#endif
 #endif //CHANGED
 

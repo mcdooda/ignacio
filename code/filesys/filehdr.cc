@@ -59,7 +59,7 @@ bool
 FileHeader::Allocate(BitMap *freeMap, int fileSize) {
 	numBytes = fileSize;
 	numSectors = divRoundUp(fileSize, SectorSize);
-	int numFileHeaders = numSectors / NumDirect;
+	int numFileHeaders = divRoundUp(numSectors, NumDirect);
 	if (freeMap->NumClear() < numSectors + numFileHeaders)
 		return FALSE; // not enough space
 
@@ -160,7 +160,7 @@ int FileHeader::ByteToSector(int offset) {
 	FileHeader *hdr = new FileHeader;
 	int idSector = offset / SectorSize;
 
-	hdr->FetchFrom(idSector / NumDirect);
+	hdr->FetchFrom(dataSectors[idSector / NumDirect]);
 
 	return hdr->dataSectors[idSector % NumDirect];
 

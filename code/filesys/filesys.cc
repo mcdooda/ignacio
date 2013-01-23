@@ -252,6 +252,8 @@ bool FileSystem::Create(const char *name, int initialSize, FileHeader::FileType 
 		delete freeMap;
 	}
 	delete directory;
+//	Print();
+//	MinimalisticPrint();
 	return success;
 }
 
