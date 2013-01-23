@@ -161,7 +161,7 @@ void UserThreadExit() __attribute__((noreturn));
 void UserThreadJoin(int id);
 
 
-int ForkExec(char *s);
+int ForkExec(char *executable);
 
 void* AllocEmptyPage(unsigned size);
 

@@ -20,7 +20,7 @@ public:
 	// permet de demander combien de cadres restent disponibles
 	unsigned int NumAvailFrame();
 private:
-	int GetEmptyFrameSynch(bool random, bool mutex);
+	int GetEmptyFrameSynch(bool random, bool mutexOn);
 	unsigned int NumAvailFrameSynch(bool mutexOn);
 	BitMap bm;
 };

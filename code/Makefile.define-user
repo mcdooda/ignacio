@@ -16,10 +16,10 @@
 # List of C files that are not userspace programs (in test/ subdirectory)
 # => add here C files that are user-space libraries
 # all other C files will be compiled as a userspace nachos program
-USERPROG_NOPROGRAM=putchar putstring es
+USERPROG_NOPROGRAM=putchar putstring libio.c
 
 # source files that must be included in any userspace nachos program
-USERPROG_LIBS=start.S
+USERPROG_LIBS=start.S libio.c
 
 # each program 'p' can specify extra sources in 'p'_EXTRA_SOURCES
 # => declare here program sources to add in addition to
@@ -77,7 +77,7 @@ USERPROG_LIBS=start.S
 
 # By default, the same flavors as the original ones are compiled
 #USER_FLAVORS=$(ORIG_FLAVORS)
-#USER_FLAVORS=filesys
+#USER_FLAVORS=threads userprog
 
 # Once some personnal flavor are defined, this list can be limited
 # to the personal flavors
@@ -86,7 +86,7 @@ USER_FLAVORS=step5
 
 # $(eval $(call define-flavor,step2,userprog filesys-stub,synchconsole.cc))
 $(eval $(call define-flavor,step5,userprog filesys,\
-     synchconsole.cc userthread.cc))
+     synchconsole.cc userthread.cc userprocessus.cc))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \
 #     synchconsole.cc userthread.cc))
 # $(eval $(call define-flavor,final,userprog filesys network,\
