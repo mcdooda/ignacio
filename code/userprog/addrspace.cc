@@ -150,7 +150,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		if (i < brk || i >= brkMax) { // TEXT, DATA ou STACK
 			pageTable[i].physicalPage = frames[i];
 			pageTable[i].valid = TRUE;
-			pageTable[i].readOnly = (i < brk); // TEXT et DATA en lecture seule
+			pageTable[i].readOnly = (i < brkMin); // TEXT et DATA en lecture seule
 		} else { // HEAP
 			// si la page appartient au tas
 			pageTable[i].physicalPage = -1;
