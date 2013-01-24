@@ -4,9 +4,10 @@
 
 MemAlloc::MemAlloc(size_t size) {
 	//TODO init
+	tete_f = NULL;
 //	tete_f = (fb*) mem;
-	tete_f->size = size;
-	tete_f->next = NULL;
+//	tete_f->size = size;
+//	tete_f->next = NULL;
 	tete_d = NULL;
 
 #if STRATEGIE == FIRST

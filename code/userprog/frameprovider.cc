@@ -7,7 +7,6 @@ static Lock mutex2("mutex FrameProvider");
 
 FrameProvider::FrameProvider() :
 bm(NumPhysPages) {
-	RandomInit(time(NULL));
 }
 
 FrameProvider::~FrameProvider() {
@@ -21,7 +20,7 @@ int FrameProvider::GetEmptyFrame(bool random) {
 unsigned* FrameProvider::GetEmptyFrames(unsigned n, bool random) {
 	mutex2.Acquire();
 	
-	if(NumAvailFrameSynch(false) == 0) { // plus de frame libre
+	if(NumAvailFrameSynch(false) < n) { // plus de frame libre
 		mutex2.Release();
 		return NULL;
 	}

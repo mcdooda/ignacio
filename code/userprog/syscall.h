@@ -164,11 +164,11 @@ void UserThreadJoin(int id);
 
 int ForkExec(char *executable);
 
-void* Malloc(unsigned size);
+void* AllocEmptyPage();
 
-void Free(void *addr);
+void FreePage(void *addr);
 
-int Sbrk(unsigned nbFrames);
+void* Sbrk(unsigned nbFrames);
 
 #endif // IN_USER_MODE
 

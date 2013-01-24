@@ -123,12 +123,13 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	brk = brkMin = numPagesCode;
 	brkMax = numPagesCode + numPagesHeap;
 
-	allocateur = new MemAlloc(numPagesHeap * PageSize);
+	unsigned *frames = frameProvider->GetEmptyFrames(numPages, STRATEGY);
 
 	// pas assez de pages libres disponibles
-	unsigned *frames = frameProvider->GetEmptyFrames(numPages, STRATEGY);
-	if (frames == NULL) // pas assez de frames libres
-		ASSERT(FALSE);
+	ASSERT(frames == NULL);
+
+	allocateur = new MemAlloc(numPagesHeap * PageSize);
+
 #endif
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n",
 			numPages, size);
@@ -140,21 +141,25 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #ifndef CHANGED
 		pageTable[i].physicalPage = i; // for now, virtual page # = phys page #
 		pageTable[i].valid = TRUE;
-#else
-		if (i < brk || i >= brkMax) {
-			pageTable[i].physicalPage = frames[i];
-			pageTable[i].valid = TRUE;
-		} else {
-			// si la page appartient au tas
-			pageTable[i].physicalPage = -1;
-			pageTable[i].valid = FALSE;
-		}
-#endif
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
 		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
 		// a separate page, we could set its 
 		// pages to be read-only
+#else
+		if (i < brk || i >= brkMax) { // TEXT, DATA ou STACK
+			pageTable[i].physicalPage = frames[i];
+			pageTable[i].valid = TRUE;
+			pageTable[i].readOnly = (i < brk); // TEXT et DATA en lecture seule
+		} else { // HEAP
+			// si la page appartient au tas
+			pageTable[i].physicalPage = -1;
+			pageTable[i].valid = FALSE;
+			pageTable[i].readOnly = FALSE;
+		}
+		pageTable[i].use = FALSE;
+		pageTable[i].dirty = FALSE;
+#endif
 	}
 
 	// zero out the entire address space, to zero the unitialized data segment 
@@ -326,18 +331,18 @@ int AddrSpace::Sbrk(unsigned nbFrames) {
 }
 
 void* AddrSpace::Malloc(unsigned size) {
-//	void *addr = allocateur->mem_alloc(size);
-//	if(addr == NULL)
-//		return NULL;
-//	
-//	if(((char*)addr + size) < (char*)(brk*PageSize))
-//		return addr;
-//	else { // il faut allouer de nouvelles pages
-		return NULL;
-//	}
+	//	void *addr = allocateur->mem_alloc(size);
+	//	if(addr == NULL)
+	//		return NULL;
+	//	
+	//	if(((char*)addr + size) < (char*)(brk*PageSize))
+	//		return addr;
+	//	else { // il faut allouer de nouvelles pages
+	return NULL;
+	//	}
 }
 
 void AddrSpace::Free(void *addr) {
-	
+
 }
 #endif
