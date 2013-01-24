@@ -69,6 +69,7 @@ Semaphore::P() {
 	}
 	value--; // semaphore available, 
 	// consume its value
+	DEBUG('t', "le thread <%s> attend sur sem : %s\n", currentThread->getName(), name);
 
 	(void) interrupt->SetLevel(oldLevel); // re-enable interrupts
 }
@@ -88,9 +89,9 @@ Semaphore::V() {
 
 	thread = (Thread *) queue->Remove();
 	if (thread != NULL) { // make thread ready, consuming the V immediately
-		DEBUG('t', "Sem Ready to Run de thread <%s> sem : %s\n", thread->getName(), name);
 		scheduler->ReadyToRun(thread);
 	}
+		DEBUG('t', "le thread relache le sem : %s\n",  name);
 	value++;
 	(void) interrupt->SetLevel(oldLevel);
 }

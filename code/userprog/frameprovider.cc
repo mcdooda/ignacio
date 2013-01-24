@@ -7,7 +7,7 @@ static Lock mutex2("mutex FrameProvider");
 
 FrameProvider::FrameProvider() :
 bm(NumPhysPages) {
-	RandomInit(time(NULL));
+//	RandomInit(time(NULL));
 }
 
 FrameProvider::~FrameProvider() {

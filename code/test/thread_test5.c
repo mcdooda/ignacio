@@ -2,7 +2,7 @@
 
 void thread1(void* data) {
 	int i;
-	for (i = 0; i < 1000; i++)
+	for (i = 0; i < 100; i++)
 		PutChar('a');
 	
 	UserThreadJoin(*(int*)data);
@@ -10,7 +10,7 @@ void thread1(void* data) {
 
 void thread2(void* data) {
 	int i;
-	for (i = 0; i < 1000; i++)
+	for (i = 0; i < 100; i++)
 		PutChar('b');
 }
 
