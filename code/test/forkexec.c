@@ -5,6 +5,6 @@ int main() {
 /*
 	ForkExec("userpages1");
 */
-	PutString("TEST\n");
+	//PutString("TEST\n");
 	return 20;
 }

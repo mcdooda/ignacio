@@ -39,7 +39,6 @@ Machine *machine;		// user program memory and registers
 SynchConsole *synchConsole;
 UserMachine *userMachine;
 FrameProvider *frameProvider;
-std::map<int, Processus*> processus;
 #endif //CHANGED
 #endif //USER_PROGRAM
 
@@ -190,9 +189,8 @@ Initialize (int argc, char **argv)
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
 #ifdef CHANGED
-	Processus *p = new Processus(currentThread, 0, 0);
-	processus[0] = p;
-	currentThread->setPid(0);
+    addMainThread(currentThread);
+
 	
 	userMachine = new UserMachine();
 	synchConsole = new SynchConsole(in, out);
