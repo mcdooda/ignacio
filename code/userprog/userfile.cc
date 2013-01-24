@@ -21,6 +21,10 @@ public:
 		std::cout << "Creation UserFile :<" << fileName << "> path : <" << absolutePath << ">" << std::endl;
 #endif
 	}
+	
+	~UserFile() {
+		delete openFile;
+	}
 
 	void SetFd(int f) {
 		fd = f;
@@ -28,6 +32,10 @@ public:
 
 	int GetFd() {
 		return fd;
+	}
+	
+	OpenFile* GetOpenFile() {
+		return openFile;
 	}
 
 	std::string GetPath() {
@@ -66,12 +74,18 @@ int do_Open(const char* fileName) {
 	return fd;
 }
 
-int do_Read(int fd, void* buf, int count) {
-	return 0;
+int do_Read(int fd, char* buf, int count) {
+	sem.P();
+	int numRead = userFiles[fd]->GetOpenFile()->Read(buf, count);
+	sem.V();
+	return numRead;
 }
 
-int do_Write(int fd, void* buf, int count) {
-	return 0;
+int do_Write(int fd, char* buf, int count) {
+	sem.P();
+	int numWritten = userFiles[fd]->GetOpenFile()->Write(buf, count);
+	sem.V();
+	return numWritten;
 }
 
 int do_Close(int fd) {

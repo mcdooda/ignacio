@@ -165,6 +165,8 @@ void ConsoleUser() {
 
 	Copy("../build/halt", "halt");
 	Copy("../build/console", "console");
+	Copy("../build/putstring", "putstring");
+	Copy("../build/putchar", "putchar");
 	fileSystem->MinimalisticPrint();
 
 	char* cons = (char*) "console";

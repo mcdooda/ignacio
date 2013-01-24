@@ -16,10 +16,10 @@
 # List of C files that are not userspace programs (in test/ subdirectory)
 # => add here C files that are user-space libraries
 # all other C files will be compiled as a userspace nachos program
-USERPROG_NOPROGRAM=putchar putstring libio.c
+USERPROG_NOPROGRAM=putchar putstring libio.c libstring.c libchar.c
 
 # source files that must be included in any userspace nachos program
-USERPROG_LIBS=start.S libio.c
+USERPROG_LIBS=start.S libio.c libstring.c libchar.c
 
 # each program 'p' can specify extra sources in 'p'_EXTRA_SOURCES
 # => declare here program sources to add in addition to
