@@ -123,10 +123,10 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	brk = brkMin = numPagesCode;
 	brkMax = numPagesCode + numPagesHeap;
 
-	unsigned *frames = frameProvider->GetEmptyFrames(numPages, STRATEGY);
+	unsigned *frames = frameProvider->GetEmptyFrames(numPagesCode + numPagesStack, STRATEGY);
 
 	// pas assez de pages libres disponibles
-	ASSERT(frames == NULL);
+	ASSERT(frames != NULL);
 
 	allocateur = new MemAlloc(numPagesHeap * PageSize);
 
@@ -143,22 +143,20 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
-		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
-		// a separate page, we could set its 
-		// pages to be read-only
 #else
-		if (i < brk || i >= brkMax) { // TEXT, DATA ou STACK
-			pageTable[i].physicalPage = frames[i];
+		if (i < brkMin || i >= brkMax) { // TEXT, DATA ou STACK
+			pageTable[i].physicalPage = frames[(i < brkMin) ? i : i - numPagesHeap];
 			pageTable[i].valid = TRUE;
-			pageTable[i].readOnly = (i < brkMin); // TEXT et DATA en lecture seule
 		} else { // HEAP
 			// si la page appartient au tas
 			pageTable[i].physicalPage = -1;
 			pageTable[i].valid = FALSE;
-			pageTable[i].readOnly = FALSE;
 		}
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
+		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
+		// a separate page, we could set its 
+		// pages to be read-only
 #endif
 	}
 
@@ -177,6 +175,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
+		
+		for(i=0; i<numPagesCode; i++)
+			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
 #endif
 	}
 	if (noffH.initData.size > 0) {
