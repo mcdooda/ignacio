@@ -3,6 +3,7 @@
 #include "machine.h"
 #include "thread.h"
 #include "system.h"
+#include "userthread.h"
 #include <string>
 
 class Processus {
@@ -81,20 +82,15 @@ private:
 
 static Semaphore semCreate("do_ForkExec", 1);
 static Semaphore semMap("map_processus", 1);
-static Semaphore semPid("nextPid", 1);
 static Semaphore semProcessus("processusMap", 1);
 static Semaphore semFinish("Finish", 1);
-
-
 
 static int nextPid = 1;
 static std::map<int, Processus*> processus;
 
 static int NewPid() {
-	semPid.P();
 	int pid = nextPid;
 	nextPid++;
-	semPid.V();
 	return pid;
 }
 
@@ -138,8 +134,10 @@ int GetPid(Thread* t) {
 void addMainThread(Thread* m) {
 	semProcessus.P();
 	char main[5] = "main";
+	m->setPid(0);
 	Processus* p = new Processus(m, 0, 0, -1, main);
 	processus[0] = p;
+	CreateProcessusThreadsTable(0);
 	semProcessus.V();
 }
 
@@ -149,37 +147,39 @@ static void StartProcessus(int pid) {
 	char* fileExec = processus[pid]->GetFilename();
 
 	OpenFile *executable = fileSystem->Open(fileExec);
-	AddrSpace *space;
 
 	if (executable == NULL) {
 		printf("Unable to open file %s\n", fileExec);
 		deleteProcessus(pid);
 	}
-	space = new AddrSpace(executable);
-	currentThread->space = space;
+	currentThread->space = new AddrSpace(executable);
 	delete executable; // close file
 
-	space->InitRegisters(); // set the initial register values
-	space->RestoreState(); // load page table register
-	processus[pid]->GetSemStart()->V();
+	currentThread->space->InitRegisters(); // set the initial register values
+	currentThread->space->RestoreState(); // load page table register
+
 	(void) interrupt->SetLevel(oldLevel);
-	DEBUG('t', "Fin de Lancement du processus\n");
+	DEBUG('t', "Fin de Lancement du processus + addr : %p\n", currentThread->space);
 	machine->Run(); // jump to the user progam
 	ASSERT(FALSE); // machine->Run never returns;
 }
 
-int do_ForkExec(char *filename) {
+int do_ForkExec(char *filename, int pointerExit) {
+	DEBUG('t', "who do fork addr : %p\n", currentThread->space);
 	semCreate.P();
-	Thread *t = new Thread("forked thread user");
 	int pid = NewPid();
 	int ppid = GetPid(GetProc(currentThread));
-
-	Processus* p = new Processus(t, pid, ppid, -1, filename);
-	p->GetSemStart()->P();
+	
+	CreateProcessusThreadsTable(pid);
+	
+	Thread *t = new Thread("forked fork user");
+	t->setPid(pid);
+	Processus* p = new Processus(t, pid, ppid, pointerExit, filename);
 	saveSon(ppid, p);
 	t->ForkProcessus(StartProcessus, pid);
 
 	semCreate.V();
+
 	return pid;
 }
 
@@ -187,6 +187,8 @@ void deleteProcessus(int pid) {
 	std::map<int, Processus*>::iterator it = processus.find(pid);
 	delete it->second;
 	processus.erase(it);
+	
+	DestroyProcessusThreadsTable(pid);
 }
 
 void waitPid(int pid) {
@@ -214,11 +216,11 @@ void exitProc(int pid) {
 	semProcessus.P();
 	processus[pid]->GetSem()->V();
 	if (processus.size() == 1) {
+		DEBUG('t', "-----------------Finnish du dernier processus\n", processus[pid]->GetFilename());
 		semProcessus.V();
-		interrupt->Halt();
 	} else {
 
-		DEBUG('t', "-----------------Finnish du processus %s\n",processus[pid]->GetFilename());
+		DEBUG('t', "-----------------Finnish du processus %s\n", processus[pid]->GetFilename());
 		semProcessus.V();
 
 		currentThread->Finish();

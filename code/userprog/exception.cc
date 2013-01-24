@@ -100,6 +100,10 @@ extern SynchConsole* synchConsole;
 #endif
 #endif
 
+#define CASE(code)\
+	case code :
+//	printf("\nException : %s  pid : %d\n",#code,GetPid(currentThread));
+
 void ExceptionHandler(ExceptionType which) {
 	int type = machine->ReadRegister(2);
 #ifndef CHANGED // Noter le if*n*def
@@ -112,44 +116,47 @@ void ExceptionHandler(ExceptionType which) {
 	}
 	UpdatePC();
 #else // CHANGED
+
+		int pid = currentThread->getPid();
+	
 	if (which == SyscallException) {
 		switch (type) {
-			case SC_Halt:
+			CASE(SC_Halt)
 			{
 				DEBUG('a', "Shutdown, initiated by user program.\n");
-				JoinUserThreads();
-				exitProc(GetPid(currentThread));
+				JoinUserThreads(pid);
+				exitProc(pid);
 				interrupt->Halt();
 				break;
 			}
-			case SC_Exit:
+			CASE(SC_Exit)
 			{
-				JoinUserThreads();
-				exitProc(GetPid(currentThread));
+				JoinUserThreads(pid);
+				exitProc(pid);
 				int code = userMachine->GetIntArg(1);
 				interrupt->Exit(code);
 				break;
 			}
-			case SC_PutChar:
+			CASE(SC_PutChar)
 			{
 				char c = userMachine->GetCharArg(1);
 				synchConsole->SynchPutChar(c);
 				break;
 			}
-			case SC_GetChar:
+			CASE(SC_GetChar)
 			{
 				int c = synchConsole->SynchGetChar();
 				userMachine->SetReturn(c);
 				break;
 			}
-			case SC_PutString:
+			CASE(SC_PutString)
 			{
 				char str[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, str);
 				synchConsole->SynchPutString(str);
 				break;
 			}
-			case SC_GetString:
+			CASE(SC_GetString)
 			{
 				int size = userMachine->GetIntArg(2);
 				size = (size > MAX_STRING_SIZE ? MAX_STRING_SIZE : size);
@@ -158,7 +165,7 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetOutArg(1, strTmp);
 				break;
 			}
-			case SC_PutInt:
+			CASE(SC_PutInt)
 			{
 				int n = userMachine->GetIntArg(1);
 				char str[MAX_INTSTR_SIZE];
@@ -166,7 +173,7 @@ void ExceptionHandler(ExceptionType which) {
 				synchConsole->SynchPutString(str);
 				break;
 			}
-			case SC_GetInt:
+			CASE(SC_GetInt)
 			{
 				char str[MAX_INTSTR_SIZE];
 				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
@@ -176,42 +183,43 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(numRead > 0);
 				break;
 			}
-			case SC_UserThreadCreate:
+			CASE(SC_UserThreadCreate)
 			{
 				int f = userMachine->GetIntArg(1);
 				int arg = userMachine->GetIntArg(2);
 				int pointerExit = userMachine->GetIntArg(3);
-				int id = do_UserThreadCreate(f, arg, pointerExit);
+				int id = do_UserThreadCreate(pid, f, arg, pointerExit);
 				userMachine->SetReturn(id);
 				break;
 			}
-			case SC_UserThreadExit:
+			CASE(SC_UserThreadExit)
 			{
-				do_UserThreadExit();
+				do_UserThreadExit(pid);
 				break;
 			}
-			case SC_UserThreadJoin:
+			CASE(SC_UserThreadJoin)
 			{
 				int id = userMachine->GetIntArg(1);
-				do_UserThreadJoin(id);
+				do_UserThreadJoin(pid, id);
 				break;
 			}
-			case SC_ForkExec:
+			CASE(SC_ForkExec)
 			{
 				char strTmp[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, strTmp);
-				int pid = do_ForkExec(strTmp);
-				userMachine->SetReturn(pid);
+				int pointerExit = userMachine->GetIntArg(2);
+				int newPid = do_ForkExec(strTmp,pointerExit);
+				userMachine->SetReturn(newPid);
 				break;
 			}
-			case SC_Create:
+			CASE(SC_Create)
 			{
 				char fileName[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, fileName);
 				do_Create(fileName);
 				break;
 			}
-			case SC_Open:
+			CASE(SC_Open)
 			{
 				char fileName[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, fileName);
@@ -219,7 +227,7 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(fd);
 				break;
 			}
-			case SC_Read:
+			CASE(SC_Read)
 			{
 				char buf[MAX_STRING_SIZE];
 				int count = userMachine->GetIntArg(2);
@@ -229,7 +237,7 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(numRead);
 				break;
 			}
-			case SC_Write:
+			CASE(SC_Write)
 			{
 				char buf[MAX_STRING_SIZE];
 				userMachine->GetStringArg(1, buf);
@@ -239,20 +247,20 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(numWritten);
 				break;
 			}
-			case SC_Close:
+			CASE(SC_Close)
 			{
 				int fd = userMachine->GetIntArg(1);
 				int err = do_Close(fd);
 				userMachine->SetReturn(err);
 				break;
 			}
-			case SC_AllocEmptyPage:
+			CASE(SC_AllocEmptyPage)
 			{
 				//TODO pas sûr, peut-être autre traitement si espace dispo dans le tas
 				userMachine->SetReturn(currentThread->space->Sbrk(1));
 				break;
 			}
-			case SC_FreePage:
+			CASE(SC_FreePage)
 			{
 //				unsigned addr = userMachine->GetIntArg(1);
 				//TODO

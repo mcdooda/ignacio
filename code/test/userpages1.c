@@ -15,10 +15,10 @@ void f(void *s) {
 }
 
 int main() {
-/*
+
 	int i;
 	i = UserThreadCreate(f, (void *) THIS);
-*/
+
 	f((void*) THAT);
 	return 15;
 }

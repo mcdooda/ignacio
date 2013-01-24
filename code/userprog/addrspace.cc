@@ -26,7 +26,7 @@
 
 #ifdef CHANGED
 #include <iostream>
-#define STRATEGY true
+#define STRATEGY false
 extern FrameProvider *frameProvider;
 #endif
 
@@ -196,6 +196,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 #ifdef CHANGED
 	InitBitMap();
+//	machine->ReadMem()
 #endif
 }
 

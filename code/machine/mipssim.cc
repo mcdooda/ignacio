@@ -120,7 +120,7 @@ Machine::OneInstruction(Instruction *instr)
        struct OpString *str = &opStrings[instr->opCode];
 
        ASSERT(instr->opCode <= MaxOpcode);
-       printf("At PC = 0x%x: ", registers[PCReg]);
+       printf("<%s>, At PC = 0x%x: ",currentThread->getName(), registers[PCReg]);
        printf(str->string, TypeToReg(str->args[0], instr), 
 		TypeToReg(str->args[1], instr), TypeToReg(str->args[2], instr));
        printf("\n");

@@ -89,7 +89,7 @@
 //	std::list<int> filspid;
 //};
 void deleteProcessus(int pid);
-extern int do_ForkExec(char *filename);
+extern int do_ForkExec(char *filename, int pointerExit);
 extern int GetPid(Thread* t);
 extern void exitProc(int pid);
 extern void addMainThread(Thread* m);
