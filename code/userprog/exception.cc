@@ -260,6 +260,12 @@ void ExceptionHandler(ExceptionType which) {
 				userMachine->SetReturn(0);
 				break;
 			}
+			case SC_Sbrk:
+			{
+				unsigned nbFrames = userMachine->GetIntArg(1);
+				userMachine->SetReturn(currentThread->space->Sbrk(nbFrames));
+				break;
+			}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);
