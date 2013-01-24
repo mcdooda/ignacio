@@ -1,10 +1,15 @@
 #include "syscall.h"
 
 int main() {
-	ForkExec("userpages0");
+	ForkExec("fork_test1");
 /*
 	ForkExec("userpages1");
 */
-	//PutString("TEST\n");
+/*
+	PutString("TEST\n");
+*/
+	PutChar('x');
+	PutChar('y');
+	PutChar('z');
 	return 20;
 }

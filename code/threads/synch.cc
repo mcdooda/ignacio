@@ -87,8 +87,10 @@ Semaphore::V() {
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
 	thread = (Thread *) queue->Remove();
-	if (thread != NULL) // make thread ready, consuming the V immediately
+	if (thread != NULL) { // make thread ready, consuming the V immediately
+		DEBUG('t', "Sem Ready to Run de thread <%s> sem : %s\n", thread->getName(), name);
 		scheduler->ReadyToRun(thread);
+	}
 	value++;
 	(void) interrupt->SetLevel(oldLevel);
 }
