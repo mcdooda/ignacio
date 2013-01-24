@@ -41,6 +41,7 @@
 #define SC_ForkExec 20
 #define SC_AllocEmptyPage 21
 #define SC_FreePage 22
+#define SC_Sbrk 23
 
 #ifdef IN_USER_MODE
 
@@ -163,9 +164,11 @@ void UserThreadJoin(int id);
 
 int ForkExec(char *executable);
 
-void* AllocEmptyPage(unsigned size);
+void* AllocEmptyPage();
 
 void FreePage(void *addr);
+
+void* Sbrk(unsigned nbFrames);
 
 #endif // IN_USER_MODE
 
