@@ -196,10 +196,12 @@ int do_ForkExec(char *filename, int pointerExit) {
 
 void deleteProcessus(int pid) {
 	std::map<int, Processus*>::iterator it = processus.find(pid);
+	delete it->second->GetThread()->space;
 	delete it->second;
 	processus.erase(it);
 
 	DestroyProcessusThreadsTable(pid);
+	
 }
 
 void waitPid(int pid) {

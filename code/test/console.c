@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
 		if (stringeq(args[0], "exit")) {
 			break;
 		} else {
+			printf("prog %s",args[0]);
 			pid = ForkExec(args[0]);
 			WaitPid(pid);
 		}
