@@ -236,6 +236,39 @@ FreePage:
 	j	$31
 	.end FreePage
 
+	.globl SemCreate
+	.ent	SemCreate
+SemCreate:
+	addiu $2,$0,SC_SemCreate
+	syscall
+	j	$31
+	.end SemCreate
+	
+	.globl SemDestroy
+	.ent	SemDestroy
+SemDestroy:
+	addiu $2,$0,SC_SemDestroy
+	syscall
+	j	$31
+	.end SemDestroy
+
+	.globl SemP
+	.ent	SemP
+SemP:
+	addiu $2,$0,SC_SemP
+	syscall
+	j	$31
+	.end SemP
+
+	.globl SemV
+	.ent	SemV
+SemV:
+	addiu $2,$0,SC_SemV
+	syscall
+	j	$31
+	.end SemV
+
+
 
 /* dummy function to keep gcc happy */
         .globl  __main

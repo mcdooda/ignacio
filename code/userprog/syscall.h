@@ -42,6 +42,10 @@
 #define SC_WaitPid  21
 #define SC_AllocEmptyPage 22
 #define SC_FreePage 23
+#define SC_SemCreate 24
+#define SC_SemDestroy 25
+#define SC_SemP 26
+#define SC_SemV 27
 
 #ifdef IN_USER_MODE
 
@@ -170,6 +174,13 @@ void* AllocEmptyPage(unsigned size);
 
 void FreePage(void *addr);
 
+int SemCreate(const char *name, int arg);
+
+void SemDestroy(int addr);
+
+void SemP(int addr);
+
+void SemV(int addr);
 #endif // IN_USER_MODE
 
 #endif /* SYSCALL_H */

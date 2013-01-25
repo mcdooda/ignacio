@@ -31,6 +31,7 @@
 #include "userthread.h"
 #include "userprocessus.h"
 #include "userfile.h"
+#include "usersynch.h"
 #endif
 
 //----------------------------------------------------------------------
@@ -272,6 +273,33 @@ void ExceptionHandler(ExceptionType which) {
 					//				unsigned addr = userMachine->GetIntArg(1);
 					//TODO
 					userMachine->SetReturn(0);
+					break;
+				}
+				CASE(SC_SemCreate)
+				{
+					char buffer[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buffer);
+					int arg = userMachine->GetIntArg(2);
+					int addr = do_SemCreate((const char *)buffer, arg);
+					userMachine->SetReturn(addr);
+					break;
+				}
+				CASE(SC_SemDestroy)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_SemDestroy(addr);
+					break;
+				}
+				CASE(SC_SemP)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_SemP(addr);
+					break;
+				}
+				CASE(SC_SemV)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_SemV(addr);
 					break;
 				}
 			default:
