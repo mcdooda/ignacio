@@ -31,6 +31,9 @@ int main(int argc, char* argv[]) {
 
 	while (1) {
 		printf("NachOS$ ");
+/*
+		PutString("NachOS$ ");
+*/
 		GetString(line, MAX_LINE_SIZE);
 		readarg(line, args);
 		if (stringeq(args[0], "exit")) {

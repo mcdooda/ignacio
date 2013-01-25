@@ -39,8 +39,9 @@
 #define SC_UserThreadExit 18
 #define SC_UserThreadJoin 19
 #define SC_ForkExec 20
-#define SC_AllocEmptyPage 21
-#define SC_FreePage 22
+#define SC_WaitPid  21
+#define SC_AllocEmptyPage 22
+#define SC_FreePage 23
 
 #ifdef IN_USER_MODE
 

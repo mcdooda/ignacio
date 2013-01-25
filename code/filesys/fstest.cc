@@ -21,7 +21,7 @@
 #include "disk.h"
 #include "stats.h"
 
-#define TransferSize 	10 	// make it small, just to be difficult
+#define TransferSize 	1000 	// make it small, just to be difficult
 
 //----------------------------------------------------------------------
 // Copy
