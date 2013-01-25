@@ -1,6 +1,8 @@
 #ifndef LIBIO_H
 #define LIBIO_H
 
+#define EOF (-1)
+
 #define printf(format, ...) \
 	{\
 		void* __args[] = { __VA_ARGS__ };\
