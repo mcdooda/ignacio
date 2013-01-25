@@ -10,6 +10,8 @@ import thread_test5
 import fork_test1
 #import thread_test6
 
+import sem_test1
+
 if len(sys.argv) > 1:
 	pychos.test(sys.argv[1])
 else:

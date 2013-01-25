@@ -2,33 +2,33 @@
 #include "libsynch.h"
 
 struct s {
-	sem_t* sem;
+	mutex_t* mut;
 	char c;
 };
 
 void SimpleThread(void* which) {
 	int i;
-	sem_P(*((struct s*)which)->sem);
+	mutex_P(*((struct s*)which)->mut);
     for (i = 0; i < 1000; i++) {
         PutChar(((struct s*)which)->c);
     }
-	sem_V(*((struct s*)which)->sem);
+	mutex_V(*((struct s*)which)->mut);
     UserThreadExit();
 }
 
 int
 main() {
-	sem_t sem;
+	mutex_t mut;
 	struct s a, b, c, d;
     int tid1;
     int tid2;
     int tid3;
     int tid4;
-	sem = sem_create("usersem test", 1);
-	a.sem = &sem; a.c = 'a';
-	b.sem = &sem; b.c = 'b';
-	c.sem = &sem; c.c = 'c';
-	d.sem = &sem; d.c = 'd';
+	mut = mutex_create("usermut test");
+	a.mut = &mut; a.c = 'a';
+	b.mut = &mut; b.c = 'b';
+	c.mut = &mut; c.c = 'c';
+	d.mut = &mut; d.c = 'd';
     tid1 = UserThreadCreate(SimpleThread, (void*) &a);
     tid2 = UserThreadCreate(SimpleThread, (void*) &b);
     tid3 = UserThreadCreate(SimpleThread, (void*) &c);
@@ -38,7 +38,7 @@ main() {
     UserThreadJoin(tid2);
     UserThreadJoin(tid3);
     UserThreadJoin(tid4);
-	sem_destroy(sem);
+	mutex_destroy(mut);
 
 	return 0;
 }
