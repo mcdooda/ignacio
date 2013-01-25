@@ -117,157 +117,163 @@ void ExceptionHandler(ExceptionType which) {
 	UpdatePC();
 #else // CHANGED
 
-		int pid = currentThread->getPid();
-	
+	int pid = currentThread->getPid();
+
 	if (which == SyscallException) {
 		switch (type) {
-			CASE(SC_Halt)
-			{
-				DEBUG('a', "Shutdown, initiated by user program.\n");
-				JoinUserThreads(pid);
-				exitProc(pid);
-				interrupt->Halt();
-				break;
-			}
-			CASE(SC_Exit)
-			{
-				JoinUserThreads(pid);
-				exitProc(pid);
-				int code = userMachine->GetIntArg(1);
-				interrupt->Exit(code);
-				break;
-			}
-			CASE(SC_PutChar)
-			{
-				char c = userMachine->GetCharArg(1);
-				synchConsole->SynchPutChar(c);
-				break;
-			}
-			CASE(SC_GetChar)
-			{
-				int c = synchConsole->SynchGetChar();
-				userMachine->SetReturn(c);
-				break;
-			}
-			CASE(SC_PutString)
-			{
-				char str[MAX_STRING_SIZE];
-				userMachine->GetStringArg(1, str);
-				synchConsole->SynchPutString(str);
-				break;
-			}
-			CASE(SC_GetString)
-			{
-				int size = userMachine->GetIntArg(2);
-				size = (size > MAX_STRING_SIZE ? MAX_STRING_SIZE : size);
-				char strTmp[size];
-				synchConsole->SynchGetString(strTmp, size);
-				userMachine->SetOutArg(1, strTmp);
-				break;
-			}
-			CASE(SC_PutInt)
-			{
-				int n = userMachine->GetIntArg(1);
-				char str[MAX_INTSTR_SIZE];
-				snprintf(str, MAX_INTSTR_SIZE, "%d", n);
-				synchConsole->SynchPutString(str);
-				break;
-			}
-			CASE(SC_GetInt)
-			{
-				char str[MAX_INTSTR_SIZE];
-				synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
-				int n;
-				int numRead = sscanf(str, "%d", &n);
-				userMachine->SetOutArg(1, n);
-				userMachine->SetReturn(numRead > 0);
-				break;
-			}
-			CASE(SC_UserThreadCreate)
-			{
-				int f = userMachine->GetIntArg(1);
-				int arg = userMachine->GetIntArg(2);
-				int pointerExit = userMachine->GetIntArg(3);
-				int id = do_UserThreadCreate(pid, f, arg, pointerExit);
-				userMachine->SetReturn(id);
-				break;
-			}
-			CASE(SC_UserThreadExit)
-			{
-				do_UserThreadExit(pid);
-				break;
-			}
-			CASE(SC_UserThreadJoin)
-			{
-				int id = userMachine->GetIntArg(1);
-				do_UserThreadJoin(pid, id);
-				break;
-			}
-			CASE(SC_ForkExec)
-			{
-				char strTmp[MAX_STRING_SIZE];
-				userMachine->GetStringArg(1, strTmp);
-				int pointerExit = userMachine->GetIntArg(2);
-				int newPid = do_ForkExec(strTmp,pointerExit);
-				userMachine->SetReturn(newPid);
-				break;
-			}
-			CASE(SC_Create)
-			{
-				char fileName[MAX_STRING_SIZE];
-				userMachine->GetStringArg(1, fileName);
-				do_Create(fileName);
-				break;
-			}
-			CASE(SC_Open)
-			{
-				char fileName[MAX_STRING_SIZE];
-				userMachine->GetStringArg(1, fileName);
-				int fd = do_Open(fileName);
-				userMachine->SetReturn(fd);
-				break;
-			}
-			CASE(SC_Read)
-			{
-				char buf[MAX_STRING_SIZE];
-				int count = userMachine->GetIntArg(2);
-				int fd = userMachine->GetIntArg(3);
-				int numRead = do_Read(fd, buf, count);
-				userMachine->SetOutArg(1, buf);
-				userMachine->SetReturn(numRead);
-				break;
-			}
-			CASE(SC_Write)
-			{
-				char buf[MAX_STRING_SIZE];
-				userMachine->GetStringArg(1, buf);
-				int count = userMachine->GetIntArg(2);
-				int fd = userMachine->GetIntArg(3);
-				int numWritten = do_Write(fd, buf, count);
-				userMachine->SetReturn(numWritten);
-				break;
-			}
-			CASE(SC_Close)
-			{
-				int fd = userMachine->GetIntArg(1);
-				int err = do_Close(fd);
-				userMachine->SetReturn(err);
-				break;
-			}
-			CASE(SC_AllocEmptyPage)
-			{
-//				unsigned size = userMachine->GetIntArg(1);
-				//TODO
-				userMachine->SetReturn(0);
-				break;
-			}
-			CASE(SC_FreePage)
-			{
-//				unsigned addr = userMachine->GetIntArg(1);
-				//TODO
-				userMachine->SetReturn(0);
-				break;
-			}
+
+				CASE(SC_Halt) {
+					DEBUG('a', "Shutdown, initiated by user program.\n");
+					JoinUserThreads(pid);
+					exitProc(pid);
+					interrupt->Halt();
+					break;
+				}
+
+				CASE(SC_Exit) {
+					JoinUserThreads(pid);
+					exitProc(pid);
+					int code = userMachine->GetIntArg(1);
+					interrupt->Exit(code);
+					break;
+				}
+
+				CASE(SC_PutChar) {
+					char c = userMachine->GetCharArg(1);
+					synchConsole->SynchPutChar(c);
+					break;
+				}
+
+				CASE(SC_GetChar) {
+					int c = synchConsole->SynchGetChar();
+					userMachine->SetReturn(c);
+					break;
+				}
+
+				CASE(SC_PutString) {
+					char str[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, str);
+					synchConsole->SynchPutString(str);
+					break;
+				}
+
+				CASE(SC_GetString) {
+					int size = userMachine->GetIntArg(2);
+					size = (size > MAX_STRING_SIZE ? MAX_STRING_SIZE : size);
+					char strTmp[size];
+					synchConsole->SynchGetString(strTmp, size);
+					userMachine->SetOutArg(1, strTmp);
+					break;
+				}
+
+				CASE(SC_PutInt) {
+					int n = userMachine->GetIntArg(1);
+					char str[MAX_INTSTR_SIZE];
+					snprintf(str, MAX_INTSTR_SIZE, "%d", n);
+					synchConsole->SynchPutString(str);
+					break;
+				}
+
+				CASE(SC_GetInt) {
+					char str[MAX_INTSTR_SIZE];
+					synchConsole->SynchGetString(str, MAX_INTSTR_SIZE);
+					int n;
+					int numRead = sscanf(str, "%d", &n);
+					userMachine->SetOutArg(1, n);
+					userMachine->SetReturn(numRead > 0);
+					break;
+				}
+
+				CASE(SC_UserThreadCreate) {
+					int f = userMachine->GetIntArg(1);
+					int arg = userMachine->GetIntArg(2);
+					int pointerExit = userMachine->GetIntArg(3);
+					int id = do_UserThreadCreate(pid, f, arg, pointerExit);
+					userMachine->SetReturn(id);
+					break;
+				}
+
+				CASE(SC_UserThreadExit) {
+					do_UserThreadExit(pid);
+					break;
+				}
+
+				CASE(SC_UserThreadJoin) {
+					int id = userMachine->GetIntArg(1);
+					do_UserThreadJoin(pid, id);
+					break;
+				}
+
+				CASE(SC_ForkExec) {
+					char strTmp[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, strTmp);
+					int pointerExit = userMachine->GetIntArg(2);
+					int newPid = do_ForkExec(strTmp, pointerExit);
+					userMachine->SetReturn(newPid);
+					break;
+				}
+
+				CASE(SC_WaitPid) {
+					int pidToWait = userMachine->GetIntArg(1);
+					do_UserWaitPid(pidToWait);
+					break;
+				}
+
+				CASE(SC_Create) {
+					char fileName[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, fileName);
+					do_Create(fileName);
+					break;
+				}
+
+				CASE(SC_Open) {
+					char fileName[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, fileName);
+					int fd = do_Open(fileName);
+					userMachine->SetReturn(fd);
+					break;
+				}
+
+				CASE(SC_Read) {
+					char buf[MAX_STRING_SIZE];
+					int count = userMachine->GetIntArg(2);
+					int fd = userMachine->GetIntArg(3);
+					int numRead = do_Read(fd, buf, count);
+					userMachine->SetOutArg(1, buf);
+					userMachine->SetReturn(numRead);
+					break;
+				}
+
+				CASE(SC_Write) {
+					char buf[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buf);
+					int count = userMachine->GetIntArg(2);
+					int fd = userMachine->GetIntArg(3);
+					int numWritten = do_Write(fd, buf, count);
+					userMachine->SetReturn(numWritten);
+					break;
+				}
+
+				CASE(SC_Close) {
+					int fd = userMachine->GetIntArg(1);
+					int err = do_Close(fd);
+					userMachine->SetReturn(err);
+					break;
+				}
+
+				CASE(SC_AllocEmptyPage) {
+					//				unsigned size = userMachine->GetIntArg(1);
+					//TODO
+					userMachine->SetReturn(0);
+					break;
+				}
+
+				CASE(SC_FreePage) {
+					//				unsigned addr = userMachine->GetIntArg(1);
+					//TODO
+					userMachine->SetReturn(0);
+					break;
+				}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);

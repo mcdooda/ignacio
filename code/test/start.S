@@ -211,6 +211,15 @@ ForkExec:
 	j	$31
 	.end ForkExec
 
+	.globl WaitPid
+	.ent	WaitPid
+WaitPid:
+	addiu $2,$0,SC_WaitPid
+	addiu $5, $0,Exit
+	syscall
+	j	$31
+	.end WaitPid
+
 	.globl AllocEmptyPage
 	.ent	AllocEmptyPage
 AllocEmptyPage:

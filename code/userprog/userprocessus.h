@@ -8,6 +8,8 @@
 
 void deleteProcessus(int pid);
 extern int do_ForkExec(char *filename, int pointerExit);
+extern void do_UserWaitPid(int pid);
+
 extern int GetPid(Thread* t);
 extern void exitProc(int pid);
 extern void addMainThread(Thread* m);

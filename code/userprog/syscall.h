@@ -164,6 +164,8 @@ void UserThreadJoin(int id);
 
 int ForkExec(char *executable);
 
+void WaitPid(int pid);
+
 void* AllocEmptyPage(unsigned size);
 
 void FreePage(void *addr);
