@@ -176,8 +176,8 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
 		
-		for(i=0; i<numPagesCode; i++)
-			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
+//		for(i=0; i<numPagesCode; i++)
+//			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
 #endif
 	}
 	if (noffH.initData.size > 0) {

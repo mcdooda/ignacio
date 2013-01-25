@@ -160,27 +160,12 @@ void FileSystemTest() {
 }
 
 void ConsoleUser() {
-
-	//	Copy("../filesys/test/small", "halt");
-
-	Copy("../build/halt", "halt");
-	Copy("../build/console", "console");
-	Copy("../build/putstring", "putstring");
-	Copy("../build/putchar", "putchar");
 	fileSystem->MinimalisticPrint();
 
 	char* cons = (char*) "console";
 	StartProcess(cons);
 
-
 	//	OpenFile* of = fileSystem->Open("halt");
-
-
-
-
-
-
-
 
 	//	fileSystem->Print();
 	//	char buf[100];

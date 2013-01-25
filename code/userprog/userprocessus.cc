@@ -19,6 +19,7 @@ public:
 		pointerExit = pE;
 		filename = new char[strlen(filename_) + 1];
 		strcpy(filename, filename_);
+		waited = false;
 	}
 
 	~Processus() {
@@ -67,6 +68,15 @@ public:
 		return pid == -1;
 	}
 
+	bool IsWaited() {
+		return waited;
+	}
+
+	void SetWaited(bool waited_) {
+		this->waited = waited_;
+	}
+
+
 private:
 	Thread* t;
 	int pid;
@@ -77,6 +87,7 @@ private:
 	Semaphore semMap;
 	char* filename;
 	std::map<int, Processus*> sons;
+	bool waited;
 
 };
 
@@ -169,9 +180,9 @@ int do_ForkExec(char *filename, int pointerExit) {
 	semCreate.P();
 	int pid = NewPid();
 	int ppid = GetPid(GetProc(currentThread));
-	
+
 	CreateProcessusThreadsTable(pid);
-	
+
 	Thread *t = new Thread("forked fork user");
 	t->setPid(pid);
 	Processus* p = new Processus(t, pid, ppid, pointerExit, filename);
@@ -185,25 +196,31 @@ int do_ForkExec(char *filename, int pointerExit) {
 
 void deleteProcessus(int pid) {
 	std::map<int, Processus*>::iterator it = processus.find(pid);
+	delete it->second->GetThread()->space;
 	delete it->second;
 	processus.erase(it);
-	
+
 	DestroyProcessusThreadsTable(pid);
+	
 }
 
 void waitPid(int pid) {
 	semProcessus.P();
 	std::map<int, Processus*>::iterator it = processus.find(pid);
 	if (it != processus.end()) {
-		Processus* son = it->second;
+		Processus* p = it->second;
 		semProcessus.V();
-		son->GetSem()->P();
+		p->GetSem()->P();
 		semProcessus.P();
 		deleteProcessus(pid);
 		semProcessus.V();
 	} else {
 		semProcessus.V();
 	}
+}
+
+void do_UserWaitPid(int pid) {
+	waitPid(pid);
 }
 
 void exitProc(int pid) {
