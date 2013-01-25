@@ -51,6 +51,7 @@ int FrameProvider::GetEmptyFrameSynch(bool random, bool mutexOn) {
 		while (bm.Test(r))
 			r = (r + 1) % NumPhysPages;
 		num = r;
+		bm.Mark(num);
 	}
 
 	if (num != -1) {

@@ -26,7 +26,8 @@
 
 #ifdef CHANGED
 #include <iostream>
-#define STRATEGY false
+// Allocation aléatoire des pages physiques (true/false)
+#define STRATEGY true
 extern FrameProvider *frameProvider;
 #endif
 
@@ -141,8 +142,6 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #ifndef CHANGED
 		pageTable[i].physicalPage = i; // for now, virtual page # = phys page #
 		pageTable[i].valid = TRUE;
-		pageTable[i].use = FALSE;
-		pageTable[i].dirty = FALSE;
 #else
 		if (i < brkMin || i >= brkMax) { // TEXT, DATA ou STACK
 			pageTable[i].physicalPage = frames[(i < brkMin) ? i : i - numPagesHeap];
@@ -152,12 +151,12 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 			pageTable[i].physicalPage = -1;
 			pageTable[i].valid = FALSE;
 		}
+#endif
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
 		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
 		// a separate page, we could set its 
 		// pages to be read-only
-#endif
 	}
 
 	// zero out the entire address space, to zero the unitialized data segment 
@@ -175,9 +174,6 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
-		
-//		for(i=0; i<numPagesCode; i++)
-//			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
 #endif
 	}
 	if (noffH.initData.size > 0) {
@@ -191,12 +187,15 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size,
 				noffH.initData.inFileAddr, pageTable, numPages);
+
+		for (i = 0; i < numPagesCode; i++)
+			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
 #endif
 	}
 
 #ifdef CHANGED
 	InitBitMap();
-//	machine->ReadMem()
+	//	machine->ReadMem()
 #endif
 }
 
