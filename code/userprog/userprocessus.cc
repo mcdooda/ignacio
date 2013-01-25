@@ -25,6 +25,8 @@ public:
 
 	~Processus() {
 		delete filename;
+		//TODO
+//		delete t->space;
 	}
 
 	int GetPointerExit() {
@@ -209,7 +211,8 @@ int do_ForkExec(char *filename, int pointerExit) {
 
 void deleteProcessus(int pid) {
 	std::map<int, Processus*>::iterator it = processus.find(pid);
-	delete it->second->GetThread()->space;
+	ASSERT(it != processus.end());
+	delete it->second->GetThread()->space; //TODO adresse de space parfois erronée
 	delete it->second;
 	synchConsole->ClearErr();
 	processus.erase(it);

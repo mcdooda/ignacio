@@ -259,6 +259,7 @@ AddrSpace::InitRegisters() {
 
 void
 AddrSpace::SaveState() {
+//	ASSERT(machine->pageTable != NULL);
 	pageTable = machine->pageTable;
 	numPages = machine->pageTableSize;
 }
@@ -272,6 +273,7 @@ AddrSpace::SaveState() {
 //----------------------------------------------------------------------
 
 void AddrSpace::RestoreState() {
+//	ASSERT(pageTable != NULL);
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
 }

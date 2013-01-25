@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
 		/*
 				PutString("NachOS$ ");
 		 */
+		//TODO ERREUR SI line trop grand
 		GetString(line, MAX_LINE_SIZE);
 		if (stringlen(line) > 1) {
 			readarg(line, args);
