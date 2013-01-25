@@ -47,7 +47,14 @@
 #define SC_SemP 26
 #define SC_SemV 27
 #define SC_Sbrk 28
-
+#define SC_MutexCreate 29
+#define SC_MutexDestroy 30
+#define SC_MutexP 31
+#define SC_MutexV 32
+#define SC_CondCreate 33
+#define SC_CondDestroy 34
+#define SC_CondWait 35
+#define SC_CondSignal 36
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -184,6 +191,23 @@ void SemDestroy(int addr);
 void SemP(int addr);
 
 void SemV(int addr);
+
+int MutexCreate(const char* name);
+
+int CondCreate(const char* name);
+
+void MutexDestroy(int addr);
+
+void CondDestroy(int addr);
+
+void MutexP(int addr);
+
+void CondWait(int addr,int addr2);
+
+void MutexV(int addr);
+
+void CondSignal(int addr,int addr2);
+
 #endif // IN_USER_MODE
 
 #endif /* SYSCALL_H */

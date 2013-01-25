@@ -268,6 +268,70 @@ SemV:
 	j	$31
 	.end SemV
 
+	.globl MutexCreate
+	.ent	MutexCreate
+MutexCreate:
+	addiu $2,$0,SC_MutexCreate
+	syscall
+	j	$31
+	.end MutexCreate
+	
+	.globl MutexDestroy
+	.ent	MutexDestroy
+MutexDestroy:
+	addiu $2,$0,SC_MutexDestroy
+	syscall
+	j	$31
+	.end MutexDestroy
+
+	.globl MutexP
+	.ent	MutexP
+MutexP:
+	addiu $2,$0,SC_MutexP
+	syscall
+	j	$31
+	.end MutexP
+
+	.globl MutexV
+	.ent	MutexV
+MutexV:
+	addiu $2,$0,SC_MutexV
+	syscall
+	j	$31
+	.end MutexV
+
+	.globl CondCreate
+	.ent	CondCreate
+CondCreate:
+	addiu $2,$0,SC_CondCreate
+	syscall
+	j	$31
+	.end CondCreate
+	
+	.globl CondDestroy
+	.ent	CondDestroy
+CondDestroy:
+	addiu $2,$0,SC_CondDestroy
+	syscall
+	j	$31
+	.end CondDestroy
+
+	.globl CondWait
+	.ent	CondWait
+CondWait:
+	addiu $2,$0,SC_CondWait
+	syscall
+	j	$31
+	.end CondWait
+
+	.globl CondSignal
+	.ent	CondSignal
+CondSignal:
+	addiu $2,$0,SC_CondSignal
+	syscall
+	j	$31
+	.end CondSignal
+
 
 
 /* dummy function to keep gcc happy */

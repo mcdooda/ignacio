@@ -307,6 +307,60 @@ void ExceptionHandler(ExceptionType which) {
 					do_SemV(addr);
 					break;
 				}
+				CASE(SC_MutexCreate)
+				{
+					char buffer[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buffer);
+					int addr = do_MutexCreate((const char *)buffer);
+					userMachine->SetReturn(addr);
+					break;
+				}
+				CASE(SC_MutexDestroy)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_MutexDestroy(addr);
+					break;
+				}
+				CASE(SC_MutexP)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_MutexP(addr);
+					break;
+				}
+				CASE(SC_MutexV)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_MutexV(addr);
+					break;
+				}
+				CASE(SC_CondCreate)
+				{
+					char buffer[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buffer);
+					int addr = do_CondCreate((const char *)buffer);
+					userMachine->SetReturn(addr);
+					break;
+				}
+				CASE(SC_CondDestroy)
+				{
+					int addr = userMachine->GetIntArg(1);
+					do_CondDestroy(addr);
+					break;
+				}
+				CASE(SC_CondWait)
+				{
+					int addr1 = userMachine->GetIntArg(1);
+					int addr2 = userMachine->GetIntArg(2);
+					do_CondWait(addr1,addr2);
+					break;
+				}
+				CASE(SC_CondSignal)
+				{
+					int addr1 = userMachine->GetIntArg(1);
+					int addr2 = userMachine->GetIntArg(2);
+					do_CondSignal(addr1,addr2);
+					break;
+				}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);
