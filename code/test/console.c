@@ -29,20 +29,25 @@ int main(int argc, char* argv[]) {
 	char line[MAX_LINE_SIZE];
 	char args[MAX_ARG_COUNT][MAX_LINE_SIZE];
 	int pid;
-	
+
 	while (1) {
 		printf("NachOS$ ");
-/*
-		PutString("NachOS$ ");
-*/
+		/*
+				PutString("NachOS$ ");
+		 */
 		GetString(line, MAX_LINE_SIZE);
-		readarg(line, args);
-		if (stringeq(args[0], "exit")) {
-			break;
-		} else {
-			printf("prog %s",args[0]);
-			pid = ForkExec(args[0]);
-			WaitPid(pid);
+		if (stringlen(line) > 1) {
+			readarg(line, args);
+			if (stringeq(args[0], "exit")) {
+				break;
+			} else {
+/*
+				printf("line %s\n", line);
+				printf("prog %s\n", args[0]);
+*/
+				pid = ForkExec(args[0]);
+				WaitPid(pid);
+			}
 		}
 	}
 

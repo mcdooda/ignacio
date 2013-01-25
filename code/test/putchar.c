@@ -1,4 +1,5 @@
 #include "syscall.h"
+#include "libio.h"
 
 void print(char c, int n) {
     int i;
@@ -14,8 +15,7 @@ int main() {
     
     c = GetChar();
     
-    //TODO : EOF = -1 mais je sais pas quoi inclure pour que ca existe
-    while (c != -1) {
+    while (c != EOF) {
         PutChar(c);
         c = GetChar();
     }
