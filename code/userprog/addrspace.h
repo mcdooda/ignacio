@@ -18,6 +18,7 @@
 
 #ifdef CHANGED
 #include "bitmap.h"
+#include "memalloc.h"
 #endif
 
 #define UserStackSize		4096	// increase this as necessary!
@@ -40,26 +41,28 @@ public:
 #ifdef CHANGED
 	int GetNextFreeStack();
 	void FreeStackSlot(int stackBottom);
-	
+
 	// alloue n nouvelles frame s vides pour l’espace d’adressage,
 	// valide les n pages suivantes à partir de celle désignée par brk
 	// et les associe à ces cadres, incrémente brk de n
-	// et retourne un pointeur vers la nouvelle zone de données
+	// et retourne un pointeur vers la nouvelle zone de données (adresse virtuelle)
 	int Sbrk(unsigned n);
+	void* Malloc(unsigned size);
+	void Free(void *addr);
 #endif
 
 private:
 	TranslationEntry * pageTable; // Assume linear page table translation
 	// for now!
 	unsigned int numPages; // Number of pages in the virtual 
-	
+
 #ifdef CHANGED
 	// address space
 	BitMap* bm;
 	unsigned int brk; // numéro de la prochaine page à allouer dynamiquement
 	unsigned int brkMin; // valeur min de brk, on ne peut plus rien libérer si atteinte
 	unsigned int brkMax; // valeur max de brk, on ne peut plus rien allouer si atteinte
-
+	MemAlloc *allocateur;
 private:
 	void InitBitMap();
 	int GetSlotAddr(int stackSlot);

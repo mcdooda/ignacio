@@ -40,8 +40,9 @@
 #define SC_UserThreadJoin 19
 #define SC_ForkExec 20
 #define SC_WaitPid  21
-#define SC_AllocEmptyPage 22
-#define SC_FreePage 23
+#define SC_Sbrk 28
+#define SC_AllocEmptyPage 29
+#define SC_FreePage 30
 
 #ifdef IN_USER_MODE
 
@@ -166,7 +167,10 @@ int ForkExec(char *executable);
 
 void WaitPid(int pid);
 
-void* AllocEmptyPage(unsigned size);
+
+void* Sbrk(unsigned nbFrames);
+
+void* AllocEmptyPage();
 
 void FreePage(void *addr);
 
