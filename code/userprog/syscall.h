@@ -46,6 +46,9 @@
 #define SC_SemDestroy 25
 #define SC_SemP 26
 #define SC_SemV 27
+#define SC_Sbrk 28
+#define SC_AllocEmptyPage 29
+#define SC_FreePage 30
 
 #ifdef IN_USER_MODE
 
@@ -170,7 +173,9 @@ int ForkExec(char *executable);
 
 void WaitPid(int pid);
 
-void* AllocEmptyPage(unsigned size);
+void* Sbrk(unsigned nbFrames);
+
+void* AllocEmptyPage();
 
 void FreePage(void *addr);
 

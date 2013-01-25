@@ -262,10 +262,15 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}
 
+				CASE(SC_Sbrk) {
+					unsigned nbFrames = userMachine->GetIntArg(1);
+					userMachine->SetReturn(currentThread->space->Sbrk(nbFrames));
+					break;
+				}
+
 				CASE(SC_AllocEmptyPage) {
-					//				unsigned size = userMachine->GetIntArg(1);
-					//TODO
-					userMachine->SetReturn(0);
+					//TODO pas sûr, peut-être autre traitement si espace dispo dans le tas
+					userMachine->SetReturn(currentThread->space->Sbrk(1));
 					break;
 				}
 

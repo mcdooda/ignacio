@@ -53,21 +53,22 @@ SwapHeader(NoffHeader * noffH) {
 }
 
 #ifdef CHANGED
+
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 		int position, TranslationEntry *pageTable, unsigned numPages) {
 	char buff[numBytes];
-	executable->ReadAt (buff, numBytes, position);
-	
+	executable->ReadAt(buff, numBytes, position);
+
 	// sauvegarde
 	TranslationEntry *pt = machine->pageTable;
 	unsigned np = machine->pageTableSize;
-	
+
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
 
-	for(int i = 0; i < numBytes; i++)
-		machine->WriteMem(virtualaddr+i, 1, buff[i]);
-	
+	for (int i = 0; i < numBytes; i++)
+		machine->WriteMem(virtualaddr + i, 1, buff[i]);
+
 	// restauration
 	machine->pageTable = pt;
 	machine->pageTableSize = np;
@@ -105,33 +106,34 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	// to leave room for the stack
 	numPages = divRoundUp(size, PageSize);
 	size = numPages * PageSize;
+
+	ASSERT(numPages <= NumPhysPages); // check we're not trying
+	// to run anything too big --
+	// at least until we have
+	// virtual memory
 #else
 	unsigned int numPagesCode, numPagesHeap, numPagesStack;
 	// on placera les champs dans des pages différentes
 	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size, PageSize);
 	numPagesHeap = divRoundUp(noffH.uninitData.size, PageSize);
 	numPagesStack = divRoundUp(UserStackSize, PageSize);
-	
+
 	numPages = numPagesCode + numPagesHeap + numPagesStack;
 	size = numPages * PageSize;
 	brk = brkMin = numPagesCode;
 	brkMax = numPagesCode + numPagesHeap;
-#endif
 
-#ifdef CHANGED
+	unsigned *frames = frameProvider->GetEmptyFrames(numPagesCode + numPagesStack, STRATEGY);
+
 	// pas assez de pages libres disponibles
-	unsigned *frames = frameProvider->GetEmptyFrames(numPages, STRATEGY);
-	if(frames == NULL) // pas assez de frames libres
-		ASSERT(FALSE);
-#else
-	ASSERT(numPages <= NumPhysPages); // check we're not trying
-	// to run anything too big --
-	// at least until we have
-	// virtual memory
+	ASSERT(frames != NULL);
+
+	allocateur = new MemAlloc(numPagesHeap * PageSize);
+
 #endif
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n",
 			numPages, size);
-		
+
 	// first, set up the translation 
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
@@ -139,22 +141,23 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #ifndef CHANGED
 		pageTable[i].physicalPage = i; // for now, virtual page # = phys page #
 		pageTable[i].valid = TRUE;
+		pageTable[i].use = FALSE;
+		pageTable[i].dirty = FALSE;
 #else
-		if(i<brk || i>=brkMax) {
-			pageTable[i].physicalPage = frames[i];
+		if (i < brkMin || i >= brkMax) { // TEXT, DATA ou STACK
+			pageTable[i].physicalPage = frames[(i < brkMin) ? i : i - numPagesHeap];
 			pageTable[i].valid = TRUE;
+		} else { // HEAP
+			// si la page appartient au tas
+			pageTable[i].physicalPage = -1;
+			pageTable[i].valid = FALSE;
 		}
-		else {
-		// si la page appartient au tas
-		pageTable[i].physicalPage = -1;
-		pageTable[i].valid = FALSE;
-		}
-#endif
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
 		pageTable[i].readOnly = FALSE; // if the code segment was entirely on 
 		// a separate page, we could set its 
 		// pages to be read-only
+#endif
 	}
 
 	// zero out the entire address space, to zero the unitialized data segment 
@@ -172,6 +175,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size,
 				noffH.code.inFileAddr, pageTable, numPages);
+		
+//		for(i=0; i<numPagesCode; i++)
+//			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
 #endif
 	}
 	if (noffH.initData.size > 0) {
@@ -202,7 +208,8 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 AddrSpace::~AddrSpace() {
 #ifdef CHANGED
 	delete bm;
-	for(unsigned int i = 0; i < numPages; i++)
+	delete allocateur;
+	for (unsigned int i = 0; i < numPages; i++)
 		frameProvider->ReleaseFrame(pageTable[i].physicalPage);
 #endif
 	// LB: Missing [] for delete
@@ -294,35 +301,50 @@ int AddrSpace::GetNextFreeStack() {
 }
 
 void AddrSpace::FreeStackSlot(int stackBottom) {
-//	for (int i = stackBottom; i > (stackBottom + (PageSize * ThreadNbPages)); i -= 4)
-//		machine->WriteMem(i, 4, 0);
-//	for(unsigned int i=(numPages * PageSize); i > (numPages * PageSize) - ((8 + 1) * (PageSize * ThreadNbPages)) ; i-=4){
-//		int j;
-//		machine->ReadMem(i,4,&j);
-//		printf("%d.",j);
-//	}
-//	std::cout << "stackBottom = " << stackBottom << " stackslot = " << (NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages << std::endl;
+	//	for (int i = stackBottom; i > (stackBottom + (PageSize * ThreadNbPages)); i -= 4)
+	//		machine->WriteMem(i, 4, 0);
+	//	for(unsigned int i=(numPages * PageSize); i > (numPages * PageSize) - ((8 + 1) * (PageSize * ThreadNbPages)) ; i-=4){
+	//		int j;
+	//		machine->ReadMem(i,4,&j);
+	//		printf("%d.",j);
+	//	}
+	//	std::cout << "stackBottom = " << stackBottom << " stackslot = " << (NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages << std::endl;
 	bm->Clear((NbStackSlot - 1) - (numPages - (stackBottom / PageSize)) / ThreadNbPages);
 }
 
-int AddrSpace::Sbrk(unsigned n) {
-	if(brk + n > brkMax) // tas plein
+int AddrSpace::Sbrk(unsigned nbFrames) {
+	if (brk + nbFrames > brkMax) // tas plein
 		return -1;
-	
-	unsigned *frames = frameProvider->GetEmptyFrames(n, STRATEGY);
-	if(frames == NULL) // pas assez de frames libres
+
+	unsigned *frames = frameProvider->GetEmptyFrames(nbFrames, STRATEGY);
+	if (frames == NULL) // pas assez de frames libres
 		return -1;
-	
-	for(unsigned i=0; i<n; i++) {
-		pageTable[brk+i].physicalPage = frames[i];
-		pageTable[brk+i].valid = TRUE;
+
+	for (unsigned i = 0; i < nbFrames; i++) {
+		pageTable[brk + i].physicalPage = frames[i];
+		pageTable[brk + i].valid = TRUE;
 	}
-	
+
 	delete frames;
-	
-	int address = pageTable[brk].virtualPage;
-	brk += n;
+
+	int address = pageTable[brk].virtualPage * PageSize;
+	brk += nbFrames;
 	return address;
 }
 
+void* AddrSpace::Malloc(unsigned size) {
+	//	void *addr = allocateur->mem_alloc(size);
+	//	if(addr == NULL)
+	//		return NULL;
+	//	
+	//	if(((char*)addr + size) < (char*)(brk*PageSize))
+	//		return addr;
+	//	else { // il faut allouer de nouvelles pages
+	return NULL;
+	//	}
+}
+
+void AddrSpace::Free(void *addr) {
+
+}
 #endif
