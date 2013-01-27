@@ -11,7 +11,7 @@ class Processus {
 public:
 
 	Processus(Thread *thread, int pid_, int ppid_, int pE, char *filename_) :
-	sem("Processus", 0),
+	semExit("Processus", 0),
 	semStart("StartProc", 1),
 	semMap("SemMap", 1) {
 		t = thread;
@@ -41,11 +41,11 @@ public:
 		return ppid;
 	}
 
-	Semaphore* GetSem() {
-		return &sem;
+	Semaphore* GetSemExit() {
+		return &semExit;
 	}
 
-	std::map<int, Processus*> GetSons() {
+	const std::map<int, Processus*>& GetSons() {
 		return sons;
 	}
 
@@ -85,7 +85,7 @@ private:
 	int pid;
 	int ppid;
 	int pointerExit;
-	Semaphore sem;
+	Semaphore semExit;
 	Semaphore semStart;
 	Semaphore semMap;
 	char* filename;
@@ -227,7 +227,7 @@ void waitPid(int pid) {
 	if (it != processus.end()) {
 		Processus* p = it->second;
 		semProcessus.V();
-		p->GetSem()->P();
+		p->GetSemExit()->P();
 		semProcessus.P();
 		deleteProcessus(pid);
 		semProcessus.V();
@@ -248,7 +248,7 @@ void exitProc(int pid) {
 		waitPid(it->first);
 	}
 	semProcessus.P();
-	processus[pid]->GetSem()->V();
+	processus[pid]->GetSemExit()->V();
 	if (processus.size() == 1) {
 		DEBUG('t', "-----------------Finnish du dernier processus\n", processus[pid]->GetFilename());
 		semProcessus.V();

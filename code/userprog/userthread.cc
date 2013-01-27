@@ -7,7 +7,6 @@
 #include "synch.h"
 #include "threadsafecounter.h"
 #include "userprocessus.h"
-#include <map>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -20,7 +19,7 @@ class UserThread {
 public:
 
 	UserThread(int function, int argument, int pE, Thread* thread) :
-	sem("UserThread", 0),
+	semExit("UserThread", 0),
 	semStart("StartThread", 0) {
 		f = function;
 		arg = argument;
@@ -46,8 +45,8 @@ public:
 		return id;
 	}
 
-	Semaphore* GetSem() {
-		return &sem;
+	Semaphore* GetSemExit() {
+		return &semExit;
 	}
 
 	Semaphore* GetSemStart() {
@@ -76,7 +75,7 @@ private:
 	int pointerExit;
 	int id;
 	int stackBottom;
-	Semaphore sem;
+	Semaphore semExit;
 	Semaphore semStart;
 	Thread* t;
 
@@ -211,7 +210,7 @@ void do_UserThreadExit(int pid) {
 	UserThread* ut = GetUserThread(pid, currentThread);
 	ut->GetThread()->space->FreeStackSlot(ut->GetStackBottom());
 
-	ut->GetSem()->V();
+	ut->GetSemExit()->V();
 	threadsCounters.P();
 	--(*threadsCounters[pid]);
 	threadsCounters.V();
@@ -222,7 +221,7 @@ void do_UserThreadJoin(int pid, int id) {
 	UserThread* ut = GetUserThread(pid, id); // thread safe!
 	// pas thread safe!
 	if (ut != NULL) {
-		ut->GetSem()->P();
+		ut->GetSemExit()->P();
 		int i;
 		machine->ReadMem(ut->GetArg(), 4, &i);
 		DeleteUserThread(pid, ut);
