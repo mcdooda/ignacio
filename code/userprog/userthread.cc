@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 //#include <stdlib>
+#include "synchmap.h"
 
 static int NewThreadId();
 
@@ -82,14 +83,13 @@ private:
 };
 
 static Semaphore semCreate("do_UserThreadCreate", 1);
-static Semaphore semThreads("userThreads", 1);
 static Semaphore semFreeStack("GetFreeStackSpace", 1);
 static Semaphore semJoin("UserThreadJoin", 1);
 static ThreadSafeCounter threadCounter(0);
 
 static int nextTid = 1;
-static std::map<int, std::map<int, UserThread*>* > userThreads;
-static std::map<int, ThreadSafeCounter*> threadsCounters;
+static SynchMap<int, SynchMap<int, UserThread*>* > userThreads;
+static SynchMap<int, ThreadSafeCounter*> threadsCounters;
 
 static int NewThreadId() {
 	int tid = nextTid;
@@ -98,37 +98,32 @@ static int NewThreadId() {
 }
 
 static int SaveUserThread(int pid, UserThread* ut) {
-	semThreads.P();
-	(*userThreads[pid])[ut->GetId()] = ut;
-	semThreads.V();
+	userThreads.SynchGet(pid)->SynchAdd(ut->GetId(), ut);
 	return ut->GetId();
 }
 
 static void DeleteUserThread(int pid, UserThread* ut) {
-	semThreads.P();
-	std::map<int, UserThread*>* procThreads = userThreads[pid];
-	std::map<int, UserThread*>::iterator it = procThreads->find(ut->GetId());
-	procThreads->erase(it);
+	SynchMap<int, UserThread*>* procThreads = userThreads.SynchGet(pid);
+	procThreads->SynchErase(ut->GetId());
 	delete ut;
-	semThreads.V();
 }
 
 static UserThread* GetUserThread(int pid, Thread* thread) {
-	semThreads.P();
-	std::map<int, UserThread*>* procThreads = userThreads[pid];
+	userThreads.P();
+	SynchMap<int, UserThread*>* procThreads = userThreads[pid];
 	UserThread* ut = NULL;
-	for (std::map<int, UserThread*>::iterator it = procThreads->begin(); it != procThreads->end(); it++) {
+	for (SynchMap<int, UserThread*>::iterator it = procThreads->begin(); it != procThreads->end(); it++) {
 		if (it->second->GetThread() == thread) {
 			ut = it->second;
 			break;
 		}
 	}
-	semThreads.V();
+	userThreads.V();
 	return ut;
 }
 
 static UserThread* GetUserThread(int pid, int id) {
-	semThreads.P();
+	userThreads.P();
 
 	//	std::cout << "Table des Threads ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 	//	for (std::map<int, std::map<int, UserThread*>*>::iterator it = userThreads.begin(); it != userThreads.end(); it++) {
@@ -140,13 +135,10 @@ static UserThread* GetUserThread(int pid, int id) {
 	//	}
 	//	std::cout << "-----------------------" << std::endl;
 
-	std::map<int, UserThread*>* procThreads = userThreads[pid];
-	std::map<int, UserThread*>::iterator it = procThreads->find(id);
+	SynchMap<int, UserThread*>* procThreads = userThreads[pid];
 	UserThread* ut = NULL;
-	if (it != procThreads->end()) {
-		ut = it->second;
-	}
-	semThreads.V();
+	procThreads->TryGet(id, ut);
+	userThreads.V();
 	return ut;
 }
 
@@ -195,9 +187,9 @@ int do_UserThreadCreate(int pid, int f, int arg, int pE) {
 		//TODO inutile ?
 		t->space = currentThread->space;
 		//
-		semThreads.P();
+		threadsCounters.P();
 		++(*threadsCounters[pid]);
-		semThreads.V();
+		threadsCounters.V();
 
 	}
 	semCreate.V();
@@ -220,9 +212,9 @@ void do_UserThreadExit(int pid) {
 	ut->GetThread()->space->FreeStackSlot(ut->GetStackBottom());
 
 	ut->GetSem()->V();
-	semThreads.P();
+	threadsCounters.P();
 	--(*threadsCounters[pid]);
-	semThreads.V();
+	threadsCounters.V();
 	currentThread->Finish();
 }
 
@@ -247,19 +239,15 @@ void JoinUserThreads(int pid) {
 }
 
 void CreateProcessusThreadsTable(int pid) {
-	semThreads.P();
-	userThreads[pid] = new std::map<int, UserThread*>();
+	userThreads.P();
+	userThreads[pid] = new SynchMap<int, UserThread*>();
 	threadsCounters[pid] = new ThreadSafeCounter(0);
-	semThreads.V();
+	userThreads.V();
 }
 
 void DestroyProcessusThreadsTable(int pid) {
-	semThreads.P();
-	std::map<int, std::map<int, UserThread*>* >::iterator it = userThreads.find(pid);
-	userThreads.erase(it);
-	std::map<int, ThreadSafeCounter*>::iterator it2 = threadsCounters.find(pid);
-	threadsCounters.erase(it2);
-	semThreads.V();
+	userThreads.SynchErase(pid);
+	threadsCounters.SynchErase(pid);
 }
 
 #endif

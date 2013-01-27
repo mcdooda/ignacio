@@ -14,4 +14,4 @@ def run_test():
 	pychos.run_single_test('test_sem1', 50, check_test)
 	
 def check_test(line, nb):
-	line == l
+	assert line == l

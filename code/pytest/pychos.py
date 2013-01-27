@@ -1,19 +1,41 @@
-import os, commands, sys, random
+import os, commands, subprocess, sys, random
 
-def exec_test(t):
-	cmd = './build/nachos-userprog -rs %d -x build/%s' % (random.randint(1, 500), t)
-	sys.stdout.write(cmd)
-	return commands.getstatusoutput(cmd)
-	
-def run_single_test(t, n, f):
-	show_title(t)
-	for i in range(n):
-		status, output = exec_test(t)
-		line = output.split('\n')[0]
-		assert status == 0
-		nb = char_count(line)
-		f(line, nb)
-		print(' \t[OK]')
+os.chdir('build')
+
+nachos_prog = './nachos-userprog'
+auto_gdb = False
+num_test_fails = 0
+full = False
+
+def run_single_test(test, n, f):
+	show_title(test)
+	try:
+		for i in range(n):
+			seed = random.randint(1, 500)
+			cmd = '%s -rs %d -x %s' % (nachos_prog, seed, test)
+			sys.stdout.write(cmd)
+			sys.stdout.flush()
+			status, output = commands.getstatusoutput(cmd)
+			line = output.split('\n')[0]
+			assert status == 0
+			nb = char_count(line)
+			f(line, nb)
+			print(' \t[OK]')
+		print('\n')
+	except AssertionError:
+		global num_test_fails
+		num_test_fails += 1
+		print('\n---------------------------------------------------------------------')
+		print(output)
+		print('---------------------------------------------------------------------')
+		print('\n')
+			
+		if auto_gdb:
+			subprocess.call('gdb -ex "run -rs %d" %s' % (seed, nachos_prog) , shell = True)
+			
+		if not full:
+			raise
+		
 
 def show_title(title):
 	print('==================== %s ====================' % title.upper())
@@ -29,12 +51,28 @@ def char_count(line):
 		
 	return nb
 	
-def test_all():
+def get_tests():
 	modules = sys.modules.values()
-	tests = [module for module in modules if 'run_test' in dir(module)]
+	tests = [(module.__name__, module) for module in modules if 'run_test' in dir(module)]
 	tests.sort()
-	for test in tests:
+	tests = [module for module_name, module in tests]
+	return tests
+	
+def test_all():
+	global num_test_fails
+	num_test_fails = 0
+	for test in get_tests():
 		test.run_test()
+		
+	if num_test_fails > 0:
+		print('%d tests failed' % num_test_fails)
 	
 def test(t):
-	sys.modules[t].run_test()
+	if t in sys.modules:
+		sys.modules[t].run_test()
+		
+	else:
+		print('Available tests:')
+		for test in get_tests():
+			print('- '+test.__name__)
+

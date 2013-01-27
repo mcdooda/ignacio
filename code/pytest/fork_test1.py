@@ -1,7 +1,7 @@
 import pychos
 
 def run_test():
-	pychos.run_single_test('forkexecPY', 500, check_test)
+	pychos.run_single_test('forkexec', 500, check_test)
 
 def check_test(line, nb):
 	assert nb['a'] == 1, line
