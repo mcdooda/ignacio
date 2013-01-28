@@ -55,6 +55,9 @@
 #define SC_CondDestroy 34
 #define SC_CondWait 35
 #define SC_CondSignal 36
+#define SC_Random 37
+#define SC_Srand 38
+
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -209,6 +212,10 @@ void CondWait(int addr,int addr2);
 void MutexV(int addr);
 
 void CondSignal(int addr,int addr2);
+
+int Random();
+
+void Srand(unsigned int seed);
 
 #endif // IN_USER_MODE
 

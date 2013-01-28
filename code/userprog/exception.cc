@@ -359,6 +359,18 @@ void ExceptionHandler(ExceptionType which) {
 					do_CondSignal(addr1,addr2);
 					break;
 				}
+				CASE(SC_Random)
+				{
+					int val = Random();
+					userMachine->SetOutArg(1,val);
+					break;
+				}
+				CASE(SC_Srand)
+				{
+					unsigned int seed = userMachine->GetIntArg(1);
+					RandomInit(seed);
+					break;
+				}				
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);
