@@ -56,6 +56,7 @@
 #ifdef CHANGED
 #include <dirent.h>
 #include <fstream>
+#include <iostream>
 #endif
 
 
@@ -97,7 +98,26 @@ main(int argc, char **argv) {
 #ifdef THREADS
 	ThreadTest();
 #endif
-
+	
+#ifdef CHANGED
+#ifdef FILESYS
+	dirent* entry;
+	DIR* d = opendir("../build/");
+	fileSystem->CreateDirectory("test");
+	fileSystem->SetDirectory("test/");
+	while ((entry = readdir(d))) {
+		if (entry->d_type == DT_REG) {
+			std::string path = std::string("../build/") + entry->d_name;
+			std::string testPath = std::string("../test/") + entry->d_name + ".c";
+			if (std::ifstream(testPath.c_str())) {
+				Copy(path.c_str(), entry->d_name);
+			}
+		}
+	}
+//	std::cout << fileSystem->GetCurrentPath() << "<-" << std::endl;
+	closedir(d);
+#endif
+#endif
 	for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
 		argCount = 1;
 		if (!strcmp(*argv, "-z")) // print copyright
@@ -140,18 +160,6 @@ main(int argc, char **argv) {
 			FileSystemTest();
 			interrupt->Halt(); // once we start the console, then 
 		} else if (!strcmp(*argv, "-k")) {
-			dirent* entry;
-			DIR* d = opendir("../build/");
-			while ((entry = readdir(d))) {
-				if (entry->d_type == DT_REG) {
-					std::string path = std::string("../build/") + entry->d_name;
-					std::string testPath = std::string("../test/") + entry->d_name + ".c";
-					if (std::ifstream(testPath.c_str())) {
-						Copy(path.c_str(), entry->d_name);
-					}
-				}
-			}
-			closedir(d);
 			ConsoleUser();
 			interrupt->Halt(); // once we start the console, then 
 		}

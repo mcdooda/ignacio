@@ -252,8 +252,8 @@ bool FileSystem::Create(const char *name, int initialSize, FileHeader::FileType 
 		delete freeMap;
 	}
 	delete directory;
-//	Print();
-//	MinimalisticPrint();
+	//	Print();
+	//	MinimalisticPrint();
 	return success;
 }
 
@@ -557,8 +557,9 @@ std::string FileSystem::GetCurrentPath() {
 	std::string path = "/";
 
 	while (fhCur->GetLinkSector() != fhPar->GetLinkSector()) {
-
+		printf("%d secteur\n", fhCur->GetLinkSector());
 		const char* currentDirName = dirCurrentP->GetName(fhCur->GetLinkSector());
+		printf("~~~~%s~~~~", currentDirName);
 		std::cout << "currentDirName = " << currentDirName << std::endl;
 		path = "/" + std::string(currentDirName) + path;
 		delete currentDirName;
@@ -578,8 +579,8 @@ std::string FileSystem::GetCurrentPath() {
 	delete currentO;
 	delete currentParentO;
 	delete dirCurrentP;
-	delete fhCur;
-	delete fhPar;
+	//	delete fhCur;
+	//	delete fhPar;
 	delete directoryFile;
 	directoryFile = oldDirectory;
 

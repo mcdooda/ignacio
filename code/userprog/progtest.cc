@@ -18,6 +18,7 @@
 #include "syscall.h"
 #ifdef CHANGED
 #include "userprocessus.h"
+#include <iostream>
 #endif
 
 //----------------------------------------------------------------------
@@ -161,7 +162,8 @@ void FileSystemTest() {
 
 void ConsoleUser() {
 	fileSystem->MinimalisticPrint();
-
+//	std::cout << fileSystem->GetCurrentPath() << "<-" << std::endl;
+	fileSystem->SetDirectory("test/");
 	char* cons = (char*) "console";
 	StartProcess(cons);
 
