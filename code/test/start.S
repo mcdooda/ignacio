@@ -332,6 +332,21 @@ CondSignal:
 	j	$31
 	.end CondSignal
 
+	.globl Random
+	.ent	Random
+Random:
+	addiu $2,$0,SC_Random
+	syscall
+	j	$31
+	.end Random
+
+	.globl Srand
+	.ent	Srand
+Srand:
+	addiu $2,$0,SC_Srand
+	syscall
+	j	$31
+	.end Srand
 
 
 /* dummy function to keep gcc happy */
