@@ -178,11 +178,13 @@ int ForkExec(char *executable);
 
 void WaitPid(int pid);
 
-void* Sbrk(unsigned nbFrames);
+
+void* Sbrk(unsigned size);
 
 void* AllocEmptyPage();
 
 void FreePage(void *addr);
+
 
 int SemCreate(const char *name, int arg);
 

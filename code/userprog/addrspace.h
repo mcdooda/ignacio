@@ -18,7 +18,6 @@
 
 #ifdef CHANGED
 #include "bitmap.h"
-#include "memalloc.h"
 #endif
 
 #define UserStackSize		4096	// increase this as necessary!
@@ -47,8 +46,8 @@ public:
 	// et les associe à ces cadres, incrémente brk de n
 	// et retourne un pointeur vers la nouvelle zone de données (adresse virtuelle)
 	int Sbrk(unsigned n);
-	void* Malloc(unsigned size);
-	void Free(void *addr);
+	int AllocEmptyPage();
+	void FreePage(int addr);
 #endif
 
 private:
@@ -62,7 +61,6 @@ private:
 	unsigned int brk; // numéro de la prochaine page à allouer dynamiquement
 	unsigned int brkMin; // valeur min de brk, on ne peut plus rien libérer si atteinte
 	unsigned int brkMax; // valeur max de brk, on ne peut plus rien allouer si atteinte
-	MemAlloc *allocateur;
 private:
 	void InitBitMap();
 	int GetSlotAddr(int stackSlot);
