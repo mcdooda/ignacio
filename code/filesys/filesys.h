@@ -109,6 +109,7 @@ public:
 	OpenFile* OpenPath(const char* path);
 	std::string GetCurrentPath();
 	std::string GetAbsolutePath(const char* relativePath);
+	OpenFile* OpenSym(const char* path);
 #endif
 
 private:

@@ -529,58 +529,61 @@ bool FileSystem::CreateDirectory(const char *name) {
 }
 
 OpenFile* FileSystem::OpenPath(const char* path) {
-	OpenFile* oldDirectory = Open(".");
-
+	OpenFile* oldDirectory = OpenSym(".");
+	OpenFile* of;
 	SetDirectory(path);
 	const char* slash = strrchr(path, '/');
-	OpenFile* of = Open(slash + 1);
-
+	if (slash != NULL) {
+		printf("nom du fichier : %s\n", slash);
+		of = Open(slash + 1);
+	} else {
+		printf("nom du fichier bis : %s\n", path);
+		of = Open(path);
+	}
 	delete directoryFile;
 	directoryFile = oldDirectory;
 	return of;
 }
 
 std::string FileSystem::GetCurrentPath() {
-	OpenFile* oldDirectory = Open(".");
+	OpenFile* oldDirectory = OpenSym(".");
 
-	OpenFile* currentO = Open(".");
-	OpenFile* currentParentO = Open("..");
+	OpenFile* currentSym = Open(".");
+	OpenFile* currentParentSym = Open("..");
+	OpenFile* currentParent = OpenSym("..");
 	//	Directory *dirCurrent = new Directory(NumDirEntries);
 	Directory *dirCurrentP = new Directory(NumDirEntries);
 
 	//	dirCurrent->FetchFrom(currentO);
-	dirCurrentP->FetchFrom(currentParentO);
+	dirCurrentP->FetchFrom(currentParent);
 
-	FileHeader* fhCur = currentO->GetFileHeader();
-	FileHeader* fhPar = currentParentO->GetFileHeader();
+	FileHeader* fhCur = currentSym->GetFileHeader();
+	FileHeader* fhPar = currentParentSym->GetFileHeader();
 
 	std::string path = "/";
 
 	while (fhCur->GetLinkSector() != fhPar->GetLinkSector()) {
-		printf("%d secteur\n", fhCur->GetLinkSector());
 		const char* currentDirName = dirCurrentP->GetName(fhCur->GetLinkSector());
-		printf("~~~~%s~~~~", currentDirName);
-		std::cout << "currentDirName = " << currentDirName << std::endl;
 		path = "/" + std::string(currentDirName) + path;
-		delete currentDirName;
 
 		SetDirectory("../");
 
-		currentO = Open(".");
-		currentParentO = Open("..");
+		currentSym = Open(".");
+		currentParentSym = Open("..");
+		currentParent = OpenSym("..");
 
-		dirCurrentP->FetchFrom(currentParentO);
+		dirCurrentP->FetchFrom(currentParent);
 
-		fhCur = currentO->GetFileHeader();
-		fhPar = currentParentO->GetFileHeader();
+		fhCur = currentSym->GetFileHeader();
+		fhPar = currentParentSym->GetFileHeader();
 	}
 
 	// TODO: eviter de perdre la memoire dans la nature
-	delete currentO;
-	delete currentParentO;
+	delete currentSym;
+	delete currentParentSym;
+	delete currentParent;
 	delete dirCurrentP;
-	//	delete fhCur;
-	//	delete fhPar;
+
 	delete directoryFile;
 	directoryFile = oldDirectory;
 
@@ -596,6 +599,26 @@ std::string FileSystem::GetAbsolutePath(const char* relativePath) {
 
 		return path;
 	}
+}
+
+OpenFile* FileSystem::OpenSym(const char* name) {
+	Directory *directory = new Directory(NumDirEntries);
+	OpenFile *openFile = NULL;
+	int sector;
+
+	DEBUG('f', "Opening file %s\n", name);
+	directory->FetchFrom(directoryFile);
+	sector = directory->Find(name);
+	FileHeader* fh = new FileHeader();
+	fh->FetchFrom(sector);
+	if (fh->GetType() == FileHeader::SYMLINK) {
+		sector = fh->GetLinkSector();
+	}
+	delete fh;
+	if (sector >= 0)
+		openFile = new OpenFile(sector); // name was found in directory 
+	delete directory;
+	return openFile; // return NULL if not found
 }
 
 #endif

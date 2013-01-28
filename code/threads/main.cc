@@ -114,7 +114,6 @@ main(int argc, char **argv) {
 			}
 		}
 	}
-//	std::cout << fileSystem->GetCurrentPath() << "<-" << std::endl;
 	closedir(d);
 #endif
 #endif
