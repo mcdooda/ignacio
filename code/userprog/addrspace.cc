@@ -198,7 +198,6 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 #ifdef CHANGED
 	InitBitMap();
-	//	machine->ReadMem()
 #endif
 }
 

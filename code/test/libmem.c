@@ -6,7 +6,7 @@
 #define BEST 1
 #define WORST 2
 
-#define STRATEGIE FIRST
+#define STRATEGIE WORST
 
 struct fb {
 	int size;
@@ -24,12 +24,7 @@ struct db* tete_d = NULL;
 mem_fit_function_t* fit_strategy;
 
 void* mem_init(int taille) {
-	struct fb* test;
-	printf("A\n");
-	test = (struct fb*) Sbrk(taille);
-	printf("B\n");
-	tete_f = test;
-	printf("C\n");
+	tete_f = (struct fb*) Sbrk(taille);
 	if(tete_f == NULL)
 		return NULL;
 	
