@@ -23,13 +23,16 @@ void user_printf(const char *str, void** args) {
 					c = *(char*) p;
 					PutChar((char) c);
 					break;
-
 				case 's':
 					s = (char*) p;
 					PutString(s);
 					break;
 				case 'd':
 					d = *(int*) p;
+					PutInt(d);
+					break;
+				case 'p':
+					d = (int) p;
 					PutInt(d);
 					break;
 				default:
@@ -57,7 +60,6 @@ int user_scanf(const char *str, void** args) {
 					s = (char*) p;
 					*s = GetChar();
 					break;
-
 				case 's':
 					s = (char*) p;
 					GetString(s, 20); //TODO MAX_STRING_SIZE
