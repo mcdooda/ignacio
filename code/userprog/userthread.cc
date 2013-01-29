@@ -7,11 +7,10 @@
 #include "synch.h"
 #include "threadsafecounter.h"
 #include "userprocessus.h"
-#include <iostream>
 #include <string>
 #include <sstream>
-//#include <stdlib>
 #include "synchmap.h"
+#include <iostream>
 
 static int NewThreadId();
 
@@ -109,9 +108,10 @@ static void DeleteUserThread(int pid, UserThread* ut) {
 
 static UserThread* GetUserThread(int pid, Thread* thread) {
 	userThreads.P();
-	SynchMap<int, UserThread*>* procThreads = userThreads[pid];
+	SynchMap<int, UserThread*>* procThreads = userThreads.Get(pid);
+	const std::map<int, UserThread*>& procThreadsMap = procThreads->GetMap();
 	UserThread* ut = NULL;
-	for (SynchMap<int, UserThread*>::iterator it = procThreads->begin(); it != procThreads->end(); it++) {
+	for (std::map<int, UserThread*>::const_iterator it = procThreadsMap.begin(); it != procThreadsMap.end(); it++) {
 		if (it->second->GetThread() == thread) {
 			ut = it->second;
 			break;
@@ -134,7 +134,7 @@ static UserThread* GetUserThread(int pid, int id) {
 	//	}
 	//	std::cout << "-----------------------" << std::endl;
 
-	SynchMap<int, UserThread*>* procThreads = userThreads[pid];
+	SynchMap<int, UserThread*>* procThreads = userThreads.Get(pid);
 	UserThread* ut = NULL;
 	procThreads->TryGet(id, ut);
 	userThreads.V();
@@ -160,7 +160,6 @@ static void StartUserThread(int id) {
 		machine->WriteRegister(StackReg, freeStackPointer);
 		machine->Run();
 	} else {
-		std::cout << "creation du thread impossible" << std::endl;
 		do_UserThreadExit(pid);
 	}
 }
@@ -184,10 +183,10 @@ int do_UserThreadCreate(int pid, int f, int arg, int pE) {
 		DeleteUserThread(pid, ut);
 	} else {
 		//TODO inutile ?
-		t->space = currentThread->space;
+		//t->space = currentThread->space;
 		//
 		threadsCounters.P();
-		++(*threadsCounters[pid]);
+		++(*threadsCounters.Get(pid));
 		threadsCounters.V();
 
 	}
@@ -212,14 +211,13 @@ void do_UserThreadExit(int pid) {
 
 	ut->GetSemExit()->V();
 	threadsCounters.P();
-	--(*threadsCounters[pid]);
+	--(*threadsCounters.Get(pid));
 	threadsCounters.V();
 	currentThread->Finish();
 }
 
 void do_UserThreadJoin(int pid, int id) {
-	UserThread* ut = GetUserThread(pid, id); // thread safe!
-	// pas thread safe!
+	UserThread* ut = GetUserThread(pid, id);
 	if (ut != NULL) {
 		ut->GetSemExit()->P();
 		int i;
@@ -229,24 +227,24 @@ void do_UserThreadJoin(int pid, int id) {
 }
 
 void JoinUserThreads(int pid) {
-	//	threadCounter.waitUntilValue(0);
-	threadsCounters[pid]->waitUntilValue(0);
-	std::map<int, UserThread*> procThreads = *userThreads[pid];
-	for (std::map<int, UserThread*>::iterator it = procThreads.begin(); it != procThreads.end(); it++) {
+	threadsCounters.SynchGet(pid)->waitUntilValue(0);
+	threadsCounters.Erase(pid);
+	SynchMap<int, UserThread*>* procThreads = userThreads.SynchGet(pid);
+	std::map<int, UserThread*> procThreadsMap = procThreads->GetMap();
+	for (std::map<int, UserThread*>::iterator it = procThreadsMap.begin(); it != procThreadsMap.end(); it++) {
 		do_UserThreadJoin(pid, it->first);
 	}
 }
 
 void CreateProcessusThreadsTable(int pid) {
 	userThreads.P();
-	userThreads[pid] = new SynchMap<int, UserThread*>();
-	threadsCounters[pid] = new ThreadSafeCounter(0);
+	userThreads.Add(pid, new SynchMap<int, UserThread*>());
+	threadsCounters.Add(pid, new ThreadSafeCounter(0));
 	userThreads.V();
 }
 
 void DestroyProcessusThreadsTable(int pid) {
 	userThreads.SynchErase(pid);
-	threadsCounters.SynchErase(pid);
 }
 
 #endif

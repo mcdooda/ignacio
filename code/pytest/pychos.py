@@ -12,15 +12,15 @@ def run_single_test(test, n, f):
 	try:
 		for i in range(n):
 			seed = random.randint(1, 500)
-			cmd = '%s -rs %d -x %s' % (nachos_prog, seed, test)
-			sys.stdout.write(cmd)
+			cmd = '%s -rs %3d -x %s' % (nachos_prog, seed, test)
+			sys.stdout.write('%3d %s' % (i + 1, cmd))
 			sys.stdout.flush()
 			status, output = commands.getstatusoutput(cmd)
 			line = output.split('\n')[0]
 			assert status == 0
 			nb = char_count(line)
 			f(line, nb)
-			print(' \t[OK]')
+			print('\t\t[OK]')
 		print('\n')
 	except AssertionError:
 		global num_test_fails
