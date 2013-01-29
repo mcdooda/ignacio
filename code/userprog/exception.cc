@@ -125,14 +125,12 @@ void ExceptionHandler(ExceptionType which) {
 
 				CASE(SC_Halt) {
 					DEBUG('a', "Shutdown, initiated by user program.\n");
-					JoinUserThreads(pid);
-					exitProc(pid);
+					//do_UserWaitPid(0);
 					interrupt->Halt();
 					break;
 				}
 
 				CASE(SC_Exit) {
-					JoinUserThreads(pid);
 					exitProc(pid);
 					int code = userMachine->GetIntArg(1);
 					interrupt->Exit(code);
