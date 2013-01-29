@@ -220,6 +220,14 @@ WaitPid:
 	j	$31
 	.end WaitPid
 
+	.globl Sbrk
+	.ent	Sbrk
+Sbrk:
+	addiu $2,$0,SC_Sbrk
+	syscall
+	j	$31
+	.end Sbrk
+
 	.globl AllocEmptyPage
 	.ent	AllocEmptyPage
 AllocEmptyPage:

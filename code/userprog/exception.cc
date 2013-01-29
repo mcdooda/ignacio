@@ -263,21 +263,19 @@ void ExceptionHandler(ExceptionType which) {
 				}
 
 				CASE(SC_Sbrk) {
-					unsigned nbFrames = userMachine->GetIntArg(1);
-					userMachine->SetReturn(currentThread->space->Sbrk(nbFrames));
+					unsigned size = userMachine->GetIntArg(1);
+					userMachine->SetReturn(currentThread->space->Sbrk(divRoundUp(size,PageSize)));
 					break;
 				}
 
 				CASE(SC_AllocEmptyPage) {
-					//TODO pas sûr, peut-être autre traitement si espace dispo dans le tas
-					userMachine->SetReturn(currentThread->space->Sbrk(1));
+					userMachine->SetReturn(currentThread->space->AllocEmptyPage());
 					break;
 				}
 
 				CASE(SC_FreePage) {
-					//				unsigned addr = userMachine->GetIntArg(1);
-					//TODO
-					userMachine->SetReturn(0);
+					unsigned addr = userMachine->GetIntArg(1);
+					currentThread->space->FreePage(addr);
 					break;
 				}
 				CASE(SC_SemCreate)
