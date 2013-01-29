@@ -41,6 +41,10 @@
 #ifdef CHANGED
 #include "filehdr.h"
 #include <string>
+
+#define FreeMapSector 		0
+#define DirectorySector 	1
+
 #endif
 
 

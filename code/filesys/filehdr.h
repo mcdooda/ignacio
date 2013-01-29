@@ -85,6 +85,7 @@ public:
 
 	void SetLinkSector(int sector);
 	int GetLinkSector();
+	bool EnlargeFile(BitMap *freeMap,int size);
 #endif
 
 private:
