@@ -57,13 +57,13 @@
 #include <iostream>
 #endif
 
-
+#ifndef CHANGED
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
 // sectors, so that they can be located on boot-up.
 #define FreeMapSector 		0
 #define DirectorySector 	1
-
+#endif
 // Initial file sizes for the bitmap and directory; until the file system
 // supports extensible files, the directory size sets the maximum number 
 // of files that can be loaded onto the disk.
@@ -421,7 +421,7 @@ void FileSystem::SetDirectory(const char* name) {
 			OpenFile* of = directoryFile;
 			directoryFile = Open(dirName);
 			delete of;
-//			printf("directoryFile: %s %p\n", dirName, directoryFile);
+			//			printf("directoryFile: %s %p\n", dirName, directoryFile);
 		}
 	}
 }
@@ -531,13 +531,14 @@ bool FileSystem::CreateDirectory(const char *name) {
 OpenFile* FileSystem::OpenPath(const char* path) {
 	OpenFile* oldDirectory = OpenSym(".");
 	OpenFile* of;
-	SetDirectory(path);
+	if (strchr(path, '/') != NULL)
+		SetDirectory(path);
 	const char* slash = strrchr(path, '/');
 	if (slash != NULL) {
-		printf("nom du fichier : %s\n", slash);
+//		printf("nom du fichier : %s\n", slash + 1);
 		of = Open(slash + 1);
 	} else {
-		printf("nom du fichier bis : %s\n", path);
+//		printf("nom du fichier bis : %s\n", path);
 		of = Open(path);
 	}
 	delete directoryFile;
@@ -609,6 +610,8 @@ OpenFile* FileSystem::OpenSym(const char* name) {
 	DEBUG('f', "Opening file %s\n", name);
 	directory->FetchFrom(directoryFile);
 	sector = directory->Find(name);
+	if(sector == -1)
+		printf("Can't Open file <%s> ",name);
 	FileHeader* fh = new FileHeader();
 	fh->FetchFrom(sector);
 	if (fh->GetType() == FileHeader::SYMLINK) {

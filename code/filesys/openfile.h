@@ -77,7 +77,7 @@ class FileHeader;
 
 class OpenFile {
 public:
-	OpenFile(int sector); // Open a file whose header is located
+	OpenFile(int sector_); // Open a file whose header is located
 	// at "sector" on the disk
 	~OpenFile(); // Close the file
 
@@ -105,6 +105,7 @@ private:
 	int seekPosition; // Current position within the file
 
 #ifdef CHANGED
+	int headerSector;
 public:
 	FileHeader* GetFileHeader();
 #endif

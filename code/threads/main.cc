@@ -57,6 +57,7 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 #endif
 
 
