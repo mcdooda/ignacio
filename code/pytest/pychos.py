@@ -31,7 +31,7 @@ def run_single_test(test, n, f):
 		print('\n')
 			
 		if auto_gdb:
-			subprocess.call('gdb -ex "run -rs %d" %s' % (seed, nachos_prog) , shell = True)
+			subprocess.call('gdb -ex "run -rs %d -x %s" %s' % (seed, test, nachos_prog) , shell = True)
 			
 		if not full:
 			raise
