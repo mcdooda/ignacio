@@ -108,13 +108,12 @@ main(int argc, char **argv) {
 	while ((entry = readdir(d))) {
 		if (entry->d_type == DT_REG) {
 			std::string path = std::string("../build/") + entry->d_name;
-			std::string testPath = std::string("../test/") + entry->d_name + "D.c";
+			std::string testPath = std::string("../test/") + entry->d_name + ".c";
 			if (std::ifstream(testPath.c_str())) {
 				Copy(path.c_str(), entry->d_name);
 			}
 		}
 	}
-	Copy("../build/console", "console");
 	closedir(d);
 #endif
 #endif
