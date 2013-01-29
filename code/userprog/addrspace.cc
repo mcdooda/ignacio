@@ -75,6 +75,7 @@ static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 	machine->pageTable = pt;
 	machine->pageTableSize = np;
 }
+
 #endif
 
 //----------------------------------------------------------------------
@@ -116,9 +117,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 	unsigned int numPagesCode, numPagesHeap, numPagesStack;
 	// on placera les champs dans des pages différentes
-//	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size, PageSize);
 	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size + noffH.uninitData.size, PageSize);
-//	numPagesHeap = divRoundUp(noffH.uninitData.size, PageSize);
 	numPagesHeap = HEAPSIZE;
 	numPagesStack = divRoundUp(UserStackSize, PageSize);
 
@@ -190,9 +189,10 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size,
 				noffH.initData.inFileAddr, pageTable, numPages);
-
-		for (i = 0; i < numPagesCode; i++)
-			pageTable[i].readOnly = TRUE; // TEXT et DATA en lecture seule
+		
+		// TEXT en lecture seule (uniquement pages qui ne contiennent pas de DATA également)
+		for (i = 0; i < (unsigned)divRoundDown(noffH.code.size, PageSize); i++)
+			pageTable[i].readOnly = TRUE;
 #endif
 	}
 
@@ -204,14 +204,14 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 //----------------------------------------------------------------------
 // AddrSpace::~AddrSpace
-//      Dealloate an address space.  Nothing for now!
+//      Dealloate an address space.
 //----------------------------------------------------------------------
 
 AddrSpace::~AddrSpace() {
 #ifdef CHANGED
 	delete bm;
 	for (unsigned int i = 0; i < numPages; i++)
-		if(pageTable[i].valid)
+		if (pageTable[i].valid)
 			frameProvider->ReleaseFrame(pageTable[i].physicalPage);
 #endif
 	// LB: Missing [] for delete
@@ -262,7 +262,7 @@ AddrSpace::InitRegisters() {
 
 void
 AddrSpace::SaveState() {
-//	ASSERT(machine->pageTable != NULL);
+	//	ASSERT(machine->pageTable != NULL);
 	pageTable = machine->pageTable;
 	numPages = machine->pageTableSize;
 }
@@ -276,7 +276,7 @@ AddrSpace::SaveState() {
 //----------------------------------------------------------------------
 
 void AddrSpace::RestoreState() {
-//	ASSERT(pageTable != NULL);
+	//	ASSERT(pageTable != NULL);
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
 }
@@ -341,13 +341,13 @@ int AddrSpace::Sbrk(unsigned nbFrames) {
 
 int AddrSpace::AllocEmptyPage() {
 	unsigned i = brkMin;
-	while(i < brk && pageTable[i].valid)
+	while (i < brk && pageTable[i].valid)
 		i++;
-	
+
 	// tas plein, il faut décaler brk
-	if(i >= brk)
+	if (i >= brk)
 		return Sbrk(1);
-	
+
 	// allocation d'une page physique
 	int frame = frameProvider->GetEmptyFrame(STRATEGY);
 	if (frame == -1) // pas assez de frames libres
@@ -358,11 +358,11 @@ int AddrSpace::AllocEmptyPage() {
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
 	pageTable[i].readOnly = FALSE;
-	
+
 	return i * PageSize;
 }
 
-void AddrSpace::FreePage(int addr){
+void AddrSpace::FreePage(int addr) {
 	unsigned numPage = divRoundDown(addr, PageSize);
 
 	if (numPage >= brkMin && numPage < brk) {
@@ -371,6 +371,5 @@ void AddrSpace::FreePage(int addr){
 	}
 	//TODO décrémenter BRK ?
 }
-
 
 #endif

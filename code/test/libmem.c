@@ -18,14 +18,18 @@ struct db {
 	struct db* next;
 };
 
-struct fb* tete_f;
-struct db* tete_d;
+struct fb* tete_f = NULL;
+struct db* tete_d = NULL;
 
 mem_fit_function_t* fit_strategy;
 
 void* mem_init(int taille) {
-	tete_f = (struct fb*) Sbrk(taille);
-	printf("ntm\n");
+	struct fb* test;
+	printf("A\n");
+	test = (struct fb*) Sbrk(taille);
+	printf("B\n");
+	tete_f = test;
+	printf("C\n");
 	if(tete_f == NULL)
 		return NULL;
 	
