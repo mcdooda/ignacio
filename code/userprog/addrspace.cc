@@ -28,6 +28,7 @@
 #include <iostream>
 // Allocation aléatoire des pages physiques (true/false)
 #define STRATEGY true
+#define HEAPSIZE 5
 extern FrameProvider *frameProvider;
 #endif
 
@@ -115,8 +116,10 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 #else
 	unsigned int numPagesCode, numPagesHeap, numPagesStack;
 	// on placera les champs dans des pages différentes
-	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size, PageSize);
-	numPagesHeap = divRoundUp(noffH.uninitData.size, PageSize);
+//	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size, PageSize);
+	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size + noffH.uninitData.size, PageSize);
+//	numPagesHeap = divRoundUp(noffH.uninitData.size, PageSize);
+	numPagesHeap = HEAPSIZE;
 	numPagesStack = divRoundUp(UserStackSize, PageSize);
 
 	numPages = numPagesCode + numPagesHeap + numPagesStack;
@@ -128,8 +131,6 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 
 	// pas assez de pages libres disponibles
 	ASSERT(frames != NULL);
-
-	allocateur = new MemAlloc(numPagesHeap * PageSize);
 
 #endif
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n",
@@ -159,9 +160,11 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 		// pages to be read-only
 	}
 
+#ifdef CHANGED
+	delete frames;
+#else
 	// zero out the entire address space, to zero the unitialized data segment 
 	// and the stack segment
-#ifndef CHANGED
 	bzero(machine->mainMemory, size);
 #endif
 	// then, copy in the code and data segments into memory
@@ -207,9 +210,9 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 AddrSpace::~AddrSpace() {
 #ifdef CHANGED
 	delete bm;
-	delete allocateur;
 	for (unsigned int i = 0; i < numPages; i++)
-		frameProvider->ReleaseFrame(pageTable[i].physicalPage);
+		if(pageTable[i].valid)
+			frameProvider->ReleaseFrame(pageTable[i].physicalPage);
 #endif
 	// LB: Missing [] for delete
 	// delete pageTable;
@@ -315,15 +318,18 @@ void AddrSpace::FreeStackSlot(int stackBottom) {
 
 int AddrSpace::Sbrk(unsigned nbFrames) {
 	if (brk + nbFrames > brkMax) // tas plein
-		return -1;
+		return NULL;
 
 	unsigned *frames = frameProvider->GetEmptyFrames(nbFrames, STRATEGY);
 	if (frames == NULL) // pas assez de frames libres
-		return -1;
+		return NULL;
 
 	for (unsigned i = 0; i < nbFrames; i++) {
 		pageTable[brk + i].physicalPage = frames[i];
 		pageTable[brk + i].valid = TRUE;
+		pageTable[brk + i].use = FALSE;
+		pageTable[brk + i].dirty = FALSE;
+		pageTable[brk + i].readOnly = FALSE;
 	}
 
 	delete frames;
@@ -333,19 +339,38 @@ int AddrSpace::Sbrk(unsigned nbFrames) {
 	return address;
 }
 
-void* AddrSpace::Malloc(unsigned size) {
-	//	void *addr = allocateur->mem_alloc(size);
-	//	if(addr == NULL)
-	//		return NULL;
-	//	
-	//	if(((char*)addr + size) < (char*)(brk*PageSize))
-	//		return addr;
-	//	else { // il faut allouer de nouvelles pages
-	return NULL;
-	//	}
+int AddrSpace::AllocEmptyPage() {
+	unsigned i = brkMin;
+	while(i < brk && pageTable[i].valid)
+		i++;
+	
+	// tas plein, il faut décaler brk
+	if(i >= brk)
+		return Sbrk(1);
+	
+	// allocation d'une page physique
+	int frame = frameProvider->GetEmptyFrame(STRATEGY);
+	if (frame == -1) // pas assez de frames libres
+		return NULL;
+
+	pageTable[i].physicalPage = frame;
+	pageTable[i].valid = TRUE;
+	pageTable[i].use = FALSE;
+	pageTable[i].dirty = FALSE;
+	pageTable[i].readOnly = FALSE;
+	
+	return i * PageSize;
 }
 
-void AddrSpace::Free(void *addr) {
+void AddrSpace::FreePage(int addr){
+	unsigned numPage = divRoundDown(addr, PageSize);
 
+	if (numPage >= brkMin && numPage < brk) {
+		pageTable[numPage].physicalPage = -1;
+		pageTable[numPage].valid = FALSE;
+	}
+	//TODO décrémenter BRK ?
 }
+
+
 #endif
