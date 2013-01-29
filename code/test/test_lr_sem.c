@@ -4,7 +4,7 @@
 // ordre d'arrivée
 
 void long_loop() {
-	unsigned int fin = 100000,i=0;
+	unsigned int fin = 1000,i=0;
 	while (i < fin) {
 		i++;
 	}
@@ -53,13 +53,14 @@ void lecteur(void *args) {
 		long_loop();
 		debut_lecture(&d->lecteur_redacteur);
 
-		printf("%s","début lecture\n");
+		printf("%s","début lecture ");
 		valeur = d->donnee;
 		long_loop();
 		if (valeur != d->donnee) {
-			printf("%s","LECTURE INCOHERENTE !!!\n");
+			//lecture incohérente
+			printf("%s","X");
 		} else {
-			printf("%s","lecture cohérente\n");
+			printf("%s","lecture cohérente ");
 		}
 
 		fin_lecture(&d->lecteur_redacteur);
@@ -74,14 +75,15 @@ void redacteur(void *args) {
 	for (i = 0; i < d->iterations; i++) {
 		debut_redaction(&d->lecteur_redacteur);
 
-		printf("%s","début rédaction......\n");
+		printf("%s","début rédaction...... ");
 		valeur = Random();
 		d->donnee = valeur;
 		long_loop();
 		if (valeur != d->donnee) {
-			printf("%s","REDACTION INCOHERENTE !!!\n");
+			//Rédaction incohérente
+			printf("%s","X");
 		} else {
-			printf("%s","rédaction cohérente......\n");
+			printf("%s","rédaction cohérente...... ");
 		}
 
 		fin_redaction(&d->lecteur_redacteur);
