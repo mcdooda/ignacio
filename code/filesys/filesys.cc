@@ -421,7 +421,7 @@ void FileSystem::SetDirectory(const char* name) {
 			OpenFile* of = directoryFile;
 			directoryFile = Open(dirName);
 			delete of;
-			printf("directoryFile: %s %p\n", dirName, directoryFile);
+//			printf("directoryFile: %s %p\n", dirName, directoryFile);
 		}
 	}
 }
