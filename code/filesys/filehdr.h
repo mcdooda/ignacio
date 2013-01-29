@@ -30,8 +30,16 @@
 #define NumIndirection 1
 
 #endif
+
+#ifndef CHANGED
+
 #define MaxFileSize 	(NumDirect * SectorSize)
 
+#else
+
+#define MaxFileSize 	(NumDirect * NumDirect * SectorSize)
+
+#endif
 // The following class defines the Nachos "file header" (in UNIX terms,  
 // the "i-node"), describing where on disk to find all of the data in the file.
 // The file header is organized as a simple table of pointers to

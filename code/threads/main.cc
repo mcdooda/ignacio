@@ -115,7 +115,6 @@ main(int argc, char **argv) {
 			}
 		}
 	}
-//	Copy("../build/console", "console");
 	closedir(d);
 #endif
 #endif

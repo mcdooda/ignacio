@@ -30,7 +30,9 @@
 OpenFile::OpenFile(int sector_) {
 	hdr = new FileHeader;
 	hdr->FetchFrom(sector_);
+#ifdef CHANGED
 	headerSector = sector_;
+#endif
 	seekPosition = 0;
 }
 
@@ -144,22 +146,27 @@ OpenFile::WriteAt(const char *from, int numBytes, int position) {
 	int i, firstSector, lastSector, numSectors;
 	bool firstAligned, lastAligned;
 	char *buf;
-
+#ifndef CHANGED
 	if ((numBytes <= 0) || (position >= fileLength))
+#else
+	if ((numBytes <= 0) || (position > fileLength))
+#endif
 		return 0; // check request
 	if ((position + numBytes) > fileLength)
 #ifndef CHANGED
 		numBytes = fileLength - position;
 #else
 		{
-			printf("********ENLARGE YOU FILE****************");
+//			printf("Enlarge your file oldSize %d -> ",hdr->FileLength());
 			BitMap *freeMap = new BitMap(NumSectors);
 			//TODO tres sale de mettre 0 ici au lieu de FreeMapSector
 			OpenFile* freeMapFile = new OpenFile(FreeMapSector);
 			freeMap->FetchFrom(freeMapFile);
 			int bytesNeeded = (position + numBytes) - fileLength;
-			hdr->EnlargeFile(freeMap, bytesNeeded);
+			ASSERT(hdr->EnlargeFile(freeMap, bytesNeeded));
 			hdr->WriteBack(headerSector);
+			freeMap->WriteBack(freeMapFile);
+//			printf("newSize %d  \n	",hdr->FileLength());
 
 		}
 #endif

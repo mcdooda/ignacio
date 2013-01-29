@@ -58,6 +58,9 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize) {
 bool
 FileHeader::Allocate(BitMap *freeMap, int fileSize) {
 	//TODO verifier que le fichier ne dépasse pas la taille max
+	if((unsigned int)fileSize > MaxFileSize){
+		return FALSE;
+	}
 	numBytes = fileSize;
 	numSectors = divRoundUp(fileSize, SectorSize);
 	int numFileHeaders = divRoundUp(numSectors, NumDirect);
@@ -68,7 +71,7 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize) {
 	for (int i = 0; i < numFileHeaders; i++) {
 		dataSectors[i] = freeMap->Find();
 		FileHeader *hdr = new FileHeader;
-		hdr->FetchFrom(dataSectors[i]);//TODO inutile ? Mauvais meme peut etre
+//		hdr->FetchFrom(dataSectors[i]);//TODO inutile ? Mauvais meme peut etre
 		for (unsigned int j = 0; j < numSectorsRestants && j < NumDirect; j++) {
 			hdr->dataSectors[j] = freeMap->Find();
 		}
@@ -256,6 +259,10 @@ int FileHeader::GetLinkSector() {
 
 bool FileHeader::EnlargeFile(BitMap *freeMap, int size) {
 	//TODO verifier que le fichier ne dépasse pas la taille max
+	if((unsigned int)(numBytes + size) > MaxFileSize){
+		return FALSE;
+	}
+	
 	
 	//Si la taille requise est présente dans le dernier secteur
 	if (numBytes + size <= numSectors * SectorSize) {
@@ -268,29 +275,32 @@ bool FileHeader::EnlargeFile(BitMap *freeMap, int size) {
 		int numNewFileHeaders = divRoundUp(numSectors + numNewSectors, NumDirect) - numFileHeadersOld;
 		if (freeMap->NumClear() < numNewSectors + numNewFileHeaders)
 			return FALSE; // not enough space
-		
+
 		//Nombre de secteurs libres restant avec l'ancien fileHeader
 		unsigned int freeSectorOldHeader = numFileHeadersOld * NumDirect - numSectors;
 
 		FileHeader *hdr = new FileHeader;
 		hdr->FetchFrom(dataSectors[numFileHeadersOld - 1]);
-		for (unsigned int j = NumDirect - freeSectorOldHeader; j < NumDirect; j++) {
+		int k = 0;
+		for (unsigned int j = NumDirect - freeSectorOldHeader; j < NumDirect && k < numNewSectors; j++, k++) {
 			hdr->dataSectors[j] = freeMap->Find();
 		}
 		hdr->WriteBack(dataSectors[numFileHeadersOld - 1]);
 
-		unsigned int numSectorsRestants = numNewSectors - freeSectorOldHeader;
+		unsigned int numSectorsRestants = numNewSectors - k;
 
 		for (int i = 0; i < numNewFileHeaders; i++) {
 			dataSectors[numFileHeadersOld + i] = freeMap->Find();
 			hdr = new FileHeader;
-			hdr->FetchFrom(dataSectors[numFileHeadersOld + i]); //TODO inutile ? Mauvais meme peut etre
+			//			hdr->FetchFrom(dataSectors[numFileHeadersOld + i]); //TODO inutile ? Mauvais meme peut etre
 			for (unsigned int j = 0; j < numSectorsRestants && j < NumDirect; j++) {
 				hdr->dataSectors[j] = freeMap->Find();
 			}
 			hdr->WriteBack(dataSectors[numFileHeadersOld + i]);
 			numSectorsRestants -= NumDirect;
 		}
+		numBytes += size;
+		numSectors += numNewSectors;
 		return TRUE;
 	}
 }

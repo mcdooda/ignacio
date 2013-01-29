@@ -6,7 +6,7 @@ int main() {
 	int *tab, i;
 	printf("coucou\n");
 
-	mem_init(sizeof (int) * 50);
+	mem_init(sizeof (int) * 10);
 	printf("recoucou\n");
 	tab = (int*) mem_alloc(sizeof (int) * 10);
 	printf("rerecoucou\n");

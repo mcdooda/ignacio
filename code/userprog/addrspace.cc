@@ -211,7 +211,8 @@ AddrSpace::~AddrSpace() {
 #ifdef CHANGED
 	delete bm;
 	for (unsigned int i = 0; i < numPages; i++)
-		frameProvider->ReleaseFrame(pageTable[i].physicalPage);
+		if(pageTable[i].valid)
+			frameProvider->ReleaseFrame(pageTable[i].physicalPage);
 #endif
 	// LB: Missing [] for delete
 	// delete pageTable;
