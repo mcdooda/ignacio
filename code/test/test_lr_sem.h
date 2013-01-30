@@ -13,6 +13,7 @@ typedef struct {
 	lecteur_redacteur_t lecteur_redacteur;
 	int iterations;
 	int donnee;
+	int id;
 } donnees_thread_t;
 
 void debut_lecture(lecteur_redacteur_t* lr);

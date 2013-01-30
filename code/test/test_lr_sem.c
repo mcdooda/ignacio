@@ -53,14 +53,14 @@ void lecteur(void *args) {
 		long_loop();
 		debut_lecture(&d->lecteur_redacteur);
 
-		printf("%s","début lecture ");
+		printf("%s","debut lecture ");
 		valeur = d->donnee;
 		long_loop();
 		if (valeur != d->donnee) {
 			//lecture incohérente
 			printf("%s","X");
 		} else {
-			printf("%s","lecture cohérente ");
+			printf("%s","lecture coherente ");
 		}
 
 		fin_lecture(&d->lecteur_redacteur);
@@ -71,19 +71,18 @@ void lecteur(void *args) {
 void redacteur(void *args) {
 	donnees_thread_t *d = (donnees_thread_t *) args;
 	int i, valeur;
-
 	for (i = 0; i < d->iterations; i++) {
 		debut_redaction(&d->lecteur_redacteur);
 
-		printf("%s","début rédaction...... ");
-		valeur = Random();
+		printf("%s","debut redaction........ ");
+		valeur = d->id;
 		d->donnee = valeur;
 		long_loop();
 		if (valeur != d->donnee) {
 			//Rédaction incohérente
 			printf("%s","X");
 		} else {
-			printf("%s","rédaction cohérente...... ");
+			printf("%s","redaction coherente...... ");
 		}
 
 		fin_redaction(&d->lecteur_redacteur);
@@ -103,6 +102,7 @@ int main(int argc, char *argv[]) {
 	initialiser_lecteur_redacteur(&donnees_thread.lecteur_redacteur);
 
 	for (i = 0; i < nb_lecteurs + nb_redacteurs; i++) {
+		donnees_thread.id = i;
 		if (i % 2) {
 			threads[i] = UserThreadCreate(lecteur, (void*) &donnees_thread);
 		} else {
