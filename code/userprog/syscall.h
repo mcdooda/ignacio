@@ -18,45 +18,64 @@
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
+
+// processus
 #define SC_Halt		0
 #define SC_Exit		1
 #define SC_Exec		2
 #define SC_Join		3
-#define SC_Create	4
-#define SC_Open		5
-#define SC_Read		6
-#define SC_Write	7
-#define SC_Close	8
-#define SC_Fork		9
-#define SC_Yield	10
-#define SC_PutChar	11
-#define SC_PutString	12
-#define SC_GetChar      13
-#define SC_GetString    14
-#define SC_PutInt       15
-#define SC_GetInt       16
-#define SC_UserThreadCreate 17
-#define SC_UserThreadExit 18
-#define SC_UserThreadJoin 19
-#define SC_ForkExec 20
-#define SC_WaitPid  21
-#define SC_AllocEmptyPage 22
-#define SC_FreePage 23
-#define SC_SemCreate 24
-#define SC_SemDestroy 25
-#define SC_SemP 26
-#define SC_SemV 27
-#define SC_Sbrk 28
-#define SC_MutexCreate 29
-#define SC_MutexDestroy 30
-#define SC_MutexP 31
-#define SC_MutexV 32
-#define SC_CondCreate 33
-#define SC_CondDestroy 34
-#define SC_CondWait 35
-#define SC_CondSignal 36
-#define SC_Random 37
-#define SC_Srand 38
+#define SC_Fork		4
+#define SC_Yield	5
+
+// io
+#define SC_Create	10
+#define SC_Open		11
+#define SC_Read		12
+#define SC_Write	13
+#define SC_Close	14
+#define SC_Seek		15
+
+// console
+#define SC_PutChar		20
+#define SC_PutString	21
+#define SC_GetChar      22
+#define SC_GetString    23
+#define SC_PutInt       24
+#define SC_GetInt       25
+
+// thread
+#define SC_UserThreadCreate 30
+#define SC_UserThreadExit 31
+#define SC_UserThreadJoin 32
+
+// fork
+#define SC_ForkExec 40
+#define SC_WaitPid  41
+
+// malloc
+#define SC_AllocEmptyPage 50
+#define SC_FreePage 51
+#define SC_Sbrk 52
+
+// synchronization
+#define SC_SemCreate 60
+#define SC_SemDestroy 61
+#define SC_SemP 62
+#define SC_SemV 63
+
+#define SC_MutexCreate 70
+#define SC_MutexDestroy 71
+#define SC_MutexP 72
+#define SC_MutexV 73
+
+#define SC_CondCreate 80
+#define SC_CondDestroy 81
+#define SC_CondWait 82
+#define SC_CondSignal 83
+
+// random
+#define SC_Random 90
+#define SC_Srand 91
 
 #ifdef IN_USER_MODE
 
@@ -139,6 +158,12 @@ int Read (char *buffer, int size, OpenFileId id);
 
 /* Close the file, we're done reading and writing to it. */
 void Close (OpenFileId id);
+
+/* sets the position of the cursor */
+int Seek(OpenFileId id, int offset, int whence);
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 
 
 

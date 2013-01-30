@@ -55,6 +55,9 @@ OpenFile::~OpenFile() {
 
 void
 OpenFile::Seek(int position) {
+#ifdef CHANGED
+	ASSERT(position >= 0 && position <= Length());
+#endif
 	seekPosition = position;
 }
 
@@ -215,4 +218,9 @@ OpenFile::Length() {
 FileHeader* OpenFile::GetFileHeader() {
 	return hdr;
 }
+
+int OpenFile::Tell() {
+	return seekPosition;
+}
+
 #endif

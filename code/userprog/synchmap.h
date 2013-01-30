@@ -29,6 +29,7 @@ template <class T, class U> class SynchMap
 		void NewSem();
 		
 		const std::map<T, U>& GetMap();
+		void Dump();
 		
 	private:
 		std::map<T, U> map;

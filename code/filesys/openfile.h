@@ -108,6 +108,7 @@ private:
 	int headerSector;
 public:
 	FileHeader* GetFileHeader();
+	int Tell();
 #endif
 };
 

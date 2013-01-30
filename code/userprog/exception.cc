@@ -260,9 +260,17 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}
 
+				CASE(SC_Seek) {
+					int fd = userMachine->GetIntArg(1);
+					int offset = userMachine->GetIntArg(2);
+					int whence = userMachine->GetIntArg(3);
+					do_Seek(fd, offset, whence);
+					break;
+				}
+
 				CASE(SC_Sbrk) {
 					unsigned size = userMachine->GetIntArg(1);
-					userMachine->SetReturn(currentThread->space->Sbrk(divRoundUp(size,PageSize)));
+					userMachine->SetReturn(currentThread->space->Sbrk(divRoundUp(size, PageSize)));
 					break;
 				}
 
@@ -276,99 +284,99 @@ void ExceptionHandler(ExceptionType which) {
 					currentThread->space->FreePage(addr);
 					break;
 				}
-				CASE(SC_SemCreate)
-				{
+
+				CASE(SC_SemCreate) {
 					char buffer[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, buffer);
 					int arg = userMachine->GetIntArg(2);
-					int addr = do_SemCreate((const char *)buffer, arg);
+					int addr = do_SemCreate((const char *) buffer, arg);
 					userMachine->SetReturn(addr);
 					break;
 				}
-				CASE(SC_SemDestroy)
-				{
+
+				CASE(SC_SemDestroy) {
 					int addr = userMachine->GetIntArg(1);
 					do_SemDestroy(addr);
 					break;
 				}
-				CASE(SC_SemP)
-				{
+
+				CASE(SC_SemP) {
 					int addr = userMachine->GetIntArg(1);
 					do_SemP(addr);
 					break;
 				}
-				CASE(SC_SemV)
-				{
+
+				CASE(SC_SemV) {
 					int addr = userMachine->GetIntArg(1);
 					do_SemV(addr);
 					break;
 				}
-				CASE(SC_MutexCreate)
-				{
+
+				CASE(SC_MutexCreate) {
 					char buffer[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, buffer);
-					int addr = do_MutexCreate((const char *)buffer);
+					int addr = do_MutexCreate((const char *) buffer);
 					userMachine->SetReturn(addr);
 					break;
 				}
-				CASE(SC_MutexDestroy)
-				{
+
+				CASE(SC_MutexDestroy) {
 					int addr = userMachine->GetIntArg(1);
 					do_MutexDestroy(addr);
 					break;
 				}
-				CASE(SC_MutexP)
-				{
+
+				CASE(SC_MutexP) {
 					int addr = userMachine->GetIntArg(1);
 					do_MutexP(addr);
 					break;
 				}
-				CASE(SC_MutexV)
-				{
+
+				CASE(SC_MutexV) {
 					int addr = userMachine->GetIntArg(1);
 					do_MutexV(addr);
 					break;
 				}
-				CASE(SC_CondCreate)
-				{
+
+				CASE(SC_CondCreate) {
 					char buffer[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, buffer);
-					int addr = do_CondCreate((const char *)buffer);
+					int addr = do_CondCreate((const char *) buffer);
 					userMachine->SetReturn(addr);
 					break;
 				}
-				CASE(SC_CondDestroy)
-				{
+
+				CASE(SC_CondDestroy) {
 					int addr = userMachine->GetIntArg(1);
 					do_CondDestroy(addr);
 					break;
 				}
-				CASE(SC_CondWait)
-				{
+
+				CASE(SC_CondWait) {
 					int addr1 = userMachine->GetIntArg(1);
 					int addr2 = userMachine->GetIntArg(2);
-					do_CondWait(addr1,addr2);
+					do_CondWait(addr1, addr2);
 					break;
 				}
-				CASE(SC_CondSignal)
-				{
+
+				CASE(SC_CondSignal) {
 					int addr1 = userMachine->GetIntArg(1);
 					int addr2 = userMachine->GetIntArg(2);
-					do_CondSignal(addr1,addr2);
+					do_CondSignal(addr1, addr2);
 					break;
 				}
-				CASE(SC_Random)
-				{
+
+				CASE(SC_Random) {
 					int val = Random();
-					userMachine->SetOutArg(1,val);
+					userMachine->SetOutArg(1, val);
 					break;
 				}
-				CASE(SC_Srand)
-				{
+
+				CASE(SC_Srand) {
 					unsigned int seed = userMachine->GetIntArg(1);
 					RandomInit(seed);
 					break;
-				}				
+				}
 			default:
 			{
 				printf("Unexpected user mode exception %d %d\n", which, type);
