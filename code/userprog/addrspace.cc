@@ -28,7 +28,6 @@
 #include <iostream>
 // Allocation aléatoire des pages physiques (true/false)
 #define STRATEGY true
-#define HEAPSIZE 5
 extern FrameProvider *frameProvider;
 #endif
 
@@ -118,7 +117,7 @@ AddrSpace::AddrSpace(OpenFile * executable) {
 	unsigned int numPagesCode, numPagesHeap, numPagesStack;
 	// on placera les champs dans des pages différentes
 	numPagesCode = divRoundUp(noffH.code.size + noffH.initData.size + noffH.uninitData.size, PageSize);
-	numPagesHeap = HEAPSIZE;
+	numPagesHeap = divRoundUp(UserHeapSize, PageSize);
 	numPagesStack = divRoundUp(UserStackSize, PageSize);
 
 	numPages = numPagesCode + numPagesHeap + numPagesStack;
