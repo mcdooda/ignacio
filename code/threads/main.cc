@@ -100,30 +100,17 @@ main(int argc, char **argv) {
 	ThreadTest();
 #endif
 	
-#ifdef CHANGED
-#ifdef FILESYS
-	dirent* entry;
-	DIR* d = opendir("../build/");
-	fileSystem->CreateDirectory("test");
-	fileSystem->SetDirectory("test/");
-	while ((entry = readdir(d))) {
-		if (entry->d_type == DT_REG) {
-			std::string path = std::string("../build/") + entry->d_name;
-			std::string testPath = std::string("../test/") + entry->d_name + ".c";
-			if (std::ifstream(testPath.c_str())) {
-				Copy(path.c_str(), entry->d_name);
-			}
-		}
-	}
-	closedir(d);
-#endif
-#endif
 	for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
 		argCount = 1;
 		if (!strcmp(*argv, "-z")) // print copyright
 			printf("%s", copyright);
 #ifdef USER_PROGRAM
 		if (!strcmp(*argv, "-x")) { // run a user program
+#ifdef FILESYS
+#ifdef CHANGED
+			fileSystem->SetDirectory("test/");
+#endif
+#endif
 			ASSERT(argc > 1);
 			StartProcess(*(argv + 1));
 			argCount = 2;
@@ -155,13 +142,36 @@ main(int argc, char **argv) {
 #ifdef FILESYS
 
 
-
 		else if (!strcmp(*argv, "-f")) {
+			std::cout << "File system formatted." << std::endl;
+			interrupt->Halt();
+		} else if (!strcmp(*argv, "-fstest")) {
 			FileSystemTest();
 			interrupt->Halt(); // once we start the console, then 
 		} else if (!strcmp(*argv, "-k")) {
 			ConsoleUser();
 			interrupt->Halt(); // once we start the console, then 
+		} else if (!strcmp(*argv, "-cpfs")) {
+#ifdef CHANGED
+#ifdef FILESYS
+			dirent* entry;
+			DIR* d = opendir("../build/");
+			fileSystem->CreateDirectory("test");
+			fileSystem->SetDirectory("test/");
+			while ((entry = readdir(d))) {
+				if (entry->d_type == DT_REG) {
+					std::string path = std::string("../build/") + entry->d_name;
+					std::string testPath = std::string("../test/") + entry->d_name + ".c";
+					if (std::ifstream(testPath.c_str())) {
+						Copy(path.c_str(), entry->d_name);
+					}
+				}
+			}
+			closedir(d);
+			std::cout << "Tests copied into test/" << std::endl;
+			interrupt->Halt();
+#endif
+#endif
 		}
 #endif
 
