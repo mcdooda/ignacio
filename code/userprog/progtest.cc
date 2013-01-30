@@ -166,19 +166,6 @@ void ConsoleUser() {
 	std::cout << fileSystem->GetCurrentPath() << "<-" << std::endl;
 	char* cons = (char*) "console";
 	StartProcess(cons);
-
-	//	OpenFile* of = fileSystem->Open("halt");
-
-	//	fileSystem->Print();
-	//	char buf[100];
-	//	if (of != NULL) {
-	//		printf("fichier ouvert\n");
-	//		of->Read(buf, 50);
-	//		printf("%s",buf);
-	//	} else {
-	//		printf("fichier non ouvert\n");
-	//	}
-
 }
 #endif
 #endif //CHANGED

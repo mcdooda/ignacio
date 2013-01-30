@@ -144,13 +144,8 @@ Initialize (int argc, char **argv)
 	      debugUserProg = TRUE;
 #endif
 #ifdef FILESYS_NEEDED
-#ifndef CHANGED
 	  if (!strcmp (*argv, "-f"))
 	      format = TRUE;
-#else
-//TODO A enlever quand le disque marchera
-	      format = TRUE;	  
-#endif
 #endif
 #ifdef NETWORK
 	  if (!strcmp (*argv, "-l"))
