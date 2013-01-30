@@ -42,6 +42,7 @@ Thread::Thread (const char *threadName)
     space = NULL;
 #ifdef CHANGED
 	pid = -1;
+	processus = 0;
 #endif
 #endif
 }

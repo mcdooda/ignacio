@@ -213,6 +213,7 @@ int do_ForkExec(char *filename, int pointerExit) {
 
 	Thread *t = new Thread("forked fork user");
 	t->setPid(pid);
+	t->setProcessus();
 	Processus* p = new Processus(t, pid, ppid, pointerExit, filename);
 	saveSon(ppid, p);
 	t->ForkProcessus(StartProcessus, pid);
@@ -225,10 +226,6 @@ int do_ForkExec(char *filename, int pointerExit) {
 void deleteProcessus(int pid) {
 	Processus* p;
 	if (processus.SynchTryGet(pid, p)) {
-		if (pid > 0) {
-			delete p->GetThread()->space;
-			p->GetThread()->space = NULL;
-		}
 		delete p;
 		processus.SynchErase(pid);
 		DestroyProcessusThreadsTable(pid);

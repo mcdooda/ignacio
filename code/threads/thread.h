@@ -102,6 +102,14 @@ class Thread
 	int getPid(){
 		return pid;
 	}
+	
+	void setProcessus(){
+		processus = 1;
+	}
+	
+	int getProcessus(){
+		return processus;
+	}
 #endif
 #endif // CHANGED
     void Yield ();		// Relinquish the CPU if any 
@@ -145,6 +153,7 @@ class Thread
     int userRegisters[NumTotalRegs];	// user-level CPU register state
 #ifdef CHANGED
 	int pid;
+	int processus;
 #endif
 
   public:

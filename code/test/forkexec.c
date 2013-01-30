@@ -1,7 +1,7 @@
 #include "syscall.h"
 
 int main() {
-	int pid1, pid2, pid3;
+	int pid1, pid2, pid3, pid4;
 	
 	pid1 = ForkExec("fork_test1");
 
@@ -10,6 +10,7 @@ int main() {
 
 	pid3 = ForkExec("userpages1");
 
+	pid4 = ForkExec("userpages0");
 
 /*
 	ForkExec("userpages1");
@@ -17,9 +18,10 @@ int main() {
 /*
 	PutString("TEST\n");
 */
-	WaitPid(pid1);
 	WaitPid(pid2);
+	WaitPid(pid1);
 	WaitPid(pid3);
+	WaitPid(pid4);
 	
 	PutChar('x');
 	PutChar('y');

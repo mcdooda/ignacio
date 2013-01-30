@@ -128,6 +128,12 @@ Scheduler::Run (Thread * nextThread)
     // point, we were still running on the old thread's stack!
     if (threadToBeDestroyed != NULL)
       {
+#ifdef CHANGED
+	printf("\nthreadToBeDestroyed pid : %d : %s\n",threadToBeDestroyed->getPid(),threadToBeDestroyed->getName());
+		if(threadToBeDestroyed->getProcessus() == 1)
+			delete threadToBeDestroyed->space;
+#endif	
+	
 	  delete threadToBeDestroyed;
 	  threadToBeDestroyed = NULL;
       }
