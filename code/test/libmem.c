@@ -2,12 +2,6 @@
 #include "syscall.h"
 #include "libio.h"
 
-#define FIRST 0
-#define BEST 1
-#define WORST 2
-
-#define STRATEGIE WORST
-
 struct fb {
 	int size;
 	struct fb* next;
@@ -21,24 +15,32 @@ struct db {
 struct fb* tete_f = NULL;
 struct db* tete_d = NULL;
 
-mem_fit_function_t* fit_strategy;
+struct fb* tete_f_orig = NULL;
+int taille_orig = 0;
+
+mem_fit_function_t* fit_strategy = NULL;
 
 void* mem_init(int taille) {
-	tete_f = (struct fb*) Sbrk(taille);
-	if(tete_f == NULL)
+	tete_f = tete_f_orig = (struct fb*) Sbrk(taille);
+	if (tete_f == NULL)
 		return NULL;
-	
-	tete_f->size = taille;
+
+	tete_f->size = taille_orig = taille;
 	tete_f->next = NULL;
 	tete_d = NULL;
 
-#if STRATEGIE == FIRST
-	mem_fit(mem_fit_first);
-#elif STRATEGIE == BEST
-	mem_fit(mem_fit_best);
-#else
-	mem_fit(mem_fit_worst);
-#endif
+	mem_fit(DEFAULT);
+	return tete_f;
+}
+
+void* mem_reinit() {
+	tete_f = tete_f_orig;
+	if (tete_f == NULL)
+		return NULL;
+
+	tete_f->size = taille_orig;
+	tete_f->next = NULL;
+	tete_d = NULL;
 
 	return tete_f;
 }
@@ -141,8 +143,6 @@ void mem_free(void* bloc) {
 
 /* renvoie l'espace utilisateur disponible pour une
    adresse allouée avec malloc ou realloc.
-   Requis pour la seconde partie du TD/TP (remplacement
-   de malloc/realloc/free du system)
  */
 int mem_get_size(void * bloc) {
 	return ((struct db*) bloc)->size - sizeof (struct db) - 1;
@@ -165,10 +165,18 @@ void mem_show(void (*print)(void *, int, int free)) {
 	}
 }
 
-/* Facultatif */
-
-void mem_fit(mem_fit_function_t* fit) {
-	fit_strategy = fit;
+void mem_fit(int strategy) {
+	switch (strategy) {
+		case FIRST:
+			fit_strategy = mem_fit_first;
+			break;
+		case BEST:
+			fit_strategy = mem_fit_best;
+			break;
+		case WORST:
+			fit_strategy = mem_fit_worst;
+			break;
+	}
 }
 
 struct fb* mem_fit_first(struct fb* tete, int size) {
@@ -188,7 +196,7 @@ struct fb* mem_fit_first(struct fb* tete, int size) {
 			} else {
 				tete = courant->next;
 			}
-		}			/*si résidu (bloc plus grand)*/
+		}/*si résidu (bloc plus grand)*/
 		else {
 			struct fb* new = (void*) courant + size;
 			new->size = courant->size - size;
@@ -240,7 +248,7 @@ struct fb* mem_fit_best(struct fb* tete, int size) {
 			} else {
 				tete = courant_best->next;
 			}
-		}			/*si résidu (bloc plus grand)*/
+		}/*si résidu (bloc plus grand)*/
 		else {
 			struct fb* new = (void*) courant_best + size;
 			new->size = courant_best->size - size;
@@ -277,7 +285,7 @@ struct fb* mem_fit_worst(struct fb* tete, int size) {
 				prec_worst = prec;
 				residu_worst = 0;
 				break;
-			}				/*si résidu est plus grand que précédemment*/
+			}/*si résidu est plus grand que précédemment*/
 			else if (courant_worst == NULL || courant->size - size > residu_worst) {
 				courant_worst = courant;
 				prec_worst = prec;
@@ -297,7 +305,7 @@ struct fb* mem_fit_worst(struct fb* tete, int size) {
 			} else {
 				tete = courant_worst->next;
 			}
-		}			/*si résidu (bloc plus grand)*/
+		}/*si résidu (bloc plus grand)*/
 		else {
 			struct fb* new = (void*) courant_worst + size;
 			new->size = courant_worst->size - size;

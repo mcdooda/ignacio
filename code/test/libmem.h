@@ -2,9 +2,14 @@
 #define	LIBMEM_H
 #define	NULL 0
 
-struct fb;
+#define FIRST 0
+#define BEST 1
+#define WORST 2
+
+#define DEFAULT WORST
 
 void* mem_init(int taille);
+void* mem_reinit();
 void* mem_alloc(int);
 void mem_free(void*);
 /* renvoie l'espace utilisateur disponible pour une
@@ -17,12 +22,12 @@ int mem_get_size(void *);
 /* Affichage du contenu de l'allocateur */
 void mem_show(void (*print)(void *, int, int free));
 
-/* Facultatif */
+struct fb;
 
 /* Choix de la strategie et strategies usuelles */
 typedef struct fb* (mem_fit_function_t) (struct fb *, int);
 
-void mem_fit(mem_fit_function_t*);
+void mem_fit(int strategy);
 struct fb* mem_fit_first(struct fb*, int);
 struct fb* mem_fit_best(struct fb*, int);
 struct fb* mem_fit_worst(struct fb*, int);
