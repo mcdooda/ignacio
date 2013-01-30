@@ -225,6 +225,10 @@ int do_ForkExec(char *filename, int pointerExit) {
 void deleteProcessus(int pid) {
 	Processus* p;
 	if (processus.SynchTryGet(pid, p)) {
+		if (pid > 0) {
+			delete p->GetThread()->space;
+			p->GetThread()->space = NULL;
+		}
 		delete p;
 		processus.SynchErase(pid);
 		DestroyProcessusThreadsTable(pid);
@@ -256,9 +260,7 @@ void exitProc(int pid) {
 		p->GetSemExit()->V();
 		//DEBUG('t', "-----------------Finish du processus %s\n", processus[pid]->GetFilename());
 		if (pid > 0) {
-			AddrSpace* space = currentThread->space;
 			currentThread->Finish();
-			delete space;
 		}
 	}
 }
@@ -292,10 +294,8 @@ bool CheckFileProc(int pid, int fd) {
 }
 
 void CloseFilesProc(int pid) {
-	processus.P();
 	Processus* p = processus.Get(pid);
 	p->CloseOpenFiles();
-	processus.V();
 }
 
 #endif // CHANGED

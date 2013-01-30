@@ -1,19 +1,18 @@
 #include "syscall.h"
 #include "libio.h"
+#include "libsynch.h"
+
+OpenFileId fd;
 
 void SimpleThread(void* which) {
-	OpenFileId fd;
 	char buf[100];
 	char* ch = (char*) which;
 	int i;
-
-	fd = Open("file");
 
 	for (i = 0; i < sizeof (buf); i++) {
 		buf[i] = (*ch);
 	}
 	Write(buf, sizeof (buf), fd);
-	Close(fd);
 	UserThreadExit();
 }
 
@@ -28,6 +27,8 @@ int main(int argc, char* argv[]) {
 	char c4 = 'd';
 
 	Create("file");
+	
+	fd = Open("file");
 
 	tid1 = UserThreadCreate(SimpleThread, (void*) &c1);
 	tid2 = UserThreadCreate(SimpleThread, (void*) &c2);
@@ -38,6 +39,8 @@ int main(int argc, char* argv[]) {
 	UserThreadJoin(tid2);
 	UserThreadJoin(tid3);
 	UserThreadJoin(tid4);
+	
+	Close(fd);
 
 	return 0;
 }
