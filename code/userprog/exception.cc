@@ -228,7 +228,7 @@ void ExceptionHandler(ExceptionType which) {
 				CASE(SC_Open) {
 					char fileName[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, fileName);
-					int fd = do_Open(fileName);
+					int fd = do_Open(pid, fileName);
 					userMachine->SetReturn(fd);
 					break;
 				}
@@ -237,7 +237,7 @@ void ExceptionHandler(ExceptionType which) {
 					char buf[MAX_STRING_SIZE];
 					int count = userMachine->GetIntArg(2);
 					int fd = userMachine->GetIntArg(3);
-					int numRead = do_Read(fd, buf, count);
+					int numRead = do_Read(pid, fd, buf, count);
 					userMachine->SetOutArg(1, buf);
 					userMachine->SetReturn(numRead);
 					break;
@@ -248,14 +248,14 @@ void ExceptionHandler(ExceptionType which) {
 					userMachine->GetStringArg(1, buf);
 					int count = userMachine->GetIntArg(2);
 					int fd = userMachine->GetIntArg(3);
-					int numWritten = do_Write(fd, buf, count);
+					int numWritten = do_Write(pid, fd, buf, count);
 					userMachine->SetReturn(numWritten);
 					break;
 				}
 
 				CASE(SC_Close) {
 					int fd = userMachine->GetIntArg(1);
-					int err = do_Close(fd);
+					int err = do_Close(pid, fd);
 					userMachine->SetReturn(err);
 					break;
 				}

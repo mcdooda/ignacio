@@ -13,5 +13,13 @@ extern void do_UserWaitPid(int pid);
 extern int GetPid(Thread* t);
 extern void exitProc(int pid);
 extern void addMainThread(Thread* m);
+
+void RestoreState(int pid);
+
+void AddFileProc(int pid, int fd);
+void RemoveFileProc(int pid, int fd);
+bool CheckFileProc(int pid, int fd);
+void CloseFilesProc(int pid);
+
 #endif	/* USERPROCESSUS_H */
 #endif // CHANGED
