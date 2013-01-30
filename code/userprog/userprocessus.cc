@@ -8,14 +8,15 @@
 #include <string>
 #include "synchmap.h"
 #include <iostream>
+#include <set>
+#include "userfile.h"
 
 class Processus {
 public:
 
 	Processus(Thread *thread, int pid_, int ppid_, int pE, char *filename_) :
-		semExit("Processus", 0),
-		semStart("StartProc", 1)
-	{
+	semExit("Processus", 0),
+	semStart("StartProc", 1) {
 		t = thread;
 		pid = pid_;
 		ppid = ppid_;
@@ -47,6 +48,26 @@ public:
 
 	SynchMap<int, Processus*> GetSons() {
 		return sons;
+	}
+
+	void RemoveOpenFile(int id) {
+		std::set<int>::iterator it = openFiles.find(id);
+		openFiles.erase(it);
+	}
+
+	void AddOpenFile(int id) {
+		openFiles.insert(id);
+	}
+	
+	bool CheckOpenFile(int id) {
+		return openFiles.find(id) != openFiles.end();
+	}
+	
+	void CloseOpenFiles() {
+		std::set<int> files = openFiles;
+		for (std::set<int>::iterator it = files.begin(); it != files.end(); it++) {
+			do_Close(pid, *it);
+		}
 	}
 
 	Semaphore* GetSemStart() {
@@ -87,6 +108,7 @@ private:
 	Semaphore semStart;
 	char* filename;
 	SynchMap<int, Processus*> sons;
+	std::set<int> openFiles;
 	bool waited;
 
 };
@@ -180,10 +202,10 @@ int do_ForkExec(char *filename, int pointerExit) {
 		return -1;
 	}
 	delete executable;
-	
-	
+
+
 	processus.P();
-	
+
 	int pid = NewPid();
 	int ppid = GetPid(GetProc(currentThread));
 
@@ -203,6 +225,10 @@ int do_ForkExec(char *filename, int pointerExit) {
 void deleteProcessus(int pid) {
 	Processus* p;
 	if (processus.SynchTryGet(pid, p)) {
+		if (pid > 0) {
+			delete p->GetThread()->space;
+			p->GetThread()->space = NULL;
+		}
 		delete p;
 		processus.SynchErase(pid);
 		DestroyProcessusThreadsTable(pid);
@@ -224,6 +250,7 @@ void do_UserWaitPid(int pid) {
 
 void exitProc(int pid) {
 	JoinUserThreads(pid);
+	CloseFilesProc(pid);
 	Processus* p = NULL;
 	if (processus.SynchTryGet(pid, p)) {
 		const std::map<int, Processus*>& sonsMap = p->GetSons().GetMap();
@@ -233,11 +260,42 @@ void exitProc(int pid) {
 		p->GetSemExit()->V();
 		//DEBUG('t', "-----------------Finish du processus %s\n", processus[pid]->GetFilename());
 		if (pid > 0) {
-			AddrSpace* space = currentThread->space;
 			currentThread->Finish();
-			delete space;
 		}
 	}
+}
+
+void RestoreState(int pid) {
+	// restauration du path
+
+	// restauration des positions des position de curseur
+}
+
+void AddFileProc(int pid, int fd) {
+	processus.P();
+	Processus* p = processus.Get(pid);
+	p->AddOpenFile(fd);
+	processus.V();
+}
+
+void RemoveFileProc(int pid, int fd) {
+	processus.P();
+	Processus* p = processus.Get(pid);
+	p->RemoveOpenFile(fd);
+	processus.V();
+}
+
+bool CheckFileProc(int pid, int fd) {
+	processus.P();
+	Processus* p = processus.Get(pid);
+	int ok = p->CheckOpenFile(fd);
+	processus.V();
+	return ok;
+}
+
+void CloseFilesProc(int pid) {
+	Processus* p = processus.Get(pid);
+	p->CloseOpenFiles();
 }
 
 #endif // CHANGED

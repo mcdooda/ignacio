@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys
+import sys, os
 sys.path.append('pytest')
 import pychos
 
@@ -19,7 +19,7 @@ i = 0
 for arg in sys.argv:
 	if i > 0:
 		if arg == '-step5':
-			pychos.nachos_prog = './nachos-step5'
+			pychos.step5()
 			
 		elif arg == '-gdb':
 			pychos.auto_gdb = True

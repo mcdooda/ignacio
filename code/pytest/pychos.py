@@ -76,3 +76,8 @@ def test(t):
 		for test in get_tests():
 			print('- '+test.__name__)
 
+def step5():
+	global nachos_prog
+	nachos_prog = './nachos-step5'
+	commands.getstatusoutput('./nachos-step5 -f')
+	commands.getstatusoutput('./nachos-step5 -cpfs')
