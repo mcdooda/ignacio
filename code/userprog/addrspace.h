@@ -21,6 +21,7 @@
 #endif
 
 #define UserStackSize		4096	// increase this as necessary!
+#define UserHeapSize		4096	// increase this as necessary!
 #define ThreadNbPages       4
 #define NbPagesStack        (UserStackSize / PageSize)
 #define NbStackSlot			(NbPagesStack / ThreadNbPages)
