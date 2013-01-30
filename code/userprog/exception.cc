@@ -368,7 +368,7 @@ void ExceptionHandler(ExceptionType which) {
 
 				CASE(SC_Random) {
 					int val = Random();
-					userMachine->SetOutArg(1, val);
+					userMachine->SetReturn(val);
 					break;
 				}
 

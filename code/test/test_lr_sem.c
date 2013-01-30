@@ -75,7 +75,7 @@ void redacteur(void *args) {
 		debut_redaction(&d->lecteur_redacteur);
 
 		printf("%s","debut redaction........ ");
-		valeur = d->id;
+		valeur = Random();
 		d->donnee = valeur;
 		long_loop();
 		if (valeur != d->donnee) {
@@ -102,7 +102,6 @@ int main(int argc, char *argv[]) {
 	initialiser_lecteur_redacteur(&donnees_thread.lecteur_redacteur);
 
 	for (i = 0; i < nb_lecteurs + nb_redacteurs; i++) {
-		donnees_thread.id = i;
 		if (i % 2) {
 			threads[i] = UserThreadCreate(lecteur, (void*) &donnees_thread);
 		} else {
