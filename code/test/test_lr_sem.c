@@ -3,8 +3,8 @@
 #include "syscall.h"
 // ordre d'arrivée
 
-void long_loop() {
-	unsigned int fin = 1000,i=0;
+void long_loop(int scale) {
+	unsigned int fin = (Random()%1000)*scale,i=0;
 	while (i < fin) {
 		i++;
 	}
@@ -50,12 +50,12 @@ void lecteur(void *args) {
 	int i, valeur;
 
 	for (i = 0; i < d->iterations; i++) {
-		long_loop();
+		long_loop(2);
 		debut_lecture(&d->lecteur_redacteur);
 
 		printf("%s","debut lecture ");
 		valeur = d->donnee;
-		long_loop();
+		long_loop(1);
 		if (valeur != d->donnee) {
 			//lecture incohérente
 			printf("%s","X");
@@ -72,12 +72,12 @@ void redacteur(void *args) {
 	donnees_thread_t *d = (donnees_thread_t *) args;
 	int i, valeur;
 	for (i = 0; i < d->iterations; i++) {
+		long_loop(2);
 		debut_redaction(&d->lecteur_redacteur);
-
 		printf("%s","debut redaction........ ");
 		valeur = Random();
 		d->donnee = valeur;
-		long_loop();
+		long_loop(1);
 		if (valeur != d->donnee) {
 			//Rédaction incohérente
 			printf("%s","X");
