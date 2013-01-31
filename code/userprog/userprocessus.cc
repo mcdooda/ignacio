@@ -58,11 +58,11 @@ public:
 	void AddOpenFile(int id) {
 		openFiles.insert(id);
 	}
-	
+
 	bool CheckOpenFile(int id) {
 		return openFiles.find(id) != openFiles.end();
 	}
-	
+
 	void CloseOpenFiles() {
 		std::set<int> files = openFiles;
 		for (std::set<int>::iterator it = files.begin(); it != files.end(); it++) {
@@ -258,6 +258,8 @@ void exitProc(int pid) {
 		//DEBUG('t', "-----------------Finish du processus %s\n", processus[pid]->GetFilename());
 		if (pid > 0) {
 			currentThread->Finish();
+		} else {
+			interrupt->Halt();
 		}
 	}
 }
