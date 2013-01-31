@@ -160,13 +160,13 @@ void mem_show(void (*print)(void *, int, int free)) {
 	struct fb* f = tete_f;
 
 	while (f != NULL) {
-		print((void*) f, f->size, 1);
+		print(f + sizeof(struct fb), f->size - sizeof(struct fb), 1);
 		f = f->next;
 	}
 
 	d = tete_d;
 	while (d != NULL) {
-		print((void*) d, d->size, 0);
+		print(d + sizeof(struct db), d->size - sizeof(struct db), 0);
 		d = d->next;
 	}
 }
