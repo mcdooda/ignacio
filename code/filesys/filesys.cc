@@ -381,8 +381,6 @@ FileSystem::Print() {
 
 #ifdef CHANGED
 
-// {name[strlen(name) - 1] == '/'} -> {change le dossier courant}
-
 bool FileSystem::SetDirectory(const char* name) {
 	char* slash = NULL;
 	char* dir = (char*) name;
@@ -425,6 +423,15 @@ bool FileSystem::SetDirectory(const char* name) {
 			d->FetchFrom(directoryFile);
 			int sector = d->Find(dirName);
 			delete d;
+
+			if (sector == -1) {
+				if (directoryFile != of) {
+					delete directoryFile;
+				}
+				directoryFile = of;
+				return false;
+			}
+
 			FileHeader* fh = new FileHeader();
 			fh->FetchFrom(sector);
 			FileHeader::FileType type = fh->GetType();
@@ -459,13 +466,7 @@ bool FileSystem::SetDirectory(const char* name) {
 }
 
 void FileSystem::MinimalisticPrint() {
-	printf("---------------------------\n");
-	OpenFile* of = directoryFile;
-	//	SetDirectory("/");
 	PrintRecursiveList(directoryFile, 0, 1000);
-	directoryFile = of;
-	//	printf("---------------------------\n");
-	//	PrintRecursiveList(directoryFile, 0);
 }
 
 void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
@@ -630,7 +631,6 @@ std::string FileSystem::GetCurrentPath() {
 
 	delete directoryFile;
 	directoryFile = oldDirectory;
-
 	return path;
 }
 

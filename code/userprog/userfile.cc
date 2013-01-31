@@ -19,7 +19,6 @@ public:
 #ifdef FILESYS
 		openFile = fileSystem->OpenPath(fileName);
 		absolutePath = fileSystem->GetAbsolutePath(fileName);
-		std::cout << "Creation UserFile :<" << fileName << "> path : <" << absolutePath << ">" << std::endl;
 #endif
 	}
 
@@ -174,14 +173,29 @@ int do_Seek(int fd, int offset, int whence) {
 }
 
 bool do_MkDir(const char* directory) {
+	userFiles.P();
 	OpenFile* of = fileSystem->Open(directory);
 	if (of == NULL) {
-		delete of;
 		fileSystem->CreateDirectory(directory);
+		return true;
+	} else {
+		delete of;
+		return false;
+	}
+	userFiles.V();
+}
+
+bool do_Rm(const char* file) {
+	userFiles.P();
+	OpenFile* of = fileSystem->Open(file);
+	if (of != NULL) {
+		delete of;
+		fileSystem->Remove(file);
 		return true;
 	} else {
 		return false;
 	}
+	userFiles.V();
 }
 
 #endif

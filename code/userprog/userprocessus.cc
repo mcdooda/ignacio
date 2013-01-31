@@ -174,6 +174,7 @@ void addMainThread(Thread* m) {
 	char main[5] = "main";
 	m->setPid(0);
 	Processus* p = new Processus(m, 0, 0, -1, main);
+	//p->SetWd(fileSystem->GetCurrentPath());
 	processus.Add(0, p);
 	CreateProcessusThreadsTable(0);
 	processus.V();
@@ -183,7 +184,7 @@ static void StartProcessus(int pid) {
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
 	DEBUG('t', "Lancement du processus\n");
 	char* fileExec = processus.Get(pid)->GetFilename();
-
+	restorePath(pid);
 	OpenFile *executable = fileSystem->Open(fileExec);
 
 	ASSERT(executable != NULL);
@@ -204,23 +205,19 @@ static void StartProcessus(int pid) {
 }
 
 int do_ForkExec(char *filename, int pointerExit) {
+	processus.P();
+	int ppid = GetPid(GetProc(currentThread));
+	Processus* pp = processus.Get(ppid);
+	fileSystem->SetDirectory(pp->GetWd().c_str());
 	DEBUG('t', "who do fork addr : %p\n", currentThread->space);
-
 	OpenFile *executable = fileSystem->Open(filename);
 	if (executable == NULL) {
-		printf("Unable to open file %s\n", filename);
+		processus.V();
 		return -1;
 	}
 	delete executable;
-
-
-	processus.P();
-
 	int pid = NewPid();
-	int ppid = GetPid(GetProc(currentThread));
-
 	CreateProcessusThreadsTable(pid);
-
 	Thread *t = new Thread("forked fork user");
 	t->setPid(pid);
 	t->setProcessus();
@@ -228,9 +225,7 @@ int do_ForkExec(char *filename, int pointerExit) {
 	saveSon(ppid, p);
 	p->SetWd(fileSystem->GetCurrentPath());
 	t->ForkProcessus(StartProcessus, pid);
-
 	processus.V();
-
 	return pid;
 }
 

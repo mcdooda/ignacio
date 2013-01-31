@@ -129,7 +129,6 @@ Scheduler::Run (Thread * nextThread)
     if (threadToBeDestroyed != NULL)
       {
 #ifdef CHANGED
-	printf("\nthreadToBeDestroyed pid : %d : %s\n",threadToBeDestroyed->getPid(),threadToBeDestroyed->getName());
 		if(threadToBeDestroyed->getProcessus() == 1)
 			delete threadToBeDestroyed->space;
 #endif	

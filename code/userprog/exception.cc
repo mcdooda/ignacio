@@ -177,6 +177,15 @@ void ExceptionHandler(ExceptionType which) {
 					userMachine->SetReturn(ok);
 					break;
 				}
+				
+				CASE (SC_Rm) {
+					restorePath(pid);
+					char buff[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buff);
+					bool ok = do_Rm(buff);
+					userMachine->SetReturn(ok);
+					break;
+				}
 
 				CASE(SC_PutChar) {
 					char c = userMachine->GetCharArg(1);
@@ -245,6 +254,7 @@ void ExceptionHandler(ExceptionType which) {
 				}
 
 				CASE(SC_ForkExec) {
+					restorePath(pid);
 					char strTmp[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, strTmp);
 					int pointerExit = userMachine->GetIntArg(2);

@@ -161,6 +161,14 @@ MkDir:
 	j	$31
 	.end MkDir
 
+	.globl Rm
+	.ent	Rm
+Rm:
+	addiu $2,$0,SC_Rm
+	syscall
+	j	$31
+	.end Rm
+
 	.globl List
 	.ent	List
 List:

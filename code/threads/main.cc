@@ -140,8 +140,6 @@ main(int argc, char **argv) {
 
 		}// for console input
 #ifdef FILESYS
-
-
 		else if (!strcmp(*argv, "-f")) {
 			std::cout << "File system formatted." << std::endl;
 			interrupt->Halt();
@@ -152,8 +150,7 @@ main(int argc, char **argv) {
 			ConsoleUser();
 			interrupt->Halt(); // once we start the console, then 
 		} else if (!strcmp(*argv, "-cpfs")) {
-#ifdef CHANGED
-#ifdef FILESYS
+
 			dirent* entry;
 			DIR* d = opendir("../build/");
 			fileSystem->CreateDirectory("test");
@@ -170,13 +167,11 @@ main(int argc, char **argv) {
 			closedir(d);
 			std::cout << "Tests copied into test/" << std::endl;
 			interrupt->Halt();
-#endif
-#endif
 		}
-#endif
-
+#endif // FILESYS
 #endif // CHANGED
 #endif // USER_PROGRAM
+
 #ifdef FILESYS
 		if (!strcmp(*argv, "-cp")) { // copy from UNIX to Nachos
 			ASSERT(argc > 2);

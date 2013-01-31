@@ -11,6 +11,7 @@ extern int do_Write(int pid, int fd, char* buf, int count);
 extern int do_Close(int pid, int fd);
 extern int do_Seek(int fd, int offset, int whence);
 extern bool do_MkDir(const char* directory);
+extern bool do_Rm(const char* file);
 
 #endif	/* USERFILE_H */
 

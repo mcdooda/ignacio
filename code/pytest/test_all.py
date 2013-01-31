@@ -8,9 +8,9 @@ import thread_test3
 import thread_test4
 import thread_test5
 import fork_test1
-#import thread_test6
 import sem_test1
 import lr_sem_test
+import file_test3
 
 pychos.nachos_prog = './nachos-userprog'
 
@@ -34,5 +34,6 @@ for arg in sys.argv:
 
 if test is None:
 	pychos.test_all()
+
 else:
 	pychos.test(test)

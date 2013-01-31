@@ -38,6 +38,7 @@
 #define SC_Close	14
 #define SC_Seek		15
 #define SC_MkDir	16
+#define SC_Rm		17
 
 // console
 #define SC_PutChar		20
@@ -170,6 +171,8 @@ int Seek(OpenFileId id, int offset, int whence);
 #define SEEK_END 2
 
 int MkDir(const char* directory);
+
+int Rm(const char* file);
 
 
 /* User-level thread operations: Fork and Yield.  To allow multiple

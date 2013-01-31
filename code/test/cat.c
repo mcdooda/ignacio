@@ -9,7 +9,6 @@ int main(int argc, char* argv[]) {
 
 
 	fd = Open("file");
-	printf("\n***\n");
 	nbLu = Read(buf, sizeof (buf), fd);
 	while (nbLu > 0) {
 		for (i = 0; i < nbLu; i++) {
@@ -17,9 +16,7 @@ int main(int argc, char* argv[]) {
 		}
 		nbLu = Read(buf, sizeof (buf), fd);
 	}
-	printf("\n***\n");
 	Close(fd);
-
 
 	return 0;
 }
