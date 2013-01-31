@@ -315,6 +315,10 @@ void AddrSpace::FreeStackSlot(int stackBottom) {
 }
 
 int AddrSpace::Sbrk(unsigned nbFrames) {
+	
+	if (nbFrames == 0)
+		return brk;
+	
 	if (brk + nbFrames > brkMax) // tas plein
 		return NULL;
 
