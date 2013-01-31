@@ -58,11 +58,11 @@ public:
 	void AddOpenFile(int id) {
 		openFiles.insert(id);
 	}
-	
+
 	bool CheckOpenFile(int id) {
 		return openFiles.find(id) != openFiles.end();
 	}
-	
+
 	void CloseOpenFiles() {
 		std::set<int> files = openFiles;
 		for (std::set<int>::iterator it = files.begin(); it != files.end(); it++) {
@@ -98,6 +98,13 @@ public:
 		this->waited = waited_;
 	}
 
+	std::string GetWd() {
+		return wd;
+	}
+
+	void SetWd(std::string wd_) {
+		wd = wd_;
+	}
 
 private:
 	Thread* t;
@@ -110,6 +117,9 @@ private:
 	SynchMap<int, Processus*> sons;
 	std::set<int> openFiles;
 	bool waited;
+	std::string wd;
+
+
 
 };
 
@@ -216,6 +226,7 @@ int do_ForkExec(char *filename, int pointerExit) {
 	t->setProcessus();
 	Processus* p = new Processus(t, pid, ppid, pointerExit, filename);
 	saveSon(ppid, p);
+	p->SetWd(fileSystem->GetCurrentPath());
 	t->ForkProcessus(StartProcessus, pid);
 
 	processus.V();
@@ -294,5 +305,24 @@ void CloseFilesProc(int pid) {
 	Processus* p = processus.Get(pid);
 	p->CloseOpenFiles();
 }
+
+bool procChDir(int pid, const char* newWd) {
+	processus.P();
+	Processus* p = processus.Get(pid);
+	bool ok = fileSystem->SetDirectory(newWd);
+	if (ok) {
+		p->SetWd(fileSystem->GetCurrentPath());
+	}
+	processus.V();
+	return ok;
+}
+
+void restorePath(int pid){
+	processus.P();
+	Processus* p = processus.Get(pid);
+	fileSystem->SetDirectory(p->GetWd().c_str());
+	processus.V();
+}
+
 
 #endif // CHANGED

@@ -173,4 +173,15 @@ int do_Seek(int fd, int offset, int whence) {
 	return err;
 }
 
+bool do_MkDir(const char* directory) {
+	OpenFile* of = fileSystem->Open(directory);
+	if (of == NULL) {
+		delete of;
+		fileSystem->CreateDirectory(directory);
+		return true;
+	} else {
+		return false;
+	}
+}
+
 #endif

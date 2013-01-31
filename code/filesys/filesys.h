@@ -93,7 +93,7 @@ public:
 	bool Create(const char *name, int initialSize); // Create a file (UNIX creat)
 #else
 	bool Create(const char* name, int initialSize, FileHeader::FileType type = FileHeader::FILE); // Create a file (UNIX creat)
-	void SetDirectory(const char* name);
+	bool SetDirectory(const char* name);
 #endif
 	
 

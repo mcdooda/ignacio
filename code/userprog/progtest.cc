@@ -161,9 +161,7 @@ void FileSystemTest() {
 }
 
 void ConsoleUser() {
-	fileSystem->MinimalisticPrint();
 	fileSystem->SetDirectory("test/");
-	std::cout << fileSystem->GetCurrentPath() << "<-" << std::endl;
 	char* cons = (char*) "console";
 	StartProcess(cons);
 }

@@ -383,12 +383,13 @@ FileSystem::Print() {
 
 // {name[strlen(name) - 1] == '/'} -> {change le dossier courant}
 
-void FileSystem::SetDirectory(const char* name) {
+bool FileSystem::SetDirectory(const char* name) {
 	char* slash = NULL;
 	char* dir = (char*) name;
 
+	OpenFile* of = directoryFile;
+
 	if (name[0] == '/') {
-		delete directoryFile;
 		directoryFile = new OpenFile(DirectorySector);
 		dir++;
 	}
@@ -414,22 +415,53 @@ void FileSystem::SetDirectory(const char* name) {
 			int parentSector = dfh->GetLinkSector();
 			delete dfh;
 
-			delete directoryFile;
+			if (directoryFile != of) {
+				delete directoryFile;
+			}
+
 			directoryFile = new OpenFile(parentSector);
-			//TODO
 		} else {
-			OpenFile* of = directoryFile;
-			directoryFile = Open(dirName);
-			delete of;
-			//			printf("directoryFile: %s %p\n", dirName, directoryFile);
+			Directory *d = new Directory(NumDirEntries);
+			d->FetchFrom(directoryFile);
+			int sector = d->Find(dirName);
+			delete d;
+			FileHeader* fh = new FileHeader();
+			fh->FetchFrom(sector);
+			FileHeader::FileType type = fh->GetType();
+			delete fh;
+			if (type == FileHeader::DIRECTORY) {
+				OpenFile* of2 = directoryFile;
+				directoryFile = Open(dirName);
+				if (of2 != of) {
+					delete of2;
+				}
+				if (directoryFile == NULL) {
+					if (directoryFile != of) {
+						delete directoryFile;
+					}
+					directoryFile = of;
+					return false;
+				}
+			} else {
+				if (directoryFile != of) {
+					delete directoryFile;
+				}
+				directoryFile = of;
+				return false;
+			}
 		}
 	}
+
+	if (directoryFile != of) {
+		delete of;
+	}
+	return true;
 }
 
 void FileSystem::MinimalisticPrint() {
 	printf("---------------------------\n");
 	OpenFile* of = directoryFile;
-	SetDirectory("/");
+	//	SetDirectory("/");
 	PrintRecursiveList(directoryFile, 0, 1000);
 	directoryFile = of;
 	//	printf("---------------------------\n");
@@ -456,11 +488,22 @@ void FileSystem::PrintRecursiveList(OpenFile* of, int tabs, int maxDepth) {
 			int sector = d->Find(fileNames[i]);
 			FileHeader* fh = new FileHeader();
 			fh->FetchFrom(sector);
-			if (fh->GetType() == FileHeader::SYMLINK) {
-				printf("%s %s -> %d\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()), fh->GetLinkSector());
-			} else {
-				printf("%s %s\n", fileNames[i], FileHeader::GetTypeName(fh->GetType()));
+			char c;
+			switch (fh->GetType()) {
+				case FileHeader::SYMLINK:
+					c = 'l';
+					break;
+				case FileHeader::FILE:
+					c = 'f';
+					break;
+				case FileHeader::DIRECTORY:
+					c = 'd';
+					break;
+				default:
+					c = '?';
+					break;
 			}
+			printf("%c %s\n", c, fileNames[i]);
 			if (fh->GetType() == FileHeader::DIRECTORY) {
 				OpenFile* openFile = new OpenFile(sector);
 				PrintRecursiveList(openFile, tabs + 1, maxDepth - 1);
@@ -525,7 +568,7 @@ bool FileSystem::CreateDirectory(const char *name) {
 	delete d;
 	SetDirectory("../");
 
-	return 1;
+	return true;
 }
 
 OpenFile* FileSystem::OpenPath(const char* path) {
@@ -535,10 +578,10 @@ OpenFile* FileSystem::OpenPath(const char* path) {
 		SetDirectory(path);
 	const char* slash = strrchr(path, '/');
 	if (slash != NULL) {
-//		printf("nom du fichier : %s\n", slash + 1);
+		//		printf("nom du fichier : %s\n", slash + 1);
 		of = Open(slash + 1);
 	} else {
-//		printf("nom du fichier bis : %s\n", path);
+		//		printf("nom du fichier bis : %s\n", path);
 		of = Open(path);
 	}
 	delete directoryFile;
@@ -610,8 +653,7 @@ OpenFile* FileSystem::OpenSym(const char* name) {
 	DEBUG('f', "Opening file %s\n", name);
 	directory->FetchFrom(directoryFile);
 	sector = directory->Find(name);
-	if(sector == -1)
-		printf("Can't Open file <%s> ",name);
+	ASSERT(sector != -1);
 	FileHeader* fh = new FileHeader();
 	fh->FetchFrom(sector);
 	if (fh->GetType() == FileHeader::SYMLINK) {

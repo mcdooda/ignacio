@@ -25,27 +25,64 @@ int readarg(const char* line, char args[MAX_ARG_COUNT][MAX_LINE_SIZE]) {
 	return k;
 }
 
+void invalidArguments(char args[MAX_ARG_COUNT][MAX_LINE_SIZE], int argc, int required) {
+	int i;
+	printf("Invalid arguments for %s: ", args[0]);
+	if (argc == 1) {
+		printf("<none> ");
+	} else {
+		for (i = 1; i < argc; i++) {
+			printf("%s ", args[i]);
+		}
+	}
+	printf("(%d argument(s) required)\n", &required);
+}
+
 int main(int argc, char* argv[]) {
 	char line[MAX_LINE_SIZE];
+	char wd[MAX_LINE_SIZE];
 	char args[MAX_ARG_COUNT][MAX_LINE_SIZE];
 	int pid;
+	
+	ChDir("..");
 
 	while (1) {
-		printf("NachOS$ ");
+		Pwd(wd);
+		printf("NachOS-%s$ ", wd);
 		/*
 				PutString("NachOS$ ");
 		 */
 		//TODO ERREUR SI line trop grand
 		GetString(line, MAX_LINE_SIZE);
 		if (stringlen(line) > 1) {
-			readarg(line, args);
+			int n = readarg(line, args);
 			if (stringeq(args[0], "exit")) {
 				break;
+			} else if (stringeq(args[0], "ls")) {
+				List();
+			} else if (stringeq(args[0], "cd")) {
+				if (n == 2) {
+					if (!ChDir(args[1])) {
+						printf("could not cd %s\n", args[1]);
+					}
+				} else if (n == 1) {
+					ChDir("/");
+				} else {
+					invalidArguments(args, n, 1);
+				}
+			} else if (stringeq(args[0], "mkdir")) {
+				if (n == 2) {
+					if (!MkDir(args[1])) {
+						printf("could not mkdir %s\n", args[1]);
+					}
+				} else {
+					invalidArguments(args, n, 1);
+				}
 			} else {
-/*
-				printf("line %s\n", line);
-				printf("prog %s\n", args[0]);
-*/
+				/*
+								printf("line %s\n", line);
+								printf("prog %s\n", args[0]);
+				 */
 				pid = ForkExec(args[0]);
 				WaitPid(pid);
 			}

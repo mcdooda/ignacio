@@ -26,6 +26,9 @@
 #define SC_Join		3
 #define SC_Fork		4
 #define SC_Yield	5
+#define SC_Pwd		6
+#define SC_ChDir	7
+#define SC_List		8
 
 // io
 #define SC_Create	10
@@ -34,6 +37,7 @@
 #define SC_Write	13
 #define SC_Close	14
 #define SC_Seek		15
+#define SC_MkDir	16
 
 // console
 #define SC_PutChar		20
@@ -165,6 +169,7 @@ int Seek(OpenFileId id, int offset, int whence);
 #define SEEK_CUR 1
 #define SEEK_END 2
 
+int MkDir(const char* directory);
 
 
 /* User-level thread operations: Fork and Yield.  To allow multiple
@@ -181,6 +186,14 @@ void Fork (void (*func) ());
  */
 void Yield ();
 
+void Pwd(char* wd);
+
+int ChDir(const char* newWd);
+
+void List();
+
+
+
 void PutChar(char c);
 
 
@@ -193,6 +206,7 @@ void GetString(char *s, int n);
 void PutInt(int i);
 
 void GetInt(int *n);
+
 
 int UserThreadCreate(void f(void *arg), void *arg);
 

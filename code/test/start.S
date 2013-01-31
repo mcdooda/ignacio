@@ -137,6 +137,38 @@ Yield:
 	j	$31
 	.end Yield
 
+	.globl Pwd
+	.ent	Pwd
+Pwd:
+	addiu $2,$0,SC_Pwd
+	syscall
+	j	$31
+	.end Pwd
+
+	.globl ChDir
+	.ent	ChDir
+ChDir:
+	addiu $2,$0,SC_ChDir
+	syscall
+	j	$31
+	.end ChDir
+
+	.globl MkDir
+	.ent	MkDir
+MkDir:
+	addiu $2,$0,SC_MkDir
+	syscall
+	j	$31
+	.end MkDir
+
+	.globl List
+	.ent	List
+List:
+	addiu $2,$0,SC_List
+	syscall
+	j	$31
+	.end List
+
 	.globl PutChar
 	.ent	PutChar
 PutChar:
@@ -184,6 +216,7 @@ GetInt:
 	syscall
 	j	$31
 	.end GetInt
+
 
 	.globl UserThreadCreate
 	.ent	UserThreadCreate

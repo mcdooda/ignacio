@@ -32,6 +32,7 @@
 #include "userprocessus.h"
 #include "userfile.h"
 #include "usersynch.h"
+#include <iostream>
 #endif
 
 //----------------------------------------------------------------------
@@ -137,6 +138,46 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}
 
+				CASE(SC_Yield) {
+					currentThread->Yield();
+					break;
+				}
+
+				CASE(SC_Pwd) {
+					restorePath(pid);
+					userMachine->SetOutArg(1, (char*) fileSystem->GetCurrentPath().c_str());
+					break;
+				}
+
+				CASE(SC_ChDir) {
+					restorePath(pid);
+					char buff[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buff);
+					int s = strlen(buff);
+					if (buff[s - 1] != '/') {
+						buff[s] = '/';
+						buff[s + 1] = '\0';
+					}
+					bool ok = procChDir(pid, buff);
+					userMachine->SetReturn(ok);
+					break;
+				}
+
+				CASE(SC_List) {
+					restorePath(pid);
+					fileSystem->MinimalisticPrint();
+					break;
+				}
+
+				CASE(SC_MkDir) {
+					restorePath(pid);
+					char buff[MAX_STRING_SIZE];
+					userMachine->GetStringArg(1, buff);
+					bool ok = do_MkDir(buff);
+					userMachine->SetReturn(ok);
+					break;
+				}
+
 				CASE(SC_PutChar) {
 					char c = userMachine->GetCharArg(1);
 					synchConsole->SynchPutChar(c);
@@ -219,6 +260,7 @@ void ExceptionHandler(ExceptionType which) {
 				}
 
 				CASE(SC_Create) {
+					restorePath(pid);
 					char fileName[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, fileName);
 					do_Create(fileName);
@@ -226,6 +268,7 @@ void ExceptionHandler(ExceptionType which) {
 				}
 
 				CASE(SC_Open) {
+					restorePath(pid);
 					char fileName[MAX_STRING_SIZE];
 					userMachine->GetStringArg(1, fileName);
 					int fd = do_Open(pid, fileName);
