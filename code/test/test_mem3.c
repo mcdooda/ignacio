@@ -89,7 +89,7 @@ int main() {
 					aide();
 					break;
 				case 'q':
-					Halt();
+					return 0;
 				default:
 					printf("Commande inconnue !\n");
 			}

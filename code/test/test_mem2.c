@@ -32,7 +32,7 @@ void my_mem_init(int s) {
 	if (s > 0) {
 		if (mem_init(s) == NULL) {
 			printf("Erreur : tas plein OU plus de frame libres\n");
-			Halt();
+			Exit(-1);
 		}
 	} else
 		mem_reinit();
@@ -62,7 +62,7 @@ void my_mem_show(void (*print)(void *, int, int free)) {
 void assert(int b) {
 	if (!b) {
 		printf("TEST ÉCHOUÉ\n\n");
-		Halt();
+		Exit(-1);
 	}
 }
 

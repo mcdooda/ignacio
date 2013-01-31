@@ -12,12 +12,18 @@ struct db {
 	struct db* next;
 };
 
+struct fb* mem_fit_first(struct fb*, int);
+struct fb* mem_fit_best(struct fb*, int);
+struct fb* mem_fit_worst(struct fb*, int);
+
 struct fb* tete_f = NULL;
 struct db* tete_d = NULL;
 
 struct fb* tete_f_orig = NULL;
 int taille_orig = 0;
 
+/* Choix de la strategie et strategies usuelles */
+typedef struct fb* (mem_fit_function_t) (struct fb *, int);
 mem_fit_function_t* fit_strategy = NULL;
 
 void* mem_init(int taille) {

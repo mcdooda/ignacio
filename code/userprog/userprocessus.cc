@@ -269,6 +269,8 @@ void exitProc(int pid) {
 		//DEBUG('t', "-----------------Finish du processus %s\n", processus[pid]->GetFilename());
 		if (pid > 0) {
 			currentThread->Finish();
+		} else {
+			interrupt->Halt();
 		}
 	}
 }
