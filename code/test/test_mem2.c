@@ -87,7 +87,7 @@ int main() {
 	assert(nb_free == 1 && nb_busy == 4);
 	printf("TEST OK\n\n");
 
-	printf("Test de mem_init :\n");
+	printf("Test de mem_reinit :\n");
 	my_mem_init(-1);
 	printf("Etat de la memoire :\n");
 	my_mem_show(afficher_zone);
