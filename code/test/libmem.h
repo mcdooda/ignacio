@@ -12,19 +12,19 @@ void* mem_init(int taille);
 
 void* mem_reinit();
 
-void* mem_alloc(int);
+void* mem_alloc(int size);
 
-void mem_free(void*);
+void mem_free(void *addr);
 
 void mem_fit(int strategy);
 
 /* renvoie l'espace utilisateur disponible pour une
    adresse allouée avec malloc ou realloc.
  */
-int mem_get_size(void *);
+int mem_get_size(void *addr);
 
 /* Affichage du contenu de l'allocateur */
-void mem_show(void (*print)(void *, int, int free));
+void mem_show(void (*print)(void *adresse, int taille, int free));
 
 #endif	/* LIBMEM_H */
 
