@@ -94,7 +94,11 @@ int main(int argc, char* argv[]) {
 			} else {
 				// programme dans le dossier courant
 				pid = ForkExec(args[0]);
-				WaitPid(pid);
+				if (pid == -1) {
+					printf("Unable to execute %s\n", args[0]);
+				} else {
+					WaitPid(pid);
+				}
 			}
 		}
 	}

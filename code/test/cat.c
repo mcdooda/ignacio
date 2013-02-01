@@ -9,14 +9,18 @@ int main(int argc, char* argv[]) {
 
 
 	fd = Open("file");
-	nbLu = Read(buf, sizeof (buf), fd);
-	while (nbLu > 0) {
-		for (i = 0; i < nbLu; i++) {
-			PutChar(buf[i]);
-		}
+	if (fd != -1) {
 		nbLu = Read(buf, sizeof (buf), fd);
+		while (nbLu > 0) {
+			for (i = 0; i < nbLu; i++) {
+				PutChar(buf[i]);
+			}
+			nbLu = Read(buf, sizeof (buf), fd);
+		}
+		Close(fd);
+	} else {
+		printf("'file' does not exist\n");
 	}
-	Close(fd);
 
 	return 0;
 }

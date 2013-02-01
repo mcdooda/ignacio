@@ -13,11 +13,11 @@ extern FileSystem* fileSystem;
 class UserFile {
 public:
 
-	UserFile(const char* fileName, int f) :
+	UserFile(const char* fileName, int f, OpenFile* of) :
 	fd(f),
 	numRef(1) {
 #ifdef FILESYS
-		openFile = fileSystem->OpenPath(fileName);
+		openFile = of;
 		absolutePath = fileSystem->GetAbsolutePath(fileName);
 #endif
 	}
@@ -80,21 +80,28 @@ int do_Open(int pid, const char* fileName) {
 	//	userFiles.Dump();
 	//	userFilesPath.Dump();
 	int fd;
-	UserFile* uf;
-	if (userFilesPath.TryGet(std::string(fileName), uf)) {
-		//Incrementer compteur
-		uf->AddRef();
-		fd = uf->GetFd();
-		//printf("Trouvé dans la tof\n");
+	
+	OpenFile* of = fileSystem->OpenPath(fileName);
+	if (of != NULL) {
+		UserFile* uf;
+		if (userFilesPath.TryGet(std::string(fileName), uf)) {
+			delete of;
+			//Incrementer compteur
+			uf->AddRef();
+			fd = uf->GetFd();
+			//printf("Trouvé dans la tof\n");
+		} else {
+			fd = nextFd;
+			nextFd++;
+			UserFile* uF = new UserFile(fileName, fd, of);
+			//std::cout << "path = <" << uF->GetAbsolutePath() << ">" << std::endl;
+			userFiles.Add(fd, uF);
+			userFilesPath.Add(uF->GetAbsolutePath(), uF);
+		}
+		AddFileProc(pid, fd);
 	} else {
-		fd = nextFd;
-		nextFd++;
-		UserFile* uF = new UserFile(fileName, fd);
-		//std::cout << "path = <" << uF->GetAbsolutePath() << ">" << std::endl;
-		userFiles.Add(fd, uF);
-		userFilesPath.Add(uF->GetAbsolutePath(), uF);
+		fd = -1;
 	}
-	AddFileProc(pid, fd);
 	userFiles.V();
 	return fd;
 }
